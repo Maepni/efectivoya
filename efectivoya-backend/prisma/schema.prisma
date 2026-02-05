@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// USUARIOS
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  password_hash         String
+  nombres               String
+  apellidos             String
+  dni                   String    @unique
+  numero_documento      String
+  whatsapp              String
+  saldo_actual          Decimal   @default(0) @db.Decimal(12, 2)
+  email_verificado      Boolean   @default(false)
+  is_active             Boolean   @default(true)
+  codigo_referido       String    @unique
+  referido_por          String?
+  bono_referido_usado   Boolean   @default(false)
+  push_token            String?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  bancos                UserBank[]
+  recargas              Recarga[]
+  retiros               Retiro[]
+  audit_logs_user       AuditLog[] @relation("UserLogs")
+  chats                 ChatSoporte[]
+  alertas               AlertaSeguridad[]
+  referidos_hechos      Referido[] @relation("Referrer")
+  referidos_recibidos   Referido[] @relation("Referred")
+  referente             User?     @relation("UserReferrals", fields: [referido_por], references: [id])
+  referidos             User[]    @relation("UserReferrals")
+
+  @@map("users")
+}
+
+// BANCOS DEL USUARIO
+model UserBank {
+  id              String   @id @default(uuid())
+  user_id         String
+  banco           BancoEnum
+  numero_cuenta   String
+  cci             String
+  alias           String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  retiros         Retiro[]
+
+  @@map("user_banks")
+}
+
+enum BancoEnum {
+  BCP
+  Interbank
+  Scotiabank
+  BBVA
+}
+
+// RECARGAS
+model Recarga {
+  id                    String    @id @default(uuid())
+  numero_operacion      String    @unique
+  user_id               String
+  banco_origen          BancoEnum
+  monto_depositado      Decimal   @db.Decimal(12, 2)
+  porcentaje_comision   Decimal   @db.Decimal(5, 2)
+  comision_calculada    Decimal   @db.Decimal(12, 2)
+  monto_neto            Decimal   @db.Decimal(12, 2)
+  boucher_url           String
+  estado                EstadoOperacion @default(pendiente)
+  admin_id              String?
+  motivo_rechazo        String?
+  comprobante_pdf_url   String?
+  created_at            DateTime  @default(now())
+  processed_at          DateTime?
+
+  user                  User      @relation(fields: [user_id], references: [id])
+  admin                 Admin?    @relation(fields: [admin_id], references: [id])
+
+  @@map("recargas")
+}
+
+// RETIROS
+model Retiro {
+  id                    String    @id @default(uuid())
+  numero_operacion      String    @unique
+  user_id               String
+  user_bank_id          String
+  monto                 Decimal   @db.Decimal(12, 2)
+  estado                EstadoOperacion @default(pendiente)
+  admin_id              String?
+  motivo_rechazo        String?
+  comprobante_pdf_url   String?
+  created_at            DateTime  @default(now())
+  processed_at          DateTime?
+
+  user                  User      @relation(fields: [user_id], references: [id])
+  banco                 UserBank  @relation(fields: [user_bank_id], references: [id])
+  admin                 Admin?    @relation(fields: [admin_id], references: [id])
+
+  @@map("retiros")
+}
+
+enum EstadoOperacion {
+  pendiente
+  aprobado
+  rechazado
+}
+
+// ADMINISTRADORES
+model Admin {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password_hash     String
+  nombre            String
+  rol               RolAdmin
+  is_active         Boolean   @default(true)
+  created_at        DateTime  @default(now())
+
+  recargas_procesadas   Recarga[]
+  retiros_procesados    Retiro[]
+  audit_logs            AuditLog[] @relation("AdminLogs")
+  chats                 ChatSoporte[]
+  alertas_revisadas     AlertaSeguridad[]
+  configuracion_updates Configuracion[]
+
+  @@map("admins")
+}
+
+enum RolAdmin {
+  super_admin
+  admin
+}
+
+// CONFIGURACIÓN GLOBAL
+model Configuracion {
+  id                        Int       @id @default(1)
+  porcentaje_comision       Decimal   @default(5.0) @db.Decimal(5, 2)
+  monto_minimo_recarga      Decimal   @default(1000) @db.Decimal(12, 2)
+  monto_maximo_recarga      Decimal   @default(100000) @db.Decimal(12, 2)
+  cuenta_recaudadora_numero String
+  cuenta_recaudadora_banco  String
+  cuenta_recaudadora_titular String
+  mantenimiento_activo      Boolean   @default(false)
+  mensaje_mantenimiento     String?
+  version_minima_android    String    @default("1.0.0")
+  version_minima_ios        String    @default("1.0.0")
+  forzar_actualizacion      Boolean   @default(false)
+  bono_referido             Decimal   @default(10.0) @db.Decimal(12, 2)
+  max_referidos_por_usuario Int       @default(10)
+  updated_at                DateTime  @updatedAt
+  updated_by                String?
+
+  admin                     Admin?    @relation(fields: [updated_by], references: [id])
+
+  @@map("configuracion")
+}
+
+// LOGS DE AUDITORÍA
+model AuditLog {
+  id          String   @id @default(uuid())
+  user_id     String?
+  admin_id    String?
+  accion      String
+  ip_address  String
+  user_agent  String
+  detalles    Json?
+  created_at  DateTime @default(now())
+
+  user        User?    @relation("UserLogs", fields: [user_id], references: [id])
+  admin       Admin?   @relation("AdminLogs", fields: [admin_id], references: [id])
+
+  @@index([user_id])
+  @@index([admin_id])
+  @@index([accion])
+  @@index([created_at])
+  @@map("audit_logs")
+}
+
+// REFERIDOS
+model Referido {
+  id                      String    @id @default(uuid())
+  referrer_id             String
+  referred_id             String
+  bono_otorgado           Boolean   @default(false)
+  fecha_primera_recarga   DateTime?
+  created_at              DateTime  @default(now())
+
+  referrer                User      @relation("Referrer", fields: [referrer_id], references: [id])
+  referred                User      @relation("Referred", fields: [referred_id], references: [id])
+
+  @@unique([referrer_id, referred_id])
+  @@map("referidos")
+}
+
+// ALERTAS DE SEGURIDAD
+model AlertaSeguridad {
+  id            String    @id @default(uuid())
+  user_id       String
+  tipo          TipoAlerta
+  descripcion   String
+  detalles      Json?
+  revisada      Boolean   @default(false)
+  admin_id      String?
+  created_at    DateTime  @default(now())
+  reviewed_at   DateTime?
+
+  user          User      @relation(fields: [user_id], references: [id])
+  admin         Admin?    @relation(fields: [admin_id], references: [id])
+
+  @@index([revisada])
+  @@index([created_at])
+  @@map("alertas_seguridad")
+}
+
+enum TipoAlerta {
+  multiples_recargas
+  retiro_inmediato
+  boucher_duplicado
+  patron_sospechoso
+}
+
+// CHAT SOPORTE
+model ChatSoporte {
+  id          String         @id @default(uuid())
+  user_id     String
+  admin_id    String?
+  estado      EstadoChat     @default(abierto)
+  created_at  DateTime       @default(now())
+  closed_at   DateTime?
+
+  user        User           @relation(fields: [user_id], references: [id])
+  admin       Admin?         @relation(fields: [admin_id], references: [id])
+  mensajes    ChatMensaje[]
+
+  @@map("chat_soporte")
+}
+
+enum EstadoChat {
+  abierto
+  cerrado
+}
+
+// MENSAJES DE CHAT
+model ChatMensaje {
+  id              String      @id @default(uuid())
+  chat_id         String
+  remitente_tipo  RemitenteChat
+  remitente_id    String
+  mensaje         String
+  leido           Boolean     @default(false)
+  created_at      DateTime    @default(now())
+
+  chat            ChatSoporte @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+
+  @@index([chat_id])
+  @@map("chat_mensajes")
+}
+
+enum RemitenteChat {
+  usuario
+  admin
+}
+
+// FAQ
+model FAQ {
+  id          String   @id @default(uuid())
+  pregunta    String
+  respuesta   String
+  orden       Int
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("faqs")
+}
+
+// TÉRMINOS Y CONDICIONES
+model TerminosCondiciones {
+  id          Int      @id @default(1)
+  contenido   String
+  version     String
+  updated_at  DateTime @updatedAt
+
+  @@map("terminos_condiciones")
+}
+
+// POLÍTICAS DE PRIVACIDAD
+model PoliticasPrivacidad {
+  id          Int      @id @default(1)
+  contenido   String
+  version     String
+  updated_at  DateTime @updatedAt
+
+  @@map("politicas_privacidad")
+}
+
+// VIDEOS INSTRUCTIVOS
+model VideoInstructivo {
+  id          String    @id @default(uuid())
+  banco       BancoEnum @unique
+  youtube_url String
+  titulo      String
+  updated_at  DateTime  @updatedAt
+
+  @@map("videos_instructivos")
+}
