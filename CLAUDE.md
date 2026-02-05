@@ -4,70 +4,40 @@
 
 ## Resumen
 
-**EfectivoYa** es una app fintech de billetera digital para Perú.
+**EfectivoYa** es una billetera digital fintech para Perú.
 
-**Funcionalidades:**
-- Recargar saldo via depósito bancario (con comisión %)
-- Retirar saldo a cuentas propias (sin comisión)
-- Todas las operaciones requieren aprobación de admin
-
-**Tagline:** "Tu Dinero Al Instante"
-
-**Plataformas:** Android, iOS, Web PWA
+| Aspecto | Detalle |
+|---------|---------|
+| Funcionalidad principal | Recargar saldo (con comisión %), retirar a cuentas propias (sin comisión) |
+| Flujo de operaciones | Todas requieren aprobación de admin |
+| Tagline | "Tu Dinero Al Instante" |
+| Plataformas | Android, iOS, Web PWA |
 
 ---
 
 ## Estado del Desarrollo
 
-### Fase 1: Backend Base ✅ COMPLETADA
-- Proyecto Node.js + Express + TypeScript configurado
-- Prisma + PostgreSQL con schema completo
-- Middlewares de seguridad (helmet, cors, auth)
-- Utilidades: JWT, logger, validators
-- Health check funcionando en puerto 3000
-
-### Fase 2: Autenticación ✅ COMPLETADA
-- Registro con validaciones robustas
-- Verificación de email con OTP (6 dígitos, 10 min expiración)
-- Login con JWT (access 15min + refresh 7d)
-- Recuperación de contraseña
-- Sistema de referidos (EFECTIVO-XXXXXX)
-- Logs de auditoría automáticos
-- Envío de emails HTML con Nodemailer
-- Rate limiting en rutas críticas
-
-### Próximas Fases
-- **Fase 3:** Gestión de bancos del usuario (CRUD)
-- **Fase 4:** Sistema de recargas
-- **Fase 5:** Sistema de retiros
-- **Fase 6:** Panel administrativo
-- **Fase 7:** Chat soporte + Push notifications
-- **Fase 8:** Frontend React Native + Expo
-- **Fase 9:** Testing + Deployment
+| Fase | Estado | Descripción |
+|------|--------|-------------|
+| 1. Backend Base | ✅ | Express + TypeScript + Prisma + PostgreSQL |
+| 2. Autenticación | ✅ | Registro, login JWT, OTP email, referidos |
+| 3. Bancos usuario | ⏳ | CRUD de cuentas bancarias |
+| 4. Recargas | ⏳ | Sistema de depósitos con boucher |
+| 5. Retiros | ⏳ | Sistema de retiros a cuentas |
+| 6. Panel admin | ⏳ | Gestión de operaciones |
+| 7. Chat + Push | ⏳ | Soporte y notificaciones |
+| 8. Frontend | ⏳ | React Native + Expo |
+| 9. Deploy | ⏳ | Testing + producción |
 
 ---
 
 ## Stack Tecnológico
 
-### Backend
-```
-Node.js v18+ | Express.js | TypeScript | Prisma | PostgreSQL
-JWT (access 15min + refresh 7d) | bcrypt (10 rounds)
-Multer + Cloudinary | pdfkit | Nodemailer | Socket.io | FCM
-```
+**Backend (activo):** Node.js v18+ · Express · TypeScript · Prisma · PostgreSQL · JWT · bcrypt · Nodemailer
 
-### Frontend (pendiente)
-```
-React Native | Expo SDK 52+ | expo-router
-Zustand | React Native Paper | expo-local-authentication
-expo-secure-store | socket.io-client | expo-notifications
-```
+**Frontend (pendiente):** React Native · Expo SDK 52+ · expo-router · Zustand · React Native Paper
 
-### Infraestructura
-```
-DigitalOcean VPS | Nginx | PM2 | Let's Encrypt
-PostgreSQL | Cloudinary | Vercel (web) | GitHub
-```
+**Infra (pendiente):** DigitalOcean · Nginx · PM2 · Cloudinary · Vercel
 
 ---
 
@@ -75,86 +45,116 @@ PostgreSQL | Cloudinary | Vercel (web) | GitHub
 
 ```
 efectivoya/
-├── CLAUDE.md                    # Este archivo
+├── CLAUDE.md
 ├── docs/
-│   ├── fase1.md                 # Instrucciones Fase 1
-│   ├── modelo-datos.md          # Schema Prisma detallado
-│   ├── flujos-negocio.md        # Flujos de usuario/admin
-│   ├── reglas-negocio.md        # Validaciones y límites
-│   └── guia-ui.md               # Colores, tipografía, estilos
+│   ├── fase1.md, fase2.md      # Instrucciones por fase
+│   ├── modelo-datos.md         # Schema Prisma
+│   ├── flujos-negocio.md       # Flujos de usuario/admin
+│   ├── reglas-negocio.md       # Validaciones y límites
+│   └── guia-ui.md              # Colores y estilos
 └── efectivoya-backend/
     ├── src/
-    │   ├── controllers/         # Lógica de negocio
-    │   ├── middleware/          # auth, validation, errorHandler
-    │   ├── routes/              # Definición de rutas
-    │   ├── services/            # email, pdf, cloudinary, etc.
-    │   ├── utils/               # jwt, logger, validators
-    │   ├── types/               # TypeScript types
-    │   ├── app.ts               # Config Express
-    │   └── server.ts            # Entry point
+    │   ├── controllers/        # auth.controller.ts
+    │   ├── middleware/         # auth, validation, errorHandler, rateLimit
+    │   ├── routes/             # auth.routes.ts
+    │   ├── services/           # otp, email, auditLog
+    │   ├── utils/              # jwt, logger, validators
+    │   ├── types/              # index.d.ts
+    │   ├── app.ts              # Config Express
+    │   └── server.ts           # Entry point
     └── prisma/
-        └── schema.prisma        # Modelo de datos completo
+        └── schema.prisma
 ```
+
+---
+
+## API Endpoints Implementados
+
+### Autenticación (`/api/auth`)
+
+| Método | Ruta | Descripción | Auth |
+|--------|------|-------------|------|
+| POST | `/register` | Registro + envía OTP | No |
+| POST | `/verify-email` | Verificar OTP | No |
+| POST | `/login` | Login → tokens JWT | No |
+| POST | `/refresh` | Renovar access token | No |
+| POST | `/resend-otp` | Reenviar OTP | No |
+| POST | `/forgot-password` | Solicitar reset | No |
+| POST | `/reset-password` | Cambiar contraseña | No |
+| POST | `/logout` | Cerrar sesión | ✅ |
+| GET | `/profile` | Obtener perfil | ✅ |
+
+**Rate limiting:** Login 5/15min · Registro 3/hora · Reset 3/hora
 
 ---
 
 ## Convenciones de Código
 
-### Nomenclatura
-- **Archivos:** `kebab-case.ts` (ej: `auth.controller.ts`)
-- **Clases:** `PascalCase` (ej: `JWTUtil`)
-- **Funciones/variables:** `camelCase` (ej: `validateRequest`)
-- **Constantes:** `UPPER_SNAKE_CASE` (ej: `JWT_SECRET`)
-- **Tablas BD:** `snake_case` plural (ej: `users`, `user_banks`)
+| Elemento | Formato | Ejemplo |
+|----------|---------|---------|
+| Archivos | kebab-case.ts | `auth.controller.ts` |
+| Clases | PascalCase | `JWTUtil` |
+| Funciones/vars | camelCase | `validateRequest` |
+| Constantes | UPPER_SNAKE | `JWT_SECRET` |
+| Tablas BD | snake_case plural | `users`, `user_banks` |
 
-### Respuestas API
+**Respuestas API:**
 ```typescript
-// Éxito
-{ success: true, data: {...}, message?: string }
-
-// Error
-{ success: false, message: string, errors?: [...] }
+{ success: true, data: {...}, message?: string }  // OK
+{ success: false, message: string, errors?: [...] }  // Error
 ```
 
-### Commits
-```
-feat: nueva funcionalidad
-fix: corrección de bug
-refactor: mejora de código
-docs: documentación
-```
+**Commits:** `feat:` `fix:` `refactor:` `docs:`
 
 ---
 
 ## Variables de Entorno
 
 ```env
-# Requeridas
+# Base de datos
 DATABASE_URL=postgresql://user:pass@localhost:5432/efectivoya_db
-JWT_SECRET=min-32-caracteres
+
+# JWT
+JWT_SECRET=min-32-caracteres-seguro
 JWT_REFRESH_SECRET=otro-min-32-caracteres
+
+# Server
 PORT=3000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:8081
 
-# Fases posteriores
+# Email (Gmail SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=tu-email@gmail.com
+SMTP_PASS=app-password-de-google
+SMTP_FROM_NAME=EfectivoYa
+SMTP_FROM_EMAIL=noreply@efectivoya.com
+
+# Cloudinary (fase posterior)
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
 ```
 
 ---
 
 ## TODOs Inmediatos
 
-- [ ] Configurar PostgreSQL local y DATABASE_URL
-- [ ] Ejecutar `npm run prisma:migrate` para crear tablas
-- [ ] Configurar variables SMTP en .env para envío de emails
-- [ ] Implementar Fase 3: Gestión de bancos del usuario (CRUD)
+- [ ] Configurar PostgreSQL local + DATABASE_URL
+- [ ] Ejecutar `npm run prisma:migrate`
+- [ ] Configurar SMTP en `.env` (Gmail app password)
+- [ ] **Fase 3:** CRUD de bancos del usuario
+
+---
+
+## Tests Pendientes
+
+- [ ] Endpoints de autenticación (registro, login, OTP)
+- [ ] Validadores (email, DNI, password, WhatsApp, CCI)
+- [ ] Middleware de auth
+- [ ] Rate limiting
+- [ ] Flujo completo de referidos
 
 ---
 
@@ -164,22 +164,12 @@ SMTP_PASS=
 
 ---
 
-## Tests Pendientes
-
-- [ ] Health check endpoint
-- [ ] Validadores (email, DNI, password, WhatsApp, CCI)
-- [ ] Middleware de autenticación
-- [ ] Generación de tokens JWT
-
----
-
 ## Comandos Útiles
 
 ```bash
-# Backend
 cd efectivoya-backend
-npm run dev              # Desarrollo
-npm run build            # Compilar
+npm run dev              # Desarrollo con hot reload
+npm run build            # Compilar TypeScript
 npm run prisma:generate  # Generar cliente Prisma
 npm run prisma:migrate   # Ejecutar migraciones
 npm run prisma:studio    # GUI de base de datos
@@ -187,11 +177,13 @@ npm run prisma:studio    # GUI de base de datos
 
 ---
 
-## Documentación Adicional
+## Documentación Detallada
 
-Para información detallada, consultar:
-- `docs/modelo-datos.md` - Schema completo de Prisma
-- `docs/flujos-negocio.md` - Flujos de recarga, retiro, referidos
-- `docs/reglas-negocio.md` - Validaciones y límites de negocio
-- `docs/guia-ui.md` - Paleta de colores y estilos
-- `docs/fase1.md` - Instrucciones de implementación Fase 1
+| Archivo | Contenido |
+|---------|-----------|
+| `docs/modelo-datos.md` | Schema Prisma completo |
+| `docs/flujos-negocio.md` | Flujos de recarga, retiro, referidos |
+| `docs/reglas-negocio.md` | Validaciones, límites, comisiones |
+| `docs/guia-ui.md` | Paleta de colores, tipografía |
+| `docs/fase1.md` | Instrucciones Fase 1 |
+| `docs/fase2.md` | Instrucciones Fase 2 |
