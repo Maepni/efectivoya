@@ -15,7 +15,6 @@ model User {
   nombres               String
   apellidos             String
   dni                   String    @unique
-  numero_documento      String
   whatsapp              String
   saldo_actual          Decimal   @default(0) @db.Decimal(12, 2)
   email_verificado      Boolean   @default(false)

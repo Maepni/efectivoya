@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { errorHandler } from './middleware/errorHandler.middleware';
 import authRoutes from './routes/auth.routes';
+import userBanksRoutes from './routes/userBanks.routes';
 
 const app: Application = express();
 
@@ -28,8 +29,7 @@ app.get('/health', (_req, res) => {
 
 // Rutas
 app.use('/api/auth', authRoutes);
-// app.use('/api/user-banks', authMiddleware, userBanksRoutes);
-// etc.
+app.use('/api/user-banks', userBanksRoutes);
 
 // Error handler (debe estar al final)
 app.use(errorHandler);

@@ -26,7 +26,7 @@ export class AuthController {
   // 1. REGISTRO
   static async register(req: Request, res: Response): Promise<Response> {
     try {
-      const { email, password, nombres, apellidos, dni, numero_documento, whatsapp, codigo_referido_usado } = req.body;
+      const { email, password, nombres, apellidos, dni, whatsapp, codigo_referido_usado } = req.body;
 
       // Validaciones
       if (!Validators.isValidEmail(email)) {
@@ -91,7 +91,6 @@ export class AuthController {
           nombres: Validators.sanitizeString(nombres),
           apellidos: Validators.sanitizeString(apellidos),
           dni,
-          numero_documento: Validators.sanitizeString(numero_documento),
           whatsapp,
           codigo_referido,
           referido_por: referrerUser?.id || null
@@ -463,7 +462,6 @@ export class AuthController {
           nombres: true,
           apellidos: true,
           dni: true,
-          numero_documento: true,
           whatsapp: true,
           saldo_actual: true,
           codigo_referido: true,

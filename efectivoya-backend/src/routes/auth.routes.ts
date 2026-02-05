@@ -17,7 +17,6 @@ router.post(
     body('nombres').isString().notEmpty().trim(),
     body('apellidos').isString().notEmpty().trim(),
     body('dni').isString().isLength({ min: 8, max: 8 }),
-    body('numero_documento').isString().notEmpty(),
     body('whatsapp').isString().isLength({ min: 9, max: 9 }),
     body('codigo_referido_usado').optional().isString()
   ],
