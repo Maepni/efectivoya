@@ -4,6 +4,9 @@ import helmet from 'helmet';
 import { errorHandler } from './middleware/errorHandler.middleware';
 import authRoutes from './routes/auth.routes';
 import userBanksRoutes from './routes/userBanks.routes';
+import recargasRoutes from './routes/recargas.routes';
+import adminAuthRoutes from './routes/adminAuth.routes';
+import adminRecargasRoutes from './routes/adminRecargas.routes';
 
 const app: Application = express();
 
@@ -30,6 +33,9 @@ app.get('/health', (_req, res) => {
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/user-banks', userBanksRoutes);
+app.use('/api/recargas', recargasRoutes);
+app.use('/api/admin', adminAuthRoutes);
+app.use('/api/admin/recargas', adminRecargasRoutes);
 
 // Error handler (debe estar al final)
 app.use(errorHandler);
