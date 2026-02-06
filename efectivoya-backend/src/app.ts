@@ -7,6 +7,9 @@ import userBanksRoutes from './routes/userBanks.routes';
 import recargasRoutes from './routes/recargas.routes';
 import adminAuthRoutes from './routes/adminAuth.routes';
 import adminRecargasRoutes from './routes/adminRecargas.routes';
+import retirosRoutes from './routes/retiros.routes';
+import adminRetirosRoutes from './routes/adminRetiros.routes';
+import userRoutes from './routes/user.routes';
 
 const app: Application = express();
 
@@ -36,6 +39,9 @@ app.use('/api/user-banks', userBanksRoutes);
 app.use('/api/recargas', recargasRoutes);
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/admin/recargas', adminRecargasRoutes);
+app.use('/api/retiros', retirosRoutes);
+app.use('/api/admin/retiros', adminRetirosRoutes);
+app.use('/api/user', userRoutes);
 
 // Error handler (debe estar al final)
 app.use(errorHandler);

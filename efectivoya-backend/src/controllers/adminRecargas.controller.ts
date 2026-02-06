@@ -7,7 +7,7 @@ import { Formatters } from '../utils/formatters.util';
 import { PDFService } from '../services/pdf.service';
 import { CloudinaryService } from '../services/cloudinary.service';
 import { ReferidosService } from '../services/referidos.service';
-import { AlertasService } from '../services/alertas.service';
+
 import { AuditLogService } from '../services/auditLog.service';
 
 const prisma = new PrismaClient();
@@ -286,9 +286,6 @@ export class AdminRecargasController {
 
       // Procesar bonos de referido (fuera de la transacción principal)
       const bonosResult = await ReferidosService.procesarBonoReferido(recarga.user_id, recarga.id);
-
-      // Verificar alertas de retiro inmediato
-      await AlertasService.verificarRetiroInmediato(recarga.user_id, recarga.id);
 
       // Audit log
       await AuditLogService.log('recarga_aprobada', req, undefined, adminId, {

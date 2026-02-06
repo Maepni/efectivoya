@@ -80,8 +80,16 @@ export class CloudinaryService {
 
       Logger.info(`Comprobante PDF subido: ${result.public_id}`);
 
+      // Generar URL firmada para evitar error "untrusted" en cuentas free
+      const signedUrl = cloudinary.url(result.public_id, {
+        resource_type: 'raw',
+        sign_url: true,
+        secure: true,
+        type: 'upload'
+      });
+
       return {
-        url: result.secure_url,
+        url: signedUrl,
         publicId: result.public_id
       };
     } catch (error) {

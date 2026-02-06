@@ -1,6 +1,23 @@
 import PDFDocument from 'pdfkit';
 import { Decimal } from '@prisma/client/runtime/library';
 import { Formatters } from '../utils/formatters.util';
+import { Logger } from '../utils/logger.util';
+
+export interface RetiroPDFData {
+  numero_operacion: string;
+  fecha: Date;
+  nombres: string;
+  apellidos: string;
+  dni: string;
+  email: string;
+  banco_destino: string;
+  alias: string | null;
+  numero_cuenta: string;
+  cci: string;
+  monto: number;
+  saldo_anterior: number;
+  nuevo_saldo: number;
+}
 
 export interface RecargaComprobanteData {
   numeroOperacion: string;
@@ -206,6 +223,185 @@ export class PDFService {
         doc.end();
       } catch (error) {
         reject(error);
+      }
+    });
+  }
+
+  /**
+   * Generar comprobante de retiro en PDF
+   */
+  static async generateRetiroComprobante(data: RetiroPDFData): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      try {
+        const doc = new PDFDocument({ size: 'A4', margin: 50 });
+        const buffers: Buffer[] = [];
+
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+          const pdfBuffer = Buffer.concat(buffers);
+          resolve(pdfBuffer);
+        });
+
+        // Header con logo
+        doc
+          .fontSize(28)
+          .fillColor('#1f1f1f')
+          .text('Efectivo', 50, 50, { continued: true })
+          .fillColor('#e83733')
+          .text('Ya');
+
+        doc
+          .fontSize(10)
+          .fillColor('#acacae')
+          .text('Tu Dinero Al Instante', 50, 80);
+
+        // Línea separadora
+        doc
+          .moveTo(50, 110)
+          .lineTo(550, 110)
+          .strokeColor('#dc993c')
+          .lineWidth(2)
+          .stroke();
+
+        // Título
+        doc
+          .fontSize(20)
+          .fillColor('#1f1f1f')
+          .text('COMPROBANTE DE RETIRO', 50, 130, { align: 'center' });
+
+        // Número de operación
+        doc
+          .fontSize(12)
+          .fillColor('#acacae')
+          .text(`N° de Operación: ${data.numero_operacion}`, 50, 170, { align: 'center' });
+
+        // Fecha
+        doc
+          .fontSize(10)
+          .text(`Fecha: ${Formatters.formatDate(data.fecha)}`, 50, 190, { align: 'center' });
+
+        // Estado
+        doc
+          .fontSize(14)
+          .fillColor('#10B981')
+          .font('Helvetica-Bold')
+          .text('APROBADO', 50, 210, { align: 'center' })
+          .font('Helvetica');
+
+        // Información del cliente
+        doc
+          .fontSize(12)
+          .fillColor('#1f1f1f')
+          .font('Helvetica-Bold')
+          .text('INFORMACIÓN DEL CLIENTE', 50, 250);
+
+        doc
+          .fontSize(10)
+          .font('Helvetica')
+          .fillColor('#1f1f1f');
+
+        const clienteY = 275;
+        doc.text(`Cliente:`, 50, clienteY);
+        doc.text(`${data.nombres} ${data.apellidos}`, 150, clienteY);
+
+        doc.text(`DNI:`, 50, clienteY + 20);
+        doc.text(data.dni, 150, clienteY + 20);
+
+        doc.text(`Email:`, 50, clienteY + 40);
+        doc.text(data.email, 150, clienteY + 40);
+
+        // Línea separadora
+        doc
+          .moveTo(50, clienteY + 70)
+          .lineTo(550, clienteY + 70)
+          .strokeColor('#acacae')
+          .lineWidth(1)
+          .stroke();
+
+        // Detalles del retiro
+        doc
+          .fontSize(12)
+          .fillColor('#1f1f1f')
+          .font('Helvetica-Bold')
+          .text('DETALLES DEL RETIRO', 50, clienteY + 90);
+
+        doc
+          .fontSize(10)
+          .font('Helvetica')
+          .fillColor('#1f1f1f');
+
+        const detallesY = clienteY + 115;
+        doc.text(`Banco destino:`, 50, detallesY);
+        doc.text(data.banco_destino, 200, detallesY);
+
+        if (data.alias) {
+          doc.text(`Alias:`, 50, detallesY + 25);
+          doc.text(data.alias, 200, detallesY + 25);
+        }
+
+        const offsetAlias = data.alias ? 25 : 0;
+
+        doc.text(`Número de cuenta:`, 50, detallesY + 25 + offsetAlias);
+        doc.text(data.numero_cuenta, 200, detallesY + 25 + offsetAlias);
+
+        doc.text(`CCI:`, 50, detallesY + 50 + offsetAlias);
+        doc.text(data.cci, 200, detallesY + 50 + offsetAlias);
+
+        // Monto retirado (destacado)
+        doc
+          .fontSize(12)
+          .font('Helvetica-Bold')
+          .fillColor('#1f1f1f');
+
+        doc.text(`Monto retirado:`, 50, detallesY + 80 + offsetAlias);
+        doc.fillColor('#e83733').text(Formatters.formatCurrency(data.monto), 200, detallesY + 80 + offsetAlias);
+
+        // Saldos
+        doc
+          .fontSize(10)
+          .font('Helvetica')
+          .fillColor('#1f1f1f');
+
+        doc.text(`Saldo anterior:`, 50, detallesY + 105 + offsetAlias);
+        doc.text(Formatters.formatCurrency(data.saldo_anterior), 200, detallesY + 105 + offsetAlias);
+
+        doc.text(`Nuevo saldo:`, 50, detallesY + 130 + offsetAlias);
+        doc.fillColor('#dc993c').text(Formatters.formatCurrency(data.nuevo_saldo), 200, detallesY + 130 + offsetAlias);
+
+        // Línea separadora
+        doc
+          .moveTo(50, detallesY + 160 + offsetAlias)
+          .lineTo(550, detallesY + 160 + offsetAlias)
+          .strokeColor('#acacae')
+          .lineWidth(1)
+          .stroke();
+
+        // Nota informativa
+        doc
+          .fontSize(9)
+          .fillColor('#acacae')
+          .text(
+            'Este comprobante es válido para fines informativos. El dinero será transferido a la cuenta indicada.',
+            50,
+            detallesY + 180 + offsetAlias,
+            { align: 'center', width: 500 }
+          );
+
+        // Footer
+        doc
+          .fontSize(8)
+          .fillColor('#acacae')
+          .text(
+            '© 2026 EfectivoYa. Todos los derechos reservados.',
+            50,
+            750,
+            { align: 'center' }
+          );
+
+        doc.end();
+      } catch (error) {
+        Logger.error('Error al generar PDF de retiro:', error);
+        reject(new Error('Error al generar comprobante PDF'));
       }
     });
   }

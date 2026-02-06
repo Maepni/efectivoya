@@ -7,6 +7,7 @@ import { Formatters } from '../utils/formatters.util';
 import { CloudinaryService } from '../services/cloudinary.service';
 import { AlertasService } from '../services/alertas.service';
 import { AuditLogService } from '../services/auditLog.service';
+import { PDFService } from '../services/pdf.service';
 
 const prisma = new PrismaClient();
 
@@ -334,9 +335,9 @@ export class RecargasController {
 
   /**
    * GET /api/recargas/:id/comprobante
-   * Obtiene la URL del comprobante PDF de una recarga aprobada
+   * Genera y descarga el comprobante PDF de una recarga aprobada
    */
-  static async getComprobante(req: AuthRequest, res: Response): Promise<Response> {
+  static async getComprobante(req: AuthRequest, res: Response): Promise<Response | void> {
     try {
       const userId = req.userId!;
       const { id } = req.params;
@@ -346,11 +347,16 @@ export class RecargasController {
           id,
           user_id: userId
         },
-        select: {
-          id: true,
-          numero_operacion: true,
-          estado: true,
-          comprobante_pdf_url: true
+        include: {
+          user: {
+            select: {
+              nombres: true,
+              apellidos: true,
+              dni: true,
+              email: true,
+              saldo_actual: true
+            }
+          }
         }
       });
 
@@ -368,20 +374,33 @@ export class RecargasController {
         });
       }
 
-      if (!recarga.comprobante_pdf_url) {
-        return res.status(404).json({
-          success: false,
-          message: 'Comprobante no disponible'
-        });
-      }
+      // Generar PDF on-the-fly
+      const montoNeto = recarga.monto_neto.toNumber();
+      const saldoNuevo = recarga.user.saldo_actual.toNumber();
+      const saldoAnterior = saldoNuevo - montoNeto;
 
-      return res.json({
-        success: true,
-        data: {
-          numeroOperacion: recarga.numero_operacion,
-          comprobanteUrl: recarga.comprobante_pdf_url
-        }
+      const pdfBuffer = await PDFService.generateRecargaComprobante({
+        numeroOperacion: recarga.numero_operacion,
+        fecha: recarga.processed_at || recarga.created_at,
+        usuario: {
+          nombres: recarga.user.nombres,
+          apellidos: recarga.user.apellidos,
+          dni: recarga.user.dni,
+          email: recarga.user.email
+        },
+        bancoOrigen: recarga.banco_origen,
+        montoDepositado: recarga.monto_depositado,
+        porcentajeComision: recarga.porcentaje_comision,
+        comisionCalculada: recarga.comision_calculada,
+        montoNeto: recarga.monto_neto,
+        saldoAnterior: saldoAnterior,
+        saldoNuevo: recarga.user.saldo_actual
       });
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="comprobante-${recarga.numero_operacion}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      res.send(pdfBuffer);
     } catch (error) {
       Logger.error('Error en getComprobante:', error);
       return res.status(500).json({

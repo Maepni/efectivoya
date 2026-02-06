@@ -139,57 +139,70 @@ export class AlertasService {
   }
 
   /**
-   * Verifica patrones sospechosos de retiro inmediato después de recarga
-   * @param userId - ID del usuario
-   * @param recargaId - ID de la recarga aprobada
-   * @returns Información de la alerta creada (si aplica)
+   * Verificar retiro inmediato después de recarga
+   * Si retira más del 80% del saldo dentro de 24h de haber recargado, crea alerta
    */
-  static async verificarRetiroInmediato(userId: string, recargaId: string): Promise<AlertaCreada> {
+  static async verificarRetiroInmediato(userId: string, montoRetiro: number): Promise<void> {
     try {
-      const diezMinutosAtras = new Date();
-      diezMinutosAtras.setMinutes(diezMinutosAtras.getMinutes() - 10);
+      const hace24Horas = new Date();
+      hace24Horas.setHours(hace24Horas.getHours() - 24);
 
-      // Buscar retiros pendientes creados poco después de la recarga
-      const retirosInmediatos = await prisma.retiro.count({
+      // Buscar recargas aprobadas en últimas 24 horas
+      const recargasRecientes = await prisma.recarga.findMany({
         where: {
           user_id: userId,
-          created_at: { gte: diezMinutosAtras },
-          estado: 'pendiente'
+          estado: 'aprobado',
+          processed_at: {
+            gte: hace24Horas
+          }
         }
       });
 
-      if (retirosInmediatos > 0) {
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { email: true }
-        });
+      if (recargasRecientes.length === 0) {
+        return;
+      }
 
-        const alerta = await prisma.alertaSeguridad.create({
+      // Obtener saldo actual del usuario
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { saldo_actual: true }
+      });
+
+      if (!user) return;
+
+      const saldoActual = user.saldo_actual.toNumber();
+      const porcentajeRetiro = (montoRetiro / (saldoActual + montoRetiro)) * 100;
+
+      // Si retira más del 80% del saldo dentro de 24h de haber recargado
+      if (porcentajeRetiro > 80) {
+        const montoRecargasRecientes = recargasRecientes.reduce(
+          (sum, r) => sum + r.monto_neto.toNumber(),
+          0
+        );
+
+        await prisma.alertaSeguridad.create({
           data: {
             user_id: userId,
             tipo: 'retiro_inmediato',
-            descripcion: `Usuario ${user?.email} solicitó retiro inmediatamente después de recargar`,
+            descripcion: `Usuario retiró ${porcentajeRetiro.toFixed(1)}% del saldo dentro de 24h de recargar`,
             detalles: {
-              recarga_id: recargaId,
-              cantidad_retiros_pendientes: retirosInmediatos,
-              periodo: '10 minutos'
+              monto_retiro: montoRetiro,
+              porcentaje_retiro: porcentajeRetiro,
+              recargas_recientes: recargasRecientes.length,
+              monto_recargado: montoRecargasRecientes,
+              horas_desde_ultima_recarga: Math.round(
+                (new Date().getTime() - recargasRecientes[0].processed_at!.getTime()) / (1000 * 60 * 60)
+              )
             }
           }
         });
 
-        Logger.warn(`Alerta de seguridad creada: retiro inmediato para usuario ${userId}`);
-
-        return {
-          created: true,
-          alertaId: alerta.id,
-          tipo: 'retiro_inmediato'
-        };
+        Logger.warn(
+          `Alerta: Usuario ${userId} retira ${porcentajeRetiro.toFixed(1)}% dentro de 24h de recargar`
+        );
       }
-
-      return { created: false };
     } catch (error) {
-      Logger.error('Error al verificar retiro inmediato:', error);
-      return { created: false };
+      Logger.error('Error en verificarRetiroInmediato:', error);
     }
   }
 }
