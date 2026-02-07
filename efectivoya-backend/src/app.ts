@@ -5,11 +5,18 @@ import { errorHandler } from './middleware/errorHandler.middleware';
 import authRoutes from './routes/auth.routes';
 import userBanksRoutes from './routes/userBanks.routes';
 import recargasRoutes from './routes/recargas.routes';
-import adminAuthRoutes from './routes/adminAuth.routes';
-import adminRecargasRoutes from './routes/adminRecargas.routes';
 import retirosRoutes from './routes/retiros.routes';
-import adminRetirosRoutes from './routes/adminRetiros.routes';
 import userRoutes from './routes/user.routes';
+import adminAuthRoutes from './routes/adminAuth.routes';
+import adminDashboardRoutes from './routes/adminDashboard.routes';
+import adminUsersRoutes from './routes/adminUsers.routes';
+import adminConfigRoutes from './routes/adminConfig.routes';
+import adminAlertasRoutes from './routes/adminAlertas.routes';
+import adminLogsRoutes from './routes/adminLogs.routes';
+import adminContenidoRoutes from './routes/adminContenido.routes';
+import adminAdminsRoutes from './routes/adminAdmins.routes';
+import adminRecargasRoutes from './routes/adminRecargas.routes';
+import adminRetirosRoutes from './routes/adminRetiros.routes';
 
 const app: Application = express();
 
@@ -33,15 +40,24 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Rutas
+// Rutas de Usuarios
 app.use('/api/auth', authRoutes);
 app.use('/api/user-banks', userBanksRoutes);
 app.use('/api/recargas', recargasRoutes);
-app.use('/api/admin', adminAuthRoutes);
-app.use('/api/admin/recargas', adminRecargasRoutes);
 app.use('/api/retiros', retirosRoutes);
-app.use('/api/admin/retiros', adminRetirosRoutes);
 app.use('/api/user', userRoutes);
+
+// Rutas de Admin
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes);
+app.use('/api/admin/users', adminUsersRoutes);
+app.use('/api/admin/config', adminConfigRoutes);
+app.use('/api/admin/alertas', adminAlertasRoutes);
+app.use('/api/admin/logs', adminLogsRoutes);
+app.use('/api/admin/contenido', adminContenidoRoutes);
+app.use('/api/admin/admins', adminAdminsRoutes);
+app.use('/api/admin/recargas', adminRecargasRoutes);
+app.use('/api/admin/retiros', adminRetirosRoutes);
 
 // Error handler (debe estar al final)
 app.use(errorHandler);
