@@ -6,6 +6,7 @@ import { Formatters } from '../utils/formatters.util';
 import { AuditLogService } from '../services/auditLog.service';
 import { AlertasService } from '../services/alertas.service';
 import { PDFService } from '../services/pdf.service';
+import { FCMService } from '../services/fcm.service';
 
 const prisma = new PrismaClient();
 
@@ -97,6 +98,11 @@ export class RetirosController {
 
       // Verificar patron de retiro inmediato
       await AlertasService.verificarRetiroInmediato(userId, montoNumber);
+
+      // Notificar a admins sobre nuevo retiro pendiente
+      FCMService.notificarAdminsPendiente('retiro', numero_operacion).catch(err =>
+        Logger.error('Error notificando admins:', err)
+      );
 
       Logger.info(`Retiro solicitado: ${numero_operacion} - Usuario: ${userId} - Monto: ${montoNumber}`);
 

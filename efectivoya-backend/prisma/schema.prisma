@@ -123,6 +123,7 @@ model Admin {
   nombre            String
   rol               RolAdmin
   is_active         Boolean   @default(true)
+  push_token        String?
   created_at        DateTime  @default(now())
 
   recargas_procesadas   Recarga[]
@@ -235,6 +236,7 @@ model ChatSoporte {
   admin_id    String?
   estado      EstadoChat     @default(abierto)
   created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
   closed_at   DateTime?
 
   user        User           @relation(fields: [user_id], references: [id])

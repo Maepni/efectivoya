@@ -9,6 +9,8 @@ import { CloudinaryService } from '../services/cloudinary.service';
 import { ReferidosService } from '../services/referidos.service';
 
 import { AuditLogService } from '../services/auditLog.service';
+import { FCMService } from '../services/fcm.service';
+import { EmailService } from '../services/email.service';
 
 const prisma = new PrismaClient();
 
@@ -216,7 +218,8 @@ export class AdminRecargasController {
               nombres: true,
               apellidos: true,
               dni: true,
-              saldo_actual: true
+              saldo_actual: true,
+              push_token: true
             }
           }
         }
@@ -300,6 +303,35 @@ export class AdminRecargasController {
 
       Logger.info(`Recarga aprobada: ${recarga.numero_operacion} por admin ${adminId}`);
 
+      // Enviar email con comprobante
+      try {
+        await EmailService.sendRecargaAprobadaEmail(
+          recarga.user.email,
+          recarga.user.nombres,
+          recarga.numero_operacion,
+          Number(recarga.monto_depositado),
+          Number(recarga.comision_calculada),
+          montoNeto,
+          saldoNuevo,
+          pdfBuffer
+        );
+      } catch (emailError) {
+        Logger.error('Error al enviar email de recarga aprobada:', emailError);
+      }
+
+      // Enviar notificación push
+      if (recarga.user.push_token) {
+        try {
+          await FCMService.notificarRecargaAprobada(
+            recarga.user.push_token,
+            recarga.numero_operacion,
+            montoNeto
+          );
+        } catch (pushError) {
+          Logger.error('Error al enviar push notification:', pushError);
+        }
+      }
+
       return res.json({
         success: true,
         message: 'Recarga aprobada correctamente',
@@ -346,7 +378,7 @@ export class AdminRecargasController {
         where: { id },
         include: {
           user: {
-            select: { email: true }
+            select: { email: true, nombres: true, push_token: true }
           }
         }
       });
@@ -385,6 +417,32 @@ export class AdminRecargasController {
       });
 
       Logger.info(`Recarga rechazada: ${recarga.numero_operacion} por admin ${adminId}`);
+
+      // Enviar email de rechazo
+      try {
+        await EmailService.sendRecargaRechazadaEmail(
+          recarga.user.email,
+          recarga.user.nombres,
+          recarga.numero_operacion,
+          Number(recarga.monto_depositado),
+          motivo.trim()
+        );
+      } catch (emailError) {
+        Logger.error('Error al enviar email de recarga rechazada:', emailError);
+      }
+
+      // Enviar notificación push
+      if (recarga.user.push_token) {
+        try {
+          await FCMService.notificarRecargaRechazada(
+            recarga.user.push_token,
+            recarga.numero_operacion,
+            motivo.trim()
+          );
+        } catch (pushError) {
+          Logger.error('Error al enviar push notification:', pushError);
+        }
+      }
 
       return res.json({
         success: true,

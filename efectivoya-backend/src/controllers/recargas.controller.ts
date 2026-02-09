@@ -8,6 +8,7 @@ import { CloudinaryService } from '../services/cloudinary.service';
 import { AlertasService } from '../services/alertas.service';
 import { AuditLogService } from '../services/auditLog.service';
 import { PDFService } from '../services/pdf.service';
+import { FCMService } from '../services/fcm.service';
 
 const prisma = new PrismaClient();
 
@@ -219,6 +220,11 @@ export class RecargasController {
 
       // Verificar alertas de seguridad
       await AlertasService.verificarMultiplesRecargas(userId);
+
+      // Notificar a admins sobre nueva recarga pendiente
+      FCMService.notificarAdminsPendiente('recarga', numeroOperacion).catch(err =>
+        Logger.error('Error notificando admins:', err)
+      );
 
       // Audit log
       await AuditLogService.log('recarga_solicitada', req, userId, undefined, {

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EfectivoYa - Test Socket.io Chat</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+    h1 { color: #38bdf8; margin-bottom: 4px; font-size: 1.5rem; }
+    .subtitle { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .section h2 { color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+    label { display: block; color: #94a3b8; font-size: 0.8rem; margin-bottom: 4px; }
+    input, textarea { width: 100%; padding: 8px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; font-family: monospace; font-size: 0.85rem; }
+    input:focus, textarea:focus { outline: none; border-color: #38bdf8; }
+    textarea { resize: vertical; min-height: 60px; }
+
+    .row { display: flex; gap: 10px; align-items: flex-end; }
+    .row > * { flex: 1; }
+    .row > .btn-col { flex: 0 0 auto; }
+
+    button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: opacity 0.2s; }
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-connect { background: #22c55e; color: #fff; }
+    .btn-disconnect { background: #ef4444; color: #fff; }
+    .btn-send { background: #38bdf8; color: #0f172a; }
+    .btn-history { background: #8b5cf6; color: #fff; }
+    .btn-read { background: #f59e0b; color: #0f172a; }
+
+    .status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; padding: 4px 10px; border-radius: 999px; }
+    .status.offline { background: #7f1d1d; color: #fca5a5; }
+    .status.online { background: #14532d; color: #86efac; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .offline .dot { background: #ef4444; }
+    .online .dot { background: #22c55e; }
+
+    #log { background: #020617; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; line-height: 1.6; }
+    .log-entry { padding: 2px 0; border-bottom: 1px solid #0f172a; }
+    .log-time { color: #475569; }
+    .log-event { font-weight: 600; }
+    .log-connect { color: #22c55e; }
+    .log-disconnect { color: #ef4444; }
+    .log-send { color: #38bdf8; }
+    .log-receive { color: #a78bfa; }
+    .log-error { color: #f87171; }
+    .log-info { color: #94a3b8; }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .note { color: #64748b; font-size: 0.75rem; margin-top: 8px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EfectivoYa - Test Socket.io</h1>
+    <p class="subtitle">Herramienta de prueba para el chat en tiempo real (Fase 7)</p>
+
+    <!-- Conexion -->
+    <div class="section">
+      <h2>Conexion</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span id="status" class="status offline"><span class="dot"></span> Desconectado</span>
+        <span id="userInfo" style="color:#64748b;font-size:0.8rem;"></span>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label for="serverUrl">URL del servidor</label>
+        <input type="text" id="serverUrl" value="http://localhost:3000" />
+      </div>
+      <div style="margin-bottom:10px;">
+        <label for="token">Access Token (JWT)</label>
+        <textarea id="token" placeholder="Pega aqui el access_token del login..."></textarea>
+      </div>
+      <div class="actions">
+        <button id="btnConnect" class="btn-connect" onclick="conectar()">Conectar</button>
+        <button id="btnDisconnect" class="btn-disconnect" onclick="desconectar()" disabled>Desconectar</button>
+      </div>
+      <p class="note">Obtener token: POST /api/auth/login con {"email","password"} → response.data.access_token</p>
+    </div>
+
+    <!-- Chat -->
+    <div class="section">
+      <h2>Chat</h2>
+      <div class="row" style="margin-bottom:10px;">
+        <div>
+          <label for="chatId">Chat ID (vacio = crear nuevo, solo usuarios)</label>
+          <input type="text" id="chatId" placeholder="UUID del chat..." />
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:10px;">
+        <div>
+          <label for="mensaje">Mensaje</label>
+          <input type="text" id="mensaje" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')enviarMensaje()" />
+        </div>
+        <div class="btn-col">
+          <button id="btnSend" class="btn-send" onclick="enviarMensaje()" disabled>Enviar</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnHistory" class="btn-history" onclick="obtenerHistorial()" disabled>Historial</button>
+        <button id="btnMarkRead" class="btn-read" onclick="marcarLeido()" disabled>Marcar leido</button>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="section">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 style="margin:0;">Eventos</h2>
+        <button style="background:#334155;color:#94a3b8;font-size:0.75rem;padding:4px 10px;" onclick="limpiarLog()">Limpiar</button>
+      </div>
+      <div id="log" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    let socket = null;
+
+    function log(type, event, data) {
+      const el = document.getElementById('log');
+      const time = new Date().toLocaleTimeString('es-PE');
+      const dataStr = data !== undefined ? ' ' + (typeof data === 'string' ? data : JSON.stringify(data, null, 2)) : '';
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-event log-${type}">${event}</span><pre style="display:inline;color:#cbd5e1;white-space:pre-wrap;">${escapeHtml(dataStr)}</pre>`;
+      el.appendChild(entry);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function limpiarLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    function setStatus(online) {
+      const el = document.getElementById('status');
+      el.className = 'status ' + (online ? 'online' : 'offline');
+      el.innerHTML = `<span class="dot"></span> ${online ? 'Conectado' : 'Desconectado'}`;
+
+      document.getElementById('btnConnect').disabled = online;
+      document.getElementById('btnDisconnect').disabled = !online;
+      document.getElementById('btnSend').disabled = !online;
+      document.getElementById('btnHistory').disabled = !online;
+      document.getElementById('btnMarkRead').disabled = !online;
+    }
+
+    function conectar() {
+      const url = document.getElementById('serverUrl').value.trim();
+      const token = document.getElementById('token').value.trim();
+
+      if (!token) {
+        log('error', 'ERROR', 'Token requerido');
+        return;
+      }
+
+      log('info', 'INFO', `Conectando a ${url}...`);
+
+      socket = io(url, {
+        auth: { token },
+        transports: ['websocket', 'polling']
+      });
+
+      socket.on('connect', () => {
+        setStatus(true);
+        log('connect', 'CONNECT', `Socket ID: ${socket.id}`);
+      });
+
+      socket.on('disconnect', (reason) => {
+        setStatus(false);
+        log('disconnect', 'DISCONNECT', reason);
+      });
+
+      socket.on('connect_error', (err) => {
+        setStatus(false);
+        log('error', 'CONNECT_ERROR', err.message);
+      });
+
+      // Eventos de chat
+      socket.on('message_sent', (data) => {
+        log('send', 'MESSAGE_SENT', data);
+        if (data.chat_id) {
+          document.getElementById('chatId').value = data.chat_id;
+        }
+      });
+
+      socket.on('new_message', (data) => {
+        log('receive', 'NEW_MESSAGE', data);
+        if (data.chat_id) {
+          document.getElementById('chatId').value = data.chat_id;
+        }
+      });
+
+      socket.on('messages_marked_read', (data) => {
+        log('info', 'MARKED_READ', data);
+      });
+
+      socket.on('error', (data) => {
+        log('error', 'SERVER_ERROR', data);
+      });
+    }
+
+    function desconectar() {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+      setStatus(false);
+      document.getElementById('userInfo').textContent = '';
+    }
+
+    function enviarMensaje() {
+      if (!socket || !socket.connected) {
+        log('error', 'ERROR', 'No conectado');
+        return;
+      }
+
+      const chatId = document.getElementById('chatId').value.trim();
+      const mensaje = document.getElementById('mensaje').value.trim();
+
+      if (!mensaje) {
+        log('error', 'ERROR', 'Mensaje vacio');
+        return;
+      }
+
+      const payload = { mensaje };
+      if (chatId) payload.chat_id = chatId;
+
+      log('info', 'EMIT', { event: 'send_message', ...payload });
+      socket.emit('send_message', payload);
+
+      document.getElementById('mensaje').value = '';
+    }
+
+    function obtenerHistorial() {
+      if (!socket || !socket.connected) {
+        log('error', 'ERROR', 'No conectado');
+        return;
+      }
+
+      const chatId = document.getElementById('chatId').value.trim();
+      if (!chatId) {
+        log('error', 'ERROR', 'Chat ID requerido para historial');
+        return;
+      }
+
+      log('info', 'EMIT', { event: 'get_chat_history', chat_id: chatId });
+      socket.emit('get_chat_history', chatId, (response) => {
+        if (response.error) {
+          log('error', 'HISTORY_ERROR', response.error);
+        } else {
+          log('receive', 'HISTORY', response);
+        }
+      });
+    }
+
+    function marcarLeido() {
+      if (!socket || !socket.connected) {
+        log('error', 'ERROR', 'No conectado');
+        return;
+      }
+
+      const chatId = document.getElementById('chatId').value.trim();
+      if (!chatId) {
+        log('error', 'ERROR', 'Chat ID requerido');
+        return;
+      }
+
+      log('info', 'EMIT', { event: 'mark_as_read', chat_id: chatId });
+      socket.emit('mark_as_read', chatId);
+    }
+  </script>
+</body>
+</html>

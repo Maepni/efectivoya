@@ -252,6 +252,105 @@ export class AdminUsersController {
   }
 
   /**
+   * Eliminar usuario y todos sus registros dependientes
+   * DELETE /api/admin/users/:id
+   */
+  static async deleteUser(req: AdminRequest, res: Response): Promise<Response> {
+    try {
+      const adminId = req.adminId;
+      const { id } = req.params;
+
+      if (!adminId) {
+        return res.status(401).json({ success: false, message: 'No autorizado' });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: { id: true, email: true, nombres: true, apellidos: true, dni: true }
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Usuario no encontrado'
+        });
+      }
+
+      // Registrar en audit log ANTES de eliminar (con datos del usuario)
+      await AuditLogService.log(
+        'usuario_eliminado',
+        req,
+        undefined,
+        adminId,
+        {
+          usuario_eliminado: {
+            id: user.id,
+            email: user.email,
+            nombres: user.nombres,
+            apellidos: user.apellidos,
+            dni: user.dni
+          }
+        }
+      );
+
+      // Eliminar todo en transacción atómica
+      const resultado = await prisma.$transaction(async (tx) => {
+        // 1. ChatSoporte (ChatMensaje se borra por cascade)
+        const chats = await tx.chatSoporte.deleteMany({ where: { user_id: id } });
+
+        // 2. Referidos (ambas direcciones)
+        const referidos = await tx.referido.deleteMany({
+          where: { OR: [{ referrer_id: id }, { referred_id: id }] }
+        });
+
+        // 3. Alertas de seguridad
+        const alertas = await tx.alertaSeguridad.deleteMany({ where: { user_id: id } });
+
+        // 4. Audit logs del usuario
+        const logs = await tx.auditLog.deleteMany({ where: { user_id: id } });
+
+        // 5. Retiros (antes de UserBank, ya que Retiro tiene FK a UserBank)
+        const retiros = await tx.retiro.deleteMany({ where: { user_id: id } });
+
+        // 6. Recargas
+        const recargas = await tx.recarga.deleteMany({ where: { user_id: id } });
+
+        // 7. Limpiar self-referencia: usuarios que fueron referidos por este
+        await tx.user.updateMany({
+          where: { referido_por: id },
+          data: { referido_por: null }
+        });
+
+        // 8. Eliminar usuario (UserBank se borra por cascade)
+        await tx.user.delete({ where: { id } });
+
+        return {
+          chats: chats.count,
+          referidos: referidos.count,
+          alertas: alertas.count,
+          logs: logs.count,
+          retiros: retiros.count,
+          recargas: recargas.count,
+        };
+      });
+
+      Logger.info(`Usuario eliminado: ${user.email} (${id}) por admin ${adminId}`);
+
+      return res.json({
+        success: true,
+        message: `Usuario ${user.email} eliminado exitosamente`,
+        data: { registros_eliminados: resultado }
+      });
+    } catch (error) {
+      Logger.error('Error en deleteUser:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error al eliminar usuario'
+      });
+    }
+  }
+
+  /**
    * Estadisticas generales de usuarios
    * GET /api/admin/users/stats
    */

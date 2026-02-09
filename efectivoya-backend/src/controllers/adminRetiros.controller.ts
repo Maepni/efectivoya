@@ -5,6 +5,7 @@ import { Logger } from '../utils/logger.util';
 import { PDFService } from '../services/pdf.service';
 import { CloudinaryService } from '../services/cloudinary.service';
 import { AuditLogService } from '../services/auditLog.service';
+import { FCMService } from '../services/fcm.service';
 
 const prisma = new PrismaClient();
 
@@ -225,6 +226,19 @@ export class AdminRetirosController {
 
       Logger.info(`Retiro aprobado: ${retiro.numero_operacion} - Admin: ${adminId}`);
 
+      // Enviar notificación push
+      if (retiro.user.push_token) {
+        try {
+          await FCMService.notificarRetiroAprobado(
+            retiro.user.push_token,
+            retiro.numero_operacion,
+            montoRetiro
+          );
+        } catch (pushError) {
+          Logger.error('Error al enviar push notification:', pushError);
+        }
+      }
+
       return res.json({
         success: true,
         message: 'Retiro aprobado exitosamente. Recuerda transferir el dinero a la cuenta del usuario.',
@@ -270,9 +284,14 @@ export class AdminRetirosController {
         });
       }
 
-      // Buscar retiro
+      // Buscar retiro con push_token del usuario
       const retiro = await prisma.retiro.findUnique({
-        where: { id }
+        where: { id },
+        include: {
+          user: {
+            select: { push_token: true }
+          }
+        }
       });
 
       if (!retiro) {
@@ -308,6 +327,19 @@ export class AdminRetirosController {
       });
 
       Logger.info(`Retiro rechazado: ${retiro.numero_operacion} - Admin: ${adminId}`);
+
+      // Enviar notificación push
+      if (retiro.user.push_token) {
+        try {
+          await FCMService.notificarRetiroRechazado(
+            retiro.user.push_token,
+            retiro.numero_operacion,
+            motivo_rechazo.trim()
+          );
+        } catch (pushError) {
+          Logger.error('Error al enviar push notification:', pushError);
+        }
+      }
 
       return res.json({
         success: true,

@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "EfectivoYa",
+    "slug": "efectivoya-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "efectivoya",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1f1f1f"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.efectivoya.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1f1f1f"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.efectivoya.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

@@ -24,3 +24,25 @@ export interface RefreshTokenPayload {
   iat?: number;
   exp?: number;
 }
+
+export interface SocketAuthData {
+  userId?: string;
+  adminId?: string;
+  email: string;
+  tipo: 'usuario' | 'admin';
+}
+
+export interface ChatMessage {
+  id: string;
+  chat_id: string;
+  remitente_tipo: 'usuario' | 'admin';
+  remitente_id: string;
+  mensaje: string;
+  created_at: Date;
+}
+
+export interface NotificationPayload {
+  title: string;
+  body: string;
+  data?: Record<string, string>;
+}

@@ -33,7 +33,15 @@ router.get(
   AdminUsersController.getUserDetail
 );
 
-// 4. Suspender/activar usuario
+// 4. Eliminar usuario
+router.delete(
+  '/:id',
+  [param('id').isUUID()],
+  validateRequest,
+  AdminUsersController.deleteUser
+);
+
+// 5. Suspender/activar usuario
 router.patch(
   '/:id/toggle-status',
   [

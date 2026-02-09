@@ -17,6 +17,9 @@ import adminContenidoRoutes from './routes/adminContenido.routes';
 import adminAdminsRoutes from './routes/adminAdmins.routes';
 import adminRecargasRoutes from './routes/adminRecargas.routes';
 import adminRetirosRoutes from './routes/adminRetiros.routes';
+import chatRoutes from './routes/chat.routes';
+import adminChatRoutes from './routes/adminChat.routes';
+import notificationsRoutes from './routes/notifications.routes';
 
 const app: Application = express();
 
@@ -46,6 +49,8 @@ app.use('/api/user-banks', userBanksRoutes);
 app.use('/api/recargas', recargasRoutes);
 app.use('/api/retiros', retirosRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 // Rutas de Admin
 app.use('/api/admin/auth', adminAuthRoutes);
@@ -58,6 +63,7 @@ app.use('/api/admin/contenido', adminContenidoRoutes);
 app.use('/api/admin/admins', adminAdminsRoutes);
 app.use('/api/admin/recargas', adminRecargasRoutes);
 app.use('/api/admin/retiros', adminRetirosRoutes);
+app.use('/api/admin/chats', adminChatRoutes);
 
 // Error handler (debe estar al final)
 app.use(errorHandler);
