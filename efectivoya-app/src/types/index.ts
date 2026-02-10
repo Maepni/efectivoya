@@ -5,7 +5,7 @@ export interface User {
   email: string;
   dni: string;
   whatsapp: string;
-  saldo_actual: number;
+  saldo_actual: number | string;
   codigo_referido: string;
   email_verificado: boolean;
   is_active: boolean;
@@ -64,7 +64,15 @@ export interface ChatMessage {
   remitente_tipo: 'usuario' | 'admin';
   remitente_id: string;
   mensaje: string;
+  leido?: boolean;
   created_at: string;
+}
+
+export interface Chat {
+  id: string;
+  estado: 'abierto' | 'cerrado';
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ApiResponse<T = unknown> {
@@ -73,30 +81,66 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
+export interface PaginatedResponse<T = unknown> {
+  success: boolean;
+  data?: {
+    recargas?: T[];
+    retiros?: T[];
+    total?: number;
+    page?: number;
+    limit?: number;
+  };
+  message?: string;
+}
+
 export interface UserBank {
   id: string;
   banco: string;
-  tipo_cuenta: string;
   numero_cuenta: string;
   cci: string;
-  es_principal: boolean;
+  alias?: string;
+  created_at?: string;
 }
 
 export interface Recarga {
   id: string;
-  monto_depositado: number;
-  banco_origen: string;
   numero_operacion: string;
+  banco_origen: string;
+  monto_depositado: number | string;
+  porcentaje_comision: number | string;
+  comision_calculada: number | string;
+  monto_neto: number | string;
+  boucher_url: string;
   estado: EstadoOperacion;
-  comision: number;
-  monto_acreditado: number;
+  motivo_rechazo?: string;
+  comprobante_pdf_url?: string;
   created_at: string;
+  processed_at?: string;
 }
 
 export interface Retiro {
   id: string;
-  monto: number;
-  banco_destino: string;
+  numero_operacion: string;
+  user_bank_id: string;
+  monto: number | string;
   estado: EstadoOperacion;
+  motivo_rechazo?: string;
+  comprobante_pdf_url?: string;
   created_at: string;
+  processed_at?: string;
+  banco?: {
+    banco: string;
+    alias?: string;
+    numero_cuenta: string;
+    cci: string;
+  };
+}
+
+export interface RecargaConfig {
+  porcentaje_comision: number;
+  monto_minimo_recarga: number;
+  monto_maximo_recarga: number;
+  cuenta_recaudadora_numero: string;
+  cuenta_recaudadora_banco: string;
+  cuenta_recaudadora_titular: string;
 }

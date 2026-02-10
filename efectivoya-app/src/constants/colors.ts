@@ -18,4 +18,15 @@ export const Colors = {
   overlay: 'rgba(0, 0, 0, 0.5)',
   error: '#ef4444',
   success: '#10B981',
+
+  // Colores de texto
+  text: '#e0e0e0',
+  textWhite: '#fefefe',
+  accent: '#fefefe',
+
+  // Fondos y bordes
+  lightGray: '#252525',
+  primaryLight: '#e8373320',
+  border: '#3a3a3a',
+  warning: '#dc993c',
 } as const;
