@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ConfirmDialog } from './ConfirmDialog';
 import { Colors } from '../constants/colors';
 import { Layout } from '../constants/layout';
 import type { UserBank } from '../types';
@@ -11,19 +12,10 @@ interface BancoCardProps {
 }
 
 export function BancoCard({ banco, onDelete }: BancoCardProps) {
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+
   const handleDelete = () => {
-    Alert.alert(
-      'Eliminar Banco',
-      `¿Estás seguro de eliminar ${banco.alias || banco.banco}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: onDelete,
-        },
-      ]
-    );
+    setDeleteDialogVisible(true);
   };
 
   const getBancoIcon = (): keyof typeof Ionicons.glyphMap => {
@@ -47,28 +39,43 @@ export function BancoCard({ banco, onDelete }: BancoCardProps) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Ionicons name={getBancoIcon()} size={32} color={Colors.primary} />
-      </View>
+    <>
+      <View style={styles.container}>
+        <View style={styles.iconContainer}>
+          <Ionicons name={getBancoIcon()} size={32} color={Colors.primary} />
+        </View>
 
-      <View style={styles.content}>
-        <Text style={styles.bancoName}>{banco.banco}</Text>
-        {banco.alias && <Text style={styles.alias}>{banco.alias}</Text>}
-        <Text style={styles.cuenta}>
-          Cuenta: {maskAccount(banco.numero_cuenta)}
-        </Text>
-        <Text style={styles.cci}>CCI: {maskAccount(banco.cci)}</Text>
+        <View style={styles.content}>
+          <Text style={styles.bancoName}>{banco.banco}</Text>
+          {banco.alias && <Text style={styles.alias}>{banco.alias}</Text>}
+          <Text style={styles.cuenta}>
+            Cuenta: {maskAccount(banco.numero_cuenta)}
+          </Text>
+          <Text style={styles.cci}>CCI: {maskAccount(banco.cci)}</Text>
+        </View>
+
+        {onDelete && (
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
+              <Ionicons name="trash-outline" size={20} color={Colors.error} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {onDelete && (
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
-            <Ionicons name="trash-outline" size={20} color={Colors.error} />
-          </TouchableOpacity>
-        </View>
+        <ConfirmDialog
+          visible={deleteDialogVisible}
+          title="Eliminar Banco"
+          message={`¿Estás seguro de eliminar ${banco.alias || banco.banco}?`}
+          buttons={[
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Eliminar', style: 'destructive', onPress: onDelete },
+          ]}
+          onDismiss={() => setDeleteDialogVisible(false)}
+        />
       )}
-    </View>
+    </>
   );
 }
 

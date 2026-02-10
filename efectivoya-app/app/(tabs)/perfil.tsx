@@ -9,11 +9,12 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
 import { Card } from '../../src/components/Card';
 import { BancoCard } from '../../src/components/BancoCard';
+import { ConfirmDialog } from '../../src/components/ConfirmDialog';
 import BancosService from '../../src/services/bancos.service';
 import { useAuthStore } from '../../src/store/authStore';
 import type { UserBank } from '../../src/types';
@@ -23,8 +24,8 @@ import { Layout } from '../../src/constants/layout';
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
 export default function PerfilScreen() {
-  const router = useRouter();
-  const { user, logout, refreshUser } = useAuthStore();
+  const insets = useSafeAreaInsets();
+  const { user, logout } = useAuthStore();
   const [bancos, setBancos] = useState<UserBank[]>([]);
   const [bancosModalVisible, setBancosModalVisible] = useState(false);
   const [addBancoModalVisible, setAddBancoModalVisible] = useState(false);
@@ -44,6 +45,7 @@ export default function PerfilScreen() {
     alias: '',
   });
   const [addingBanco, setAddingBanco] = useState(false);
+  const [logoutDialogVisible, setLogoutDialogVisible] = useState(false);
 
   const loadBancos = useCallback(async () => {
     try {
@@ -61,17 +63,7 @@ export default function PerfilScreen() {
   }, [loadBancos]);
 
   const handleLogout = () => {
-    Alert.alert('Cerrar Sesión', '¿Estás seguro que deseas cerrar sesión?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Cerrar Sesión',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          router.replace('/(auth)/login');
-        },
-      },
-    ]);
+    setLogoutDialogVisible(true);
   };
 
   const handleUpdateProfile = async () => {
@@ -140,16 +132,10 @@ export default function PerfilScreen() {
       });
 
       if (response.success) {
-        Alert.alert('¡Éxito!', 'Cuenta bancaria agregada correctamente', [
-          {
-            text: 'OK',
-            onPress: () => {
-              setAddBancoModalVisible(false);
-              resetNuevoBancoForm();
-              loadBancos();
-            },
-          },
-        ]);
+        setAddBancoModalVisible(false);
+        resetNuevoBancoForm();
+        loadBancos();
+        Alert.alert('¡Éxito!', 'Cuenta bancaria agregada correctamente');
       }
     } catch (error: any) {
       Alert.alert(
@@ -361,7 +347,7 @@ export default function PerfilScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             <Input
               label="Nombres"
               placeholder="Tus nombres"
@@ -412,7 +398,7 @@ export default function PerfilScreen() {
               <Ionicons name="close" size={28} color={Colors.accent} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             <Button
               title="Agregar Nueva Cuenta"
               onPress={() => {
@@ -446,7 +432,7 @@ export default function PerfilScreen() {
               <Ionicons name="close" size={28} color={Colors.accent} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             <Text style={styles.label}>Banco *</Text>
             <View style={styles.bancosGrid}>
               {BANCOS.map((banco) => (
@@ -508,6 +494,17 @@ export default function PerfilScreen() {
           </ScrollView>
         </View>
       </Modal>
+
+      <ConfirmDialog
+        visible={logoutDialogVisible}
+        title="Cerrar Sesión"
+        message="¿Estás seguro que deseas cerrar sesión?"
+        buttons={[
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Cerrar Sesión', style: 'destructive', onPress: () => logout() },
+        ]}
+        onDismiss={() => setLogoutDialogVisible(false)}
+      />
     </View>
   );
 }

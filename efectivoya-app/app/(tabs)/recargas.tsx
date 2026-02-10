@@ -12,11 +12,13 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
 import { Card } from '../../src/components/Card';
 import { OperacionCard } from '../../src/components/OperacionCard';
+import { ConfirmDialog } from '../../src/components/ConfirmDialog';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import RecargasService from '../../src/services/recargas.service';
 import { useAuthStore } from '../../src/store/authStore';
@@ -27,6 +29,7 @@ import { Layout } from '../../src/constants/layout';
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
 export default function RecargasScreen() {
+  const insets = useSafeAreaInsets();
   const { refreshUser } = useAuthStore();
   const [recargas, setRecargas] = useState<Recarga[]>([]);
   const [config, setConfig] = useState<RecargaConfig | null>(null);
@@ -40,6 +43,7 @@ export default function RecargasScreen() {
     youtube_url: string;
   } | null>(null);
 
+  const [imagePickerDialogVisible, setImagePickerDialogVisible] = useState(false);
   const [bancoOrigen, setBancoOrigen] = useState('');
   const [montoDepositado, setMontoDepositado] = useState('');
   const [boucherUri, setBoucherUri] = useState('');
@@ -116,11 +120,7 @@ export default function RecargasScreen() {
   };
 
   const showImageOptions = () => {
-    Alert.alert('Seleccionar Comprobante', 'Elige una opción', [
-      { text: 'Tomar Foto', onPress: takePhoto },
-      { text: 'Elegir de Galería', onPress: pickImage },
-      { text: 'Cancelar', style: 'cancel' },
-    ]);
+    setImagePickerDialogVisible(true);
   };
 
   const showVideoTutorial = async (banco: string) => {
@@ -193,20 +193,13 @@ export default function RecargasScreen() {
       });
 
       if (response.success) {
+        setModalVisible(false);
+        resetForm();
+        loadData();
+        refreshUser();
         Alert.alert(
           '¡Solicitud Enviada!',
-          'Tu recarga está siendo revisada. Te notificaremos cuando sea aprobada.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                setModalVisible(false);
-                resetForm();
-                loadData();
-                refreshUser();
-              },
-            },
-          ]
+          'Tu recarga está siendo revisada. Te notificaremos cuando sea aprobada.'
         );
       }
     } catch (error: any) {
@@ -330,7 +323,7 @@ export default function RecargasScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             {config?.cuenta_recaudadora_numero && (
               <Card style={styles.cuentaCard}>
                 <View style={styles.cuentaHeader}>
@@ -476,6 +469,18 @@ export default function RecargasScreen() {
           </ScrollView>
         </View>
       </Modal>
+
+      <ConfirmDialog
+        visible={imagePickerDialogVisible}
+        title="Seleccionar Comprobante"
+        message="Elige una opción"
+        buttons={[
+          { text: 'Tomar Foto', onPress: takePhoto },
+          { text: 'Elegir de Galería', onPress: pickImage },
+          { text: 'Cancelar', style: 'cancel' },
+        ]}
+        onDismiss={() => setImagePickerDialogVisible(false)}
+      />
 
       {/* Modal Video Tutorial */}
       <Modal

@@ -11,6 +11,7 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
 import { Card } from '../../src/components/Card';
@@ -27,6 +28,7 @@ import { Layout } from '../../src/constants/layout';
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
 export default function RetirosScreen() {
+  const insets = useSafeAreaInsets();
   const { user, refreshUser } = useAuthStore();
   const [retiros, setRetiros] = useState<Retiro[]>([]);
   const [bancos, setBancos] = useState<UserBank[]>([]);
@@ -114,20 +116,13 @@ export default function RetirosScreen() {
       });
 
       if (response.success) {
+        setModalVisible(false);
+        resetForm();
+        loadData();
+        refreshUser();
         Alert.alert(
           '¡Solicitud Enviada!',
-          'Tu retiro está siendo procesado. Te notificaremos cuando sea aprobado.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                setModalVisible(false);
-                resetForm();
-                loadData();
-                refreshUser();
-              },
-            },
-          ]
+          'Tu retiro está siendo procesado. Te notificaremos cuando sea aprobado.'
         );
       }
     } catch (error: any) {
@@ -202,16 +197,10 @@ export default function RetirosScreen() {
       });
 
       if (response.success) {
-        Alert.alert('¡Éxito!', 'Cuenta bancaria agregada correctamente', [
-          {
-            text: 'OK',
-            onPress: () => {
-              setAddBancoModalVisible(false);
-              resetNuevoBancoForm();
-              loadData();
-            },
-          },
-        ]);
+        setAddBancoModalVisible(false);
+        resetNuevoBancoForm();
+        loadData();
+        Alert.alert('¡Éxito!', 'Cuenta bancaria agregada correctamente');
       }
     } catch (error: any) {
       Alert.alert(
@@ -347,7 +336,7 @@ export default function RetirosScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             <Card style={styles.saldoModalCard}>
               <Text style={styles.saldoModalLabel}>Saldo Disponible</Text>
               <Text style={styles.saldoModalAmount}>
@@ -453,7 +442,7 @@ export default function RetirosScreen() {
               <Ionicons name="close" size={28} color={Colors.accent} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             <Button
               title="Agregar Nueva Cuenta"
               onPress={() => {
@@ -487,7 +476,7 @@ export default function RetirosScreen() {
               <Ionicons name="close" size={28} color={Colors.accent} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
             <Text style={styles.label}>Banco *</Text>
             <View style={styles.bancosGrid}>
               {BANCOS.map((banco) => (

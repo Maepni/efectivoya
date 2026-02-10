@@ -111,4 +111,12 @@ export const authService = {
       };
     }
   },
+
+  async logout(): Promise<void> {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // No bloquear el logout local si el backend falla
+    }
+  },
 };

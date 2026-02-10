@@ -65,6 +65,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         ]);
         set({ user, isAuthenticated: true });
         socketService.connect();
+        // Refrescar perfil completo en background (incluye email_verificado, is_active)
+        get().refreshUser();
       }
 
       return result;
@@ -112,24 +114,35 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logout: async () => {
-    socketService.disconnect();
-    await get().clearAuth();
+    try {
+      await authService.logout();
+      socketService.disconnect();
+    } finally {
+      await get().clearAuth();
+    }
   },
 
   refreshUser: async () => {
     try {
       const response = await authService.getProfile();
       if (response.success && response.data) {
-        set({ user: response.data });
-        await AsyncStorage.setItem('user', JSON.stringify(response.data));
+        const userData = (response.data as any).user ?? response.data;
+        set({ user: userData });
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+      } else {
+        await get().clearAuth();
       }
     } catch {
-      // Silently fail - user data will be stale but not critical
+      await get().clearAuth();
     }
   },
 
   clearAuth: async () => {
-    await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+    try {
+      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+    } catch {
+      // No bloquear el clear de estado si AsyncStorage falla
+    }
     set({ user: null, isAuthenticated: false });
   },
 }));

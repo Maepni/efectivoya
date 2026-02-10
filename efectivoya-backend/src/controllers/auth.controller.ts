@@ -187,8 +187,12 @@ export class AuthController {
             email: user.email,
             nombres: user.nombres,
             apellidos: user.apellidos,
+            dni: user.dni,
+            whatsapp: user.whatsapp,
             saldo_actual: user.saldo_actual,
-            codigo_referido: user.codigo_referido
+            codigo_referido: user.codigo_referido,
+            email_verificado: true,
+            is_active: user.is_active
           }
         }
       });
@@ -261,7 +265,9 @@ export class AuthController {
             dni: user.dni,
             whatsapp: user.whatsapp,
             saldo_actual: user.saldo_actual,
-            codigo_referido: user.codigo_referido
+            codigo_referido: user.codigo_referido,
+            email_verificado: user.email_verificado,
+            is_active: user.is_active
           }
         }
       });
