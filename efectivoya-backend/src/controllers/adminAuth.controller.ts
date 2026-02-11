@@ -129,6 +129,50 @@ export class AdminAuthController {
   }
 
   /**
+   * Refresh token de administrador
+   * POST /api/admin/auth/refresh
+   */
+  static async refreshToken(req: Request, res: Response): Promise<Response> {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        return res.status(400).json({
+          success: false,
+          message: 'Refresh token es requerido'
+        });
+      }
+
+      const decoded = JWTUtil.verifyRefreshToken(refreshToken);
+
+      const admin = await prisma.admin.findUnique({
+        where: { id: decoded.userId },
+        select: { id: true, email: true, is_active: true }
+      });
+
+      if (!admin || !admin.is_active) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token inválido o admin inactivo'
+        });
+      }
+
+      const newAccessToken = JWTUtil.generateAccessToken(admin.id, admin.email);
+
+      return res.json({
+        success: true,
+        data: { accessToken: newAccessToken }
+      });
+    } catch (error) {
+      Logger.error('Error en admin refreshToken:', error);
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token inválido o expirado'
+      });
+    }
+  }
+
+  /**
    * Logout de administrador
    * POST /api/admin/auth/logout
    */

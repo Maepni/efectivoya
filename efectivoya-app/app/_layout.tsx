@@ -21,6 +21,9 @@ export default function RootLayout() {
 
     SplashScreen.hideAsync();
 
+    // Admin routes manage their own auth guard
+    if (segments[0] === '(admin)') return;
+
     const inAuthGroup = segments[0] === '(auth)';
 
     if (isAuthenticated && inAuthGroup) {

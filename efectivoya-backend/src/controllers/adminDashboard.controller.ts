@@ -233,12 +233,19 @@ export class AdminDashboardController {
         ORDER BY fecha ASC
       `;
 
+      const serialize = (rows: any[]) =>
+        rows.map((r) => ({
+          fecha: r.fecha,
+          cantidad: Number(r.cantidad),
+          ...(r.monto_total !== undefined && { monto: Number(r.monto_total) }),
+        }));
+
       return res.json({
         success: true,
         data: {
-          recargas_por_dia: recargasPorDia,
-          retiros_por_dia: retirosPorDia,
-          usuarios_por_dia: usuariosPorDia
+          recargas_por_dia: serialize(recargasPorDia as any[]),
+          retiros_por_dia: serialize(retirosPorDia as any[]),
+          usuarios_por_dia: serialize(usuariosPorDia as any[])
         }
       });
     } catch (error) {

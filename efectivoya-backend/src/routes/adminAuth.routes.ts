@@ -19,7 +19,15 @@ router.post(
   AdminAuthController.login
 );
 
-// 2. Perfil (protegida)
+// 2. Refresh token
+router.post(
+  '/refresh',
+  [body('refreshToken').isString().notEmpty()],
+  validateRequest,
+  AdminAuthController.refreshToken
+);
+
+// 3. Perfil (protegida)
 router.get('/profile', adminAuthMiddleware, AdminAuthController.getProfile);
 
 // 3. Logout (protegida)
