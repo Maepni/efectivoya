@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { AdminRequest } from '../types';
 import { Logger } from '../utils/logger.util';
 import { AuditLogService } from '../services/auditLog.service';
+import { CloudinaryService } from '../services/cloudinary.service';
 
 const prisma = new PrismaClient();
 
@@ -301,27 +302,53 @@ export class AdminContenidoController {
   /**
    * Actualizar video instructivo por banco
    * PATCH /api/admin/contenido/videos/:banco
+   * Acepta multipart/form-data con campo 'video' (archivo) y 'titulo' (texto)
    */
   static async updateVideo(req: AdminRequest, res: Response): Promise<Response> {
     try {
       const adminId = req.adminId;
       const { banco } = req.params;
-      const { youtube_url, titulo } = req.body;
+      const { titulo } = req.body;
+      const file = req.file;
 
       if (!adminId) {
         return res.status(401).json({ success: false, message: 'No autorizado' });
       }
 
+      const existing = await prisma.videoInstructivo.findUnique({
+        where: { banco: banco as any }
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, message: 'Video no encontrado para este banco' });
+      }
+
+      const dataToUpdate: { titulo?: string; video_url?: string; video_cloudinary_id?: string } = {};
+
+      if (titulo) {
+        dataToUpdate.titulo = titulo;
+      }
+
+      if (file) {
+        // Eliminar video anterior de Cloudinary si existe
+        if (existing.video_cloudinary_id) {
+          await CloudinaryService.deleteFile(existing.video_cloudinary_id, 'video');
+        }
+
+        // Subir nuevo video
+        const uploadResult = await CloudinaryService.uploadVideo(file.buffer, banco);
+        dataToUpdate.video_url = uploadResult.url;
+        dataToUpdate.video_cloudinary_id = uploadResult.publicId;
+      }
+
       const video = await prisma.videoInstructivo.update({
         where: { banco: banco as any },
-        data: {
-          youtube_url,
-          titulo
-        }
+        data: dataToUpdate
       });
 
       await AuditLogService.log('video_actualizado', req, undefined, adminId, {
-        banco
+        banco,
+        has_video_file: !!file
       });
 
       return res.json({

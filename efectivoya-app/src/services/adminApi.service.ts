@@ -106,6 +106,14 @@ class AdminApiServiceClass {
     const response = await adminApi.patch(url, data);
     return response.data;
   }
+
+  async patchFormData<T = any>(url: string, formData: FormData): Promise<T> {
+    const response = await adminApi.patch(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000,
+    });
+    return response.data;
+  }
 }
 
 export const AdminApiService = new AdminApiServiceClass();

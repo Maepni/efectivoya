@@ -10,9 +10,12 @@ import {
   Modal,
   Image,
   Linking,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
@@ -28,6 +31,18 @@ import { Layout } from '../../src/constants/layout';
 
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
+function NativeVideoPlayer({ url }: { url: string }) {
+  const player = useVideoPlayer(url);
+  return (
+    <VideoView
+      player={player}
+      style={{ width: '100%', height: 200, borderRadius: 8 }}
+      contentFit="contain"
+      nativeControls
+    />
+  );
+}
+
 export default function RecargasScreen() {
   const insets = useSafeAreaInsets();
   const { refreshUser } = useAuthStore();
@@ -36,12 +51,13 @@ export default function RecargasScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [videoModalVisible, setVideoModalVisible] = useState(false);
+  const [videoExpanded, setVideoExpanded] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<{
     titulo: string;
     banco: string;
-    youtube_url: string;
+    video_url: string | null;
   } | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
 
   const [imagePickerDialogVisible, setImagePickerDialogVisible] = useState(false);
   const [bancoOrigen, setBancoOrigen] = useState('');
@@ -85,7 +101,7 @@ export default function RecargasScreen() {
     if (status !== 'granted') {
       Alert.alert(
         'Permisos necesarios',
-        'Necesitamos acceso a tu galería para subir el comprobante'
+        'Necesitamos acceso a tu galeria para subir el comprobante'
       );
       return;
     }
@@ -105,7 +121,7 @@ export default function RecargasScreen() {
     if (status !== 'granted') {
       Alert.alert(
         'Permisos necesarios',
-        'Necesitamos acceso a la cámara para tomar una foto del comprobante'
+        'Necesitamos acceso a la camara para tomar una foto del comprobante'
       );
       return;
     }
@@ -123,15 +139,22 @@ export default function RecargasScreen() {
     setImagePickerDialogVisible(true);
   };
 
-  const showVideoTutorial = async (banco: string) => {
+  const toggleVideoTutorial = async (banco: string) => {
+    if (videoExpanded && selectedVideo?.banco === banco) {
+      setVideoExpanded(false);
+      return;
+    }
+    setVideoLoading(true);
     try {
       const response = await RecargasService.getVideoInstructivo(banco);
       if (response.success && response.data) {
         setSelectedVideo(response.data.video);
-        setVideoModalVisible(true);
+        setVideoExpanded(true);
       }
     } catch (_error) {
       Alert.alert('Error', 'No se pudo cargar el video instructivo');
+    } finally {
+      setVideoLoading(false);
     }
   };
 
@@ -160,23 +183,23 @@ export default function RecargasScreen() {
     }
     const monto = parseFloat(montoDepositado);
     if (isNaN(monto) || monto <= 0) {
-      Alert.alert('Error', 'Monto inválido');
+      Alert.alert('Error', 'Monto invalido');
       return;
     }
     if (config) {
       const minimo = Number(config.monto_minimo_recarga);
       const maximo = Number(config.monto_maximo_recarga);
       if (monto < minimo) {
-        Alert.alert('Error', `El monto mínimo es S/. ${minimo.toFixed(2)}`);
+        Alert.alert('Error', `El monto minimo es S/. ${minimo.toFixed(2)}`);
         return;
       }
       if (monto > maximo) {
-        Alert.alert('Error', `El monto máximo es S/. ${maximo.toFixed(2)}`);
+        Alert.alert('Error', `El monto maximo es S/. ${maximo.toFixed(2)}`);
         return;
       }
     }
     if (!boucherUri) {
-      Alert.alert('Error', 'Sube el comprobante de depósito');
+      Alert.alert('Error', 'Sube el comprobante de deposito');
       return;
     }
 
@@ -198,8 +221,8 @@ export default function RecargasScreen() {
         loadData();
         refreshUser();
         Alert.alert(
-          '¡Solicitud Enviada!',
-          'Tu recarga está siendo revisada. Te notificaremos cuando sea aprobada.'
+          'Solicitud Enviada!',
+          'Tu recarga esta siendo revisada. Te notificaremos cuando sea aprobada.'
         );
       }
     } catch (error: any) {
@@ -222,7 +245,7 @@ export default function RecargasScreen() {
     if (recarga.estado !== 'aprobado' || !recarga.comprobante_pdf_url) {
       Alert.alert(
         'Info',
-        'El comprobante estará disponible cuando se apruebe la recarga'
+        'El comprobante estara disponible cuando se apruebe la recarga'
       );
       return;
     }
@@ -258,19 +281,19 @@ export default function RecargasScreen() {
 
         {config && (
           <Card style={styles.infoCard}>
-            <Text style={styles.infoTitle}>Información de Recargas</Text>
+            <Text style={styles.infoTitle}>Informacion de Recargas</Text>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Comisión:</Text>
+              <Text style={styles.infoLabel}>Comision:</Text>
               <Text style={styles.infoValue}>{comisionPct}%</Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Monto mínimo:</Text>
+              <Text style={styles.infoLabel}>Monto minimo:</Text>
               <Text style={styles.infoValue}>
                 S/. {Number(config.monto_minimo_recarga).toFixed(2)}
               </Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Monto máximo:</Text>
+              <Text style={styles.infoLabel}>Monto maximo:</Text>
               <Text style={styles.infoValue}>
                 S/. {Number(config.monto_maximo_recarga).toFixed(2)}
               </Text>
@@ -287,9 +310,9 @@ export default function RecargasScreen() {
                 size={64}
                 color={Colors.gray}
               />
-              <Text style={styles.emptyText}>No tienes recargas aún</Text>
+              <Text style={styles.emptyText}>No tienes recargas aun</Text>
               <Text style={styles.emptySubtext}>
-                Presiona el botón + para hacer tu primera recarga
+                Presiona el boton + para hacer tu primera recarga
               </Text>
             </View>
           ) : (
@@ -353,7 +376,13 @@ export default function RecargasScreen() {
                     styles.bancoOption,
                     bancoOrigen === banco && styles.bancoSelected,
                   ]}
-                  onPress={() => setBancoOrigen(banco)}
+                  onPress={() => {
+                    setBancoOrigen(banco);
+                    if (banco !== bancoOrigen) {
+                      setVideoExpanded(false);
+                      setSelectedVideo(null);
+                    }
+                  }}
                 >
                   <Text
                     style={[
@@ -375,19 +404,55 @@ export default function RecargasScreen() {
             </View>
 
             {bancoOrigen !== '' && (
-              <TouchableOpacity
-                style={styles.videoButton}
-                onPress={() => showVideoTutorial(bancoOrigen)}
-              >
-                <Ionicons
-                  name="play-circle"
-                  size={20}
-                  color={Colors.primary}
-                />
-                <Text style={styles.videoButtonText}>
-                  Ver tutorial de depósito en {bancoOrigen}
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.videoSection}>
+                <TouchableOpacity
+                  style={styles.videoButton}
+                  onPress={() => toggleVideoTutorial(bancoOrigen)}
+                  disabled={videoLoading}
+                >
+                  {videoLoading ? (
+                    <ActivityIndicator size="small" color={Colors.primary} />
+                  ) : (
+                    <Ionicons
+                      name={videoExpanded ? 'chevron-up-circle' : 'play-circle'}
+                      size={20}
+                      color={Colors.primary}
+                    />
+                  )}
+                  <Text style={styles.videoButtonText}>
+                    {videoExpanded ? 'Ocultar tutorial' : `Ver tutorial de deposito en ${bancoOrigen}`}
+                  </Text>
+                </TouchableOpacity>
+
+                {videoExpanded && selectedVideo && (
+                  <View style={styles.videoPlayerContainer}>
+                    <Text style={styles.videoTitle}>{selectedVideo.titulo}</Text>
+                    {selectedVideo.video_url ? (
+                      Platform.OS === 'web' ? (
+                        <video
+                          src={selectedVideo.video_url}
+                          controls
+                          style={{
+                            width: '100%',
+                            height: 200,
+                            borderRadius: 8,
+                            backgroundColor: '#000',
+                          }}
+                        />
+                      ) : (
+                        <NativeVideoPlayer url={selectedVideo.video_url} />
+                      )
+                    ) : (
+                      <View style={styles.videoFallback}>
+                        <Ionicons name="videocam-off" size={48} color={Colors.gray} />
+                        <Text style={styles.videoFallbackText}>
+                          Video no disponible
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
             )}
 
             <Input
@@ -410,7 +475,7 @@ export default function RecargasScreen() {
                   </View>
                   <View style={styles.calculoRow}>
                     <Text style={styles.calculoLabel}>
-                      Comisión ({comisionPct}%):
+                      Comision ({comisionPct}%):
                     </Text>
                     <Text
                       style={[styles.calculoValue, { color: Colors.error }]}
@@ -419,7 +484,7 @@ export default function RecargasScreen() {
                     </Text>
                   </View>
                   <View style={[styles.calculoRow, styles.calculoTotal]}>
-                    <Text style={styles.calculoTotalLabel}>Recibirás:</Text>
+                    <Text style={styles.calculoTotalLabel}>Recibiras:</Text>
                     <Text style={styles.calculoTotalValue}>
                       S/. {calcularMontoNeto().toFixed(2)}
                     </Text>
@@ -427,7 +492,7 @@ export default function RecargasScreen() {
                 </Card>
               )}
 
-            <Text style={styles.label}>Comprobante de Depósito *</Text>
+            <Text style={styles.label}>Comprobante de Deposito *</Text>
             <TouchableOpacity
               style={styles.uploadButton}
               onPress={showImageOptions}
@@ -454,7 +519,7 @@ export default function RecargasScreen() {
                   <Ionicons name="cloud-upload" size={48} color={Colors.gray} />
                   <Text style={styles.uploadText}>Subir Comprobante</Text>
                   <Text style={styles.uploadSubtext}>
-                    Toca para tomar foto o elegir de galería
+                    Toca para tomar foto o elegir de galeria
                   </Text>
                 </View>
               )}
@@ -473,48 +538,15 @@ export default function RecargasScreen() {
       <ConfirmDialog
         visible={imagePickerDialogVisible}
         title="Seleccionar Comprobante"
-        message="Elige una opción"
+        message="Elige una opcion"
         buttons={[
           { text: 'Tomar Foto', onPress: takePhoto },
-          { text: 'Elegir de Galería', onPress: pickImage },
+          { text: 'Elegir de Galeria', onPress: pickImage },
           { text: 'Cancelar', style: 'cancel' },
         ]}
         onDismiss={() => setImagePickerDialogVisible(false)}
       />
 
-      {/* Modal Video Tutorial */}
-      <Modal
-        visible={videoModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Tutorial de Depósito</Text>
-            <TouchableOpacity onPress={() => setVideoModalVisible(false)}>
-              <Ionicons name="close" size={28} color={Colors.accent} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.videoContent}>
-            {selectedVideo && (
-              <>
-                <Text style={styles.videoTitle}>{selectedVideo.titulo}</Text>
-                <Text style={styles.videoBanco}>
-                  Banco: {selectedVideo.banco}
-                </Text>
-                <Button
-                  title="Ver Video en YouTube"
-                  onPress={() => {
-                    if (selectedVideo.youtube_url)
-                      Linking.openURL(selectedVideo.youtube_url);
-                  }}
-                  style={styles.youtubeButton}
-                />
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -655,18 +687,46 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   bancoTextSelected: { color: Colors.primary, fontWeight: 'bold' },
+  videoSection: {
+    marginBottom: Layout.spacing.md,
+  },
   videoButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     padding: Layout.spacing.sm,
-    marginBottom: Layout.spacing.md,
     gap: Layout.spacing.xs,
   },
   videoButtonText: {
     color: Colors.primary,
     fontSize: Layout.fontSize.sm,
     fontWeight: '600',
+  },
+  videoPlayerContainer: {
+    marginTop: Layout.spacing.sm,
+    borderRadius: Layout.borderRadius.md,
+    overflow: 'hidden',
+    backgroundColor: Colors.lightGray,
+    padding: Layout.spacing.sm,
+  },
+  videoPlayer: {
+    width: '100%',
+    height: 200,
+    borderRadius: Layout.borderRadius.md,
+    backgroundColor: '#000',
+  },
+  videoFallback: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.lightGray,
+    borderRadius: Layout.borderRadius.md,
+  },
+  videoFallbackText: {
+    color: Colors.gray,
+    fontSize: Layout.fontSize.sm,
+    fontWeight: '600',
+    marginTop: Layout.spacing.sm,
   },
   calculoCard: {
     backgroundColor: Colors.lightGray,
@@ -739,17 +799,10 @@ const styles = StyleSheet.create({
     marginTop: Layout.spacing.md,
     marginBottom: Layout.spacing.xl,
   },
-  videoContent: { padding: Layout.spacing.lg },
   videoTitle: {
-    fontSize: Layout.fontSize.lg,
-    fontWeight: 'bold',
+    fontSize: Layout.fontSize.md,
+    fontWeight: '600',
     color: Colors.accent,
     marginBottom: Layout.spacing.sm,
   },
-  videoBanco: {
-    fontSize: Layout.fontSize.md,
-    color: Colors.gray,
-    marginBottom: Layout.spacing.lg,
-  },
-  youtubeButton: { backgroundColor: '#FF0000' },
 });

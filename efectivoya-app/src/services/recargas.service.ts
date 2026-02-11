@@ -29,7 +29,7 @@ class RecargasService {
     return await ApiService.get(`/recargas/${id}/comprobante`);
   }
 
-  async getVideoInstructivo(banco: string): Promise<ApiResponse<{ video: { titulo: string; banco: string; youtube_url: string } }>> {
+  async getVideoInstructivo(banco: string): Promise<ApiResponse<{ video: { titulo: string; banco: string; video_url: string | null } }>> {
     return await ApiService.get(`/recargas/video/${banco}`);
   }
 }

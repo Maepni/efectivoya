@@ -99,11 +99,51 @@ export class CloudinaryService {
   }
 
   /**
+   * Sube un video instructivo a Cloudinary
+   * @param file - Buffer del archivo de video
+   * @param banco - Nombre del banco para organizar carpetas
+   * @returns URL y publicId del video subido
+   */
+  static async uploadVideo(file: Buffer, banco: string): Promise<UploadResult> {
+    try {
+      const result = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          {
+            folder: 'efectivoya/videos_instructivos',
+            resource_type: 'video',
+            public_id: `video_${banco.toLowerCase()}_${Date.now()}`,
+            allowed_formats: ['mp4', 'mov', 'webm'],
+            transformation: [
+              { quality: 'auto:good' },
+              { fetch_format: 'mp4' }
+            ]
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else if (result) resolve(result);
+            else reject(new Error('No se obtuvo resultado de Cloudinary'));
+          }
+        ).end(file);
+      });
+
+      Logger.info(`Video instructivo subido: ${result.public_id}`);
+
+      return {
+        url: result.secure_url,
+        publicId: result.public_id
+      };
+    } catch (error) {
+      Logger.error('Error al subir video a Cloudinary:', error);
+      throw new Error('Error al subir el video');
+    }
+  }
+
+  /**
    * Elimina un archivo de Cloudinary
    * @param publicId - ID público del archivo
-   * @param resourceType - Tipo de recurso (image, raw)
+   * @param resourceType - Tipo de recurso (image, raw, video)
    */
-  static async deleteFile(publicId: string, resourceType: 'image' | 'raw' = 'image'): Promise<void> {
+  static async deleteFile(publicId: string, resourceType: 'image' | 'raw' | 'video' = 'image'): Promise<void> {
     try {
       await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
       Logger.info(`Archivo eliminado de Cloudinary: ${publicId}`);

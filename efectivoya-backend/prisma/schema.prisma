@@ -307,11 +307,12 @@ model PoliticasPrivacidad {
 
 // VIDEOS INSTRUCTIVOS
 model VideoInstructivo {
-  id          String    @id @default(uuid())
-  banco       BancoEnum @unique
-  youtube_url String
-  titulo      String
-  updated_at  DateTime  @updatedAt
+  id                  String    @id @default(uuid())
+  banco               BancoEnum @unique
+  video_url           String?
+  video_cloudinary_id String?
+  titulo              String
+  updated_at          DateTime  @updatedAt
 
   @@map("videos_instructivos")
 }

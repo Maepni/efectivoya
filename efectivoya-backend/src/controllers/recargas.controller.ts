@@ -97,9 +97,11 @@ export class RecargasController {
       return res.json({
         success: true,
         data: {
-          banco: video.banco,
-          titulo: video.titulo,
-          youtubeUrl: video.youtube_url
+          video: {
+            banco: video.banco,
+            titulo: video.titulo,
+            video_url: video.video_url
+          }
         }
       });
     } catch (error) {

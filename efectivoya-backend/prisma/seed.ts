@@ -52,22 +52,26 @@ async function main() {
   const videos = [
     {
       banco: 'BCP' as const,
-      youtube_url: 'https://www.youtube.com/watch?v=ejemplo_bcp',
+      video_url: null as string | null,
+      video_cloudinary_id: null as string | null,
       titulo: 'Cómo depositar en EfectivoYa desde BCP'
     },
     {
       banco: 'Interbank' as const,
-      youtube_url: 'https://www.youtube.com/watch?v=ejemplo_interbank',
+      video_url: null as string | null,
+      video_cloudinary_id: null as string | null,
       titulo: 'Cómo depositar en EfectivoYa desde Interbank'
     },
     {
       banco: 'Scotiabank' as const,
-      youtube_url: 'https://www.youtube.com/watch?v=ejemplo_scotiabank',
+      video_url: null as string | null,
+      video_cloudinary_id: null as string | null,
       titulo: 'Cómo depositar en EfectivoYa desde Scotiabank'
     },
     {
       banco: 'BBVA' as const,
-      youtube_url: 'https://www.youtube.com/watch?v=ejemplo_bbva',
+      video_url: null as string | null,
+      video_cloudinary_id: null as string | null,
       titulo: 'Cómo depositar en EfectivoYa desde BBVA'
     }
   ];
@@ -75,7 +79,7 @@ async function main() {
   for (const video of videos) {
     await prisma.videoInstructivo.upsert({
       where: { banco: video.banco },
-      update: { youtube_url: video.youtube_url, titulo: video.titulo },
+      update: { titulo: video.titulo },
       create: video
     });
   }

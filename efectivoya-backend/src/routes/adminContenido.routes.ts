@@ -3,6 +3,7 @@ import { param, body } from 'express-validator';
 import { AdminContenidoController } from '../controllers/adminContenido.controller';
 import { validateRequest } from '../middleware/validation.middleware';
 import { adminAuthMiddleware } from '../middleware/adminAuth.middleware';
+import { uploadVideo } from '../middleware/upload.middleware';
 
 const router = Router();
 
@@ -68,11 +69,10 @@ router.get('/videos', AdminContenidoController.listVideos);
 router.patch(
   '/videos/:banco',
   [
-    param('banco').isIn(['BCP', 'Interbank', 'Scotiabank', 'BBVA']),
-    body('youtube_url').isString().notEmpty(),
-    body('titulo').isString().notEmpty()
+    param('banco').isIn(['BCP', 'Interbank', 'Scotiabank', 'BBVA'])
   ],
   validateRequest,
+  uploadVideo,
   AdminContenidoController.updateVideo
 );
 
