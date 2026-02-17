@@ -34,7 +34,7 @@ export function AdminSidebar() {
   return (
     <View style={styles.sidebar}>
       <View style={styles.logoContainer}>
-        <Text style={styles.logo}>EfectivoYa</Text>
+        <Text style={styles.logo}>Efectivo<Text style={styles.logoAccent}>Ya</Text></Text>
         <Text style={styles.logoSub}>Admin</Text>
       </View>
 
@@ -82,6 +82,9 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: Layout.fontSize.xl,
     fontWeight: 'bold',
+    color: Colors.white,
+  },
+  logoAccent: {
     color: Colors.primary,
   },
   logoSub: {

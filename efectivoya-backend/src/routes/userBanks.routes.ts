@@ -30,12 +30,15 @@ router.post(
     body('banco')
       .isIn(['BCP', 'Interbank', 'Scotiabank', 'BBVA'])
       .withMessage('Banco debe ser: BCP, Interbank, Scotiabank o BBVA'),
+    body('tipo_cuenta')
+      .optional()
+      .isIn(['ahorros', 'corriente'])
+      .withMessage('Tipo de cuenta debe ser: ahorros o corriente'),
     body('numero_cuenta')
       .isString()
       .notEmpty()
       .isNumeric()
-      .isLength({ min: 13 })
-      .withMessage('Número de cuenta debe tener al menos 13 dígitos'),
+      .withMessage('Número de cuenta debe contener solo dígitos'),
     body('cci')
       .isString()
       .notEmpty()
@@ -57,12 +60,15 @@ router.put(
   '/:id',
   [
     param('id').isUUID(),
+    body('tipo_cuenta')
+      .optional()
+      .isIn(['ahorros', 'corriente'])
+      .withMessage('Tipo de cuenta debe ser: ahorros o corriente'),
     body('numero_cuenta')
       .optional()
       .isString()
       .isNumeric()
-      .isLength({ min: 13 })
-      .withMessage('Número de cuenta debe tener al menos 13 dígitos'),
+      .withMessage('Número de cuenta debe contener solo dígitos'),
     body('cci')
       .optional()
       .isString()

@@ -9,9 +9,10 @@ import type { UserBank } from '../types';
 interface BancoCardProps {
   banco: UserBank;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
-export function BancoCard({ banco, onDelete }: BancoCardProps) {
+export function BancoCard({ banco, onDelete, onEdit }: BancoCardProps) {
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
 
   const handleDelete = () => {
@@ -46,7 +47,10 @@ export function BancoCard({ banco, onDelete }: BancoCardProps) {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.bancoName}>{banco.banco}</Text>
+          <Text style={styles.bancoName}>
+            {banco.banco}
+            {banco.tipo_cuenta ? ` - ${banco.tipo_cuenta === 'ahorros' ? 'Ahorros' : 'Corriente'}` : ''}
+          </Text>
           {banco.alias && <Text style={styles.alias}>{banco.alias}</Text>}
           <Text style={styles.cuenta}>
             Cuenta: {maskAccount(banco.numero_cuenta)}
@@ -54,11 +58,18 @@ export function BancoCard({ banco, onDelete }: BancoCardProps) {
           <Text style={styles.cci}>CCI: {maskAccount(banco.cci)}</Text>
         </View>
 
-        {onDelete && (
+        {(onEdit || onDelete) && (
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={20} color={Colors.error} />
-            </TouchableOpacity>
+            {onEdit && (
+              <TouchableOpacity style={styles.actionButton} onPress={onEdit}>
+                <Ionicons name="create-outline" size={20} color={Colors.primary} />
+              </TouchableOpacity>
+            )}
+            {onDelete && (
+              <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
+                <Ionicons name="trash-outline" size={20} color={Colors.error} />
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
@@ -121,6 +132,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     justifyContent: 'center',
+    gap: 8,
   },
   actionButton: {
     width: 36,

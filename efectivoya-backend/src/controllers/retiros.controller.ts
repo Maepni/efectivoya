@@ -114,8 +114,8 @@ export class RetirosController {
             id: retiro.id,
             numero_operacion: retiro.numero_operacion,
             monto: retiro.monto,
-            banco: retiro.banco.banco,
-            alias: retiro.banco.alias,
+            banco: retiro.banco?.banco,
+            alias: retiro.banco?.alias,
             estado: retiro.estado,
             created_at: retiro.created_at
           }
@@ -251,10 +251,10 @@ export class RetirosController {
         apellidos: retiro.user.apellidos,
         dni: retiro.user.dni,
         email: retiro.user.email,
-        banco_destino: retiro.banco.banco,
-        alias: retiro.banco.alias,
-        numero_cuenta: retiro.banco.numero_cuenta,
-        cci: retiro.banco.cci,
+        banco_destino: retiro.banco?.banco ?? 'N/A',
+        alias: retiro.banco?.alias ?? null,
+        numero_cuenta: retiro.banco?.numero_cuenta ?? 'N/A',
+        cci: retiro.banco?.cci ?? 'N/A',
         monto: montoRetiro,
         saldo_anterior: saldoAnterior,
         nuevo_saldo: nuevoSaldo

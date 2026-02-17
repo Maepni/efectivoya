@@ -153,39 +153,31 @@ export class AdminRecargasController {
             numeroOperacion: recarga.numero_operacion,
             bancoOrigen: recarga.banco_origen,
             montoDepositado: Number(recarga.monto_depositado),
-            montoDepositadoFormateado: Formatters.formatCurrency(recarga.monto_depositado),
             porcentajeComision: Number(recarga.porcentaje_comision),
-            comisionCalculada: Number(recarga.comision_calculada),
-            comisionFormateada: Formatters.formatCurrency(recarga.comision_calculada),
+            comision: Number(recarga.comision_calculada),
             montoNeto: Number(recarga.monto_neto),
-            montoNetoFormateado: Formatters.formatCurrency(recarga.monto_neto),
             boucherUrl: recarga.boucher_url,
             estado: recarga.estado,
             motivoRechazo: recarga.motivo_rechazo,
             comprobantePdfUrl: recarga.comprobante_pdf_url,
-            fecha: Formatters.formatDate(recarga.created_at),
-            fechaProcesado: recarga.processed_at ? Formatters.formatDate(recarga.processed_at) : null,
-            procesadoPor: recarga.admin ? {
-              id: recarga.admin.id,
+            fechaCreacion: recarga.created_at.toISOString(),
+            fechaProcesamiento: recarga.processed_at ? recarga.processed_at.toISOString() : undefined,
+            admin: recarga.admin ? {
               email: recarga.admin.email,
               nombre: recarga.admin.nombre
-            } : null
+            } : undefined
           },
           usuario: {
             id: recarga.user.id,
             email: recarga.user.email,
-            nombre: `${recarga.user.nombres} ${recarga.user.apellidos}`,
+            nombres: recarga.user.nombres,
+            apellidos: recarga.user.apellidos,
             dni: recarga.user.dni,
             whatsapp: recarga.user.whatsapp,
-            saldoActual: Formatters.formatCurrency(recarga.user.saldo_actual),
-            fechaRegistro: Formatters.formatDate(recarga.user.created_at),
-            esReferido: !!recarga.user.referido_por,
-            bonoReferidoUsado: recarga.user.bono_referido_usado,
-            estadisticas: {
-              totalRecargas: historialUsuario,
-              recargasAprobadas,
-              alertasActivas
-            }
+            saldoActual: Number(recarga.user.saldo_actual),
+            totalRecargas: historialUsuario,
+            recargasAprobadas,
+            alertasActivas
           }
         }
       });
@@ -515,6 +507,7 @@ export class AdminRecargasController {
           include: {
             user: {
               select: {
+                id: true,
                 email: true,
                 nombres: true,
                 apellidos: true,
@@ -540,14 +533,17 @@ export class AdminRecargasController {
             id: r.id,
             numeroOperacion: r.numero_operacion,
             bancoOrigen: r.banco_origen,
-            montoDepositado: Formatters.formatCurrency(r.monto_depositado),
-            montoNeto: Formatters.formatCurrency(r.monto_neto),
+            montoDepositado: Number(r.monto_depositado),
+            comision: Number(r.comision_calculada),
+            montoNeto: Number(r.monto_neto),
+            boucherUrl: r.boucher_url,
             estado: r.estado,
-            fecha: Formatters.formatDate(r.created_at),
-            fechaProcesado: r.processed_at ? Formatters.formatDate(r.processed_at) : null,
+            fecha: r.created_at.toISOString(),
             usuario: {
+              id: r.user.id,
               email: r.user.email,
-              nombre: `${r.user.nombres} ${r.user.apellidos}`,
+              nombres: r.user.nombres,
+              apellidos: r.user.apellidos,
               dni: r.user.dni
             },
             procesadoPor: r.admin?.nombre || null
@@ -631,7 +627,7 @@ export class AdminRecargasController {
           },
           mes: {
             totalAprobadas: totalMes,
-            montoTotal: Formatters.formatCurrency(montoTotal)
+            montoTotal
           }
         }
       });

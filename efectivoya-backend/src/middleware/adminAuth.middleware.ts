@@ -65,8 +65,12 @@ export const adminAuthMiddleware = async (
       req.adminRol = admin.rol;
 
       next();
-    } catch (error) {
-      Logger.error('Token de admin inválido:', error);
+    } catch (error: any) {
+      if (error?.name === 'TokenExpiredError') {
+        Logger.debug('Token de admin expirado — cliente debe renovar');
+      } else {
+        Logger.error('Token de admin inválido:', error);
+      }
       res.status(401).json({
         success: false,
         message: 'Token de administrador inválido o expirado'

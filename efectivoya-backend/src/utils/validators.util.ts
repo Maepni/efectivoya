@@ -22,8 +22,45 @@ export class Validators {
     return hasMinLength && hasUppercase && hasNumber && hasSymbol;
   }
 
-  static isValidNumeroCuenta(cuenta: string): boolean {
-    return /^\d{13,}$/.test(cuenta);
+  static getExpectedCuentaLength(banco?: string, tipoCuenta?: string): number[] {
+    switch (banco) {
+      case 'BCP':
+        if (tipoCuenta === 'ahorros') return [14];
+        if (tipoCuenta === 'corriente') return [13];
+        return [13, 14];
+      case 'Interbank':
+        return [13];
+      case 'Scotiabank':
+        return [10];
+      case 'BBVA':
+        return [18];
+      default:
+        return [10, 13, 14, 18];
+    }
+  }
+
+  static getNumeroCuentaErrorMessage(banco?: string, tipoCuenta?: string): string {
+    const lengths = Validators.getExpectedCuentaLength(banco, tipoCuenta);
+    switch (banco) {
+      case 'BCP':
+        if (tipoCuenta === 'ahorros') return 'Cuenta BCP ahorros debe tener 14 dígitos';
+        if (tipoCuenta === 'corriente') return 'Cuenta BCP corriente debe tener 13 dígitos';
+        return 'Cuenta BCP debe tener 13 dígitos (corriente) o 14 dígitos (ahorros)';
+      case 'Interbank':
+        return 'Cuenta Interbank debe tener 13 dígitos';
+      case 'Scotiabank':
+        return 'Cuenta Scotiabank debe tener 10 dígitos';
+      case 'BBVA':
+        return 'Cuenta BBVA debe tener 18 dígitos';
+      default:
+        return `Número de cuenta debe tener ${lengths.join(' o ')} dígitos`;
+    }
+  }
+
+  static isValidNumeroCuenta(cuenta: string, banco?: string, tipoCuenta?: string): boolean {
+    if (!/^\d+$/.test(cuenta)) return false;
+    const validLengths = Validators.getExpectedCuentaLength(banco, tipoCuenta);
+    return validLengths.includes(cuenta.length);
   }
 
   static isValidCCI(cci: string): boolean {

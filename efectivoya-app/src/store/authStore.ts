@@ -40,9 +40,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         const user = JSON.parse(userStr[1]) as User;
         set({ user, isAuthenticated: true });
 
-        // Refresh user data in background
-        get().refreshUser();
-        socketService.connect();
+        // Refresh user data (el interceptor de Axios renueva el accessToken si expiró)
+        // Luego reconectar socket con el token fresco
+        get().refreshUser().then(() => {
+          socketService.reconnect();
+        });
       }
     } catch {
       await get().clearAuth();

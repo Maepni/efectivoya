@@ -44,6 +44,12 @@ api.interceptors.response.use(
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // No intentar refresh en rutas de auth para preservar el mensaje de error original
+      const url = originalRequest.url || '';
+      if (url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/refresh')) {
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -61,7 +67,8 @@ api.interceptors.response.use(
       try {
         const refreshToken = await AsyncStorage.getItem('refreshToken');
         if (!refreshToken) {
-          throw new Error('No refresh token');
+          await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+          return Promise.reject(new Error('No refresh token'));
         }
 
         const { data } = await axios.post(`${API_URL}/api/auth/refresh`, {
@@ -72,7 +79,9 @@ api.interceptors.response.use(
         const newRefreshToken = data.data.refreshToken;
 
         await AsyncStorage.setItem('accessToken', newAccessToken);
-        await AsyncStorage.setItem('refreshToken', newRefreshToken);
+        if (newRefreshToken) {
+          await AsyncStorage.setItem('refreshToken', newRefreshToken);
+        }
 
         processQueue(null, newAccessToken);
 

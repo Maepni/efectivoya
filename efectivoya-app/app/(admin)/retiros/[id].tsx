@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Linking,
+  TextInput,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +30,7 @@ export default function AdminRetiroDetalleScreen() {
   const [actionLoading, setActionLoading] = useState(false);
   const [showRechazo, setShowRechazo] = useState(false);
   const [showAprobar, setShowAprobar] = useState(false);
+  const [referenciaBanco, setReferenciaBanco] = useState('');
   const [message, setMessage] = useState('');
   const { isMobile } = useResponsive();
 
@@ -45,11 +47,12 @@ export default function AdminRetiroDetalleScreen() {
   const handleAprobar = async () => {
     if (!id) return;
     setActionLoading(true);
-    const res = await adminRetirosService.aprobar(id);
+    const res = await adminRetirosService.aprobar(id, referenciaBanco.trim() || undefined);
     setActionLoading(false);
     setShowAprobar(false);
     if (res.success) {
-      setMessage('Retiro aprobado exitosamente');
+      setReferenciaBanco('');
+      setMessage('Retiro aprobado exitosamente. Recuerda transferir el dinero al usuario.');
       fetchDetalle();
     } else {
       setMessage(res.message || 'Error al aprobar');
@@ -136,6 +139,9 @@ export default function AdminRetiroDetalleScreen() {
               {retiro.motivo_rechazo && (
                 <InfoRow label="Motivo Rechazo" value={retiro.motivo_rechazo} />
               )}
+              {retiro.referencia_banco && (
+                <InfoRow label="Ref. Transferencia" value={retiro.referencia_banco} />
+              )}
               {retiro.admin && (
                 <InfoRow label="Admin" value={retiro.admin.nombre} />
               )}
@@ -172,19 +178,30 @@ export default function AdminRetiroDetalleScreen() {
 
         {/* Actions */}
         {isPendiente && (
-          <View style={[styles.actions, isMobile && styles.actionsMobile]}>
-            <Button
-              title="Aprobar Retiro"
-              onPress={() => setShowAprobar(true)}
-              style={{ ...styles.approveButton, ...(isMobile ? styles.buttonMobile : {}) }}
+          <View style={styles.actionsContainer}>
+            <Text style={styles.refLabel}>N° de operación bancaria (opcional)</Text>
+            <TextInput
+              style={styles.refInput}
+              placeholder="Ej: 123456789 — ingresar después de transferir"
+              placeholderTextColor={Colors.gray}
+              value={referenciaBanco}
+              onChangeText={setReferenciaBanco}
+              autoCapitalize="none"
             />
-            <Button
-              title="Rechazar Retiro"
-              onPress={() => setShowRechazo(true)}
-              variant="outline"
-              style={{ ...styles.rejectButton, ...(isMobile ? styles.buttonMobile : {}) }}
-              textStyle={{ color: Colors.error }}
-            />
+            <View style={[styles.actions, isMobile && styles.actionsMobile]}>
+              <Button
+                title="Aprobar Retiro"
+                onPress={() => setShowAprobar(true)}
+                style={{ ...styles.approveButton, ...(isMobile ? styles.buttonMobile : {}) }}
+              />
+              <Button
+                title="Rechazar Retiro"
+                onPress={() => setShowRechazo(true)}
+                variant="outline"
+                style={{ ...styles.rejectButton, ...(isMobile ? styles.buttonMobile : {}) }}
+                textStyle={{ color: Colors.error }}
+              />
+            </View>
           </View>
         )}
       </ScrollView>
@@ -327,10 +344,27 @@ const styles = StyleSheet.create({
     marginTop: Layout.spacing.md,
     textDecorationLine: 'underline',
   },
+  actionsContainer: {
+    marginTop: Layout.spacing.xxl,
+  },
+  refLabel: {
+    fontSize: Layout.fontSize.sm,
+    color: Colors.gray,
+    marginBottom: Layout.spacing.sm,
+  },
+  refInput: {
+    backgroundColor: Colors.cardBackground,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Layout.borderRadius.sm,
+    padding: Layout.spacing.md,
+    color: Colors.text,
+    fontSize: Layout.fontSize.sm,
+    marginBottom: Layout.spacing.lg,
+  },
   actions: {
     flexDirection: 'row',
     gap: Layout.spacing.md,
-    marginTop: Layout.spacing.xxl,
     justifyContent: 'center',
   },
   actionsMobile: {

@@ -295,13 +295,16 @@ export class AuthController {
         return res.status(401).json({ success: false, message: 'Token inválido' });
       }
 
-      // Generar nuevo access token
+      // Generar nuevos tokens (token rotation)
       const newAccessToken = JWTUtil.generateAccessToken(user.id, user.email);
+      const newTokenId = uuidv4();
+      const newRefreshToken = JWTUtil.generateRefreshToken(user.id, newTokenId);
 
       return res.json({
         success: true,
         data: {
-          accessToken: newAccessToken
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken
         }
       });
     } catch (error) {

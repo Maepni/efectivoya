@@ -22,6 +22,10 @@ export class RecargasController {
       const config = await prisma.configuracion.findFirst({
         select: {
           porcentaje_comision: true,
+          comision_bcp: true,
+          comision_interbank: true,
+          comision_scotiabank: true,
+          comision_bbva: true,
           monto_minimo_recarga: true,
           monto_maximo_recarga: true,
           cuenta_recaudadora_numero: true,
@@ -40,9 +44,11 @@ export class RecargasController {
       return res.json({
         success: true,
         data: {
-          comision: {
-            porcentaje: Number(config.porcentaje_comision),
-            descripcion: `Se aplicará una comisión del ${config.porcentaje_comision}% al monto depositado`
+          comisiones: {
+            BCP: Number(config.comision_bcp),
+            Interbank: Number(config.comision_interbank),
+            Scotiabank: Number(config.comision_scotiabank),
+            BBVA: Number(config.comision_bbva),
           },
           limites: {
             minimo: Number(config.monto_minimo_recarga),
@@ -189,8 +195,17 @@ export class RecargasController {
         });
       }
 
-      // Calcular comisión
-      const porcentajeComision = Number(config.porcentaje_comision);
+      // Calcular comisión (por banco)
+      const comisionMap: Record<string, string> = {
+        BCP: 'comision_bcp',
+        Interbank: 'comision_interbank',
+        Scotiabank: 'comision_scotiabank',
+        BBVA: 'comision_bbva'
+      };
+      const campoComision = comisionMap[banco_origen] as keyof typeof config;
+      const porcentajeComision = campoComision && config[campoComision]
+        ? Number(config[campoComision])
+        : Number(config.porcentaje_comision);
       const comisionCalculada = monto * (porcentajeComision / 100);
       const montoNeto = monto - comisionCalculada;
 
@@ -293,6 +308,7 @@ export class RecargasController {
             numero_operacion: true,
             banco_origen: true,
             monto_depositado: true,
+            porcentaje_comision: true,
             comision_calculada: true,
             monto_neto: true,
             estado: true,
@@ -312,16 +328,17 @@ export class RecargasController {
         data: {
           recargas: recargas.map(r => ({
             id: r.id,
-            numeroOperacion: r.numero_operacion,
-            bancoOrigen: r.banco_origen,
-            montoDepositado: Formatters.formatCurrency(r.monto_depositado),
-            comision: Formatters.formatCurrency(r.comision_calculada),
-            montoNeto: Formatters.formatCurrency(r.monto_neto),
+            numero_operacion: r.numero_operacion,
+            banco_origen: r.banco_origen,
+            monto_depositado: Number(r.monto_depositado),
+            porcentaje_comision: Number(r.porcentaje_comision),
+            comision_calculada: Number(r.comision_calculada),
+            monto_neto: Number(r.monto_neto),
             estado: r.estado,
-            motivoRechazo: r.motivo_rechazo,
-            tieneComprobante: !!r.comprobante_pdf_url,
-            fecha: Formatters.formatDate(r.created_at),
-            fechaProcesado: r.processed_at ? Formatters.formatDate(r.processed_at) : null
+            motivo_rechazo: r.motivo_rechazo,
+            comprobante_pdf_url: r.comprobante_pdf_url,
+            created_at: r.created_at.toISOString(),
+            processed_at: r.processed_at ? r.processed_at.toISOString() : null
           })),
           pagination: {
             page,

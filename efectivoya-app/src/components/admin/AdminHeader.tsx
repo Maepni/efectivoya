@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
@@ -13,16 +12,10 @@ interface AdminHeaderProps {
 export function AdminHeader({ title }: AdminHeaderProps) {
   const { admin, logout } = useAdminAuthStore();
   const { isMobile } = useResponsive();
-  const router = useRouter();
 
   return (
     <View style={styles.header}>
       <View style={styles.left}>
-        {isMobile ? (
-          <TouchableOpacity onPress={() => router.back()} style={styles.menuButton} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={24} color={Colors.accent} />
-          </TouchableOpacity>
-        ) : null}
         <Text style={styles.title}>{title}</Text>
       </View>
 
@@ -52,10 +45,6 @@ const styles = StyleSheet.create({
   left: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  menuButton: {
-    marginRight: Layout.spacing.md,
-    padding: Layout.spacing.xs,
   },
   title: {
     fontSize: Layout.fontSize.lg,

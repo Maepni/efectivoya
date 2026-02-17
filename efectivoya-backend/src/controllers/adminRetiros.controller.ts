@@ -101,7 +101,38 @@ export class AdminRetirosController {
 
       return res.json({
         success: true,
-        data: { retiro }
+        data: {
+          retiro: {
+            id: retiro.id,
+            numero_operacion: retiro.numero_operacion,
+            monto: Number(retiro.monto),
+            estado: retiro.estado,
+            motivo_rechazo: retiro.motivo_rechazo,
+            referencia_banco: retiro.referencia_banco,
+            comprobante_pdf_url: retiro.comprobante_pdf_url,
+            created_at: retiro.created_at.toISOString(),
+            processed_at: retiro.processed_at ? retiro.processed_at.toISOString() : null,
+            usuario: {
+              id: retiro.user.id,
+              email: retiro.user.email,
+              nombres: retiro.user.nombres,
+              apellidos: retiro.user.apellidos,
+              dni: retiro.user.dni,
+              whatsapp: retiro.user.whatsapp,
+              saldo_actual: Number(retiro.user.saldo_actual)
+            },
+            banco: retiro.banco ? {
+              banco: retiro.banco.banco,
+              numero_cuenta: retiro.banco.numero_cuenta,
+              cci: retiro.banco.cci,
+              alias: retiro.banco.alias
+            } : null,
+            admin: retiro.admin ? {
+              email: retiro.admin.email,
+              nombre: retiro.admin.nombre
+            } : null
+          }
+        }
       });
     } catch (error) {
       Logger.error('Error en getDetalle:', error);
@@ -120,6 +151,7 @@ export class AdminRetirosController {
     try {
       const adminId = req.adminId;
       const { id } = req.params;
+      const { referencia_banco } = req.body;
 
       if (!adminId) {
         return res.status(401).json({ success: false, message: 'No autorizado' });
@@ -145,6 +177,13 @@ export class AdminRetirosController {
         return res.status(400).json({
           success: false,
           message: `Este retiro ya fue ${retiro.estado}`
+        });
+      }
+
+      if (!retiro.banco) {
+        return res.status(400).json({
+          success: false,
+          message: 'La cuenta bancaria asociada a este retiro fue eliminada'
         });
       }
 
@@ -180,7 +219,8 @@ export class AdminRetirosController {
           data: {
             estado: 'aprobado',
             admin_id: adminId,
-            processed_at: new Date()
+            processed_at: new Date(),
+            ...(referencia_banco ? { referencia_banco } : {})
           }
         });
 
@@ -201,7 +241,8 @@ export class AdminRetirosController {
         cci: retiro.banco.cci,
         monto: montoRetiro,
         saldo_anterior: saldoAnterior,
-        nuevo_saldo: nuevoSaldo
+        nuevo_saldo: nuevoSaldo,
+        referencia_banco: referencia_banco || undefined
       };
 
       const pdfBuffer = await PDFService.generateRetiroComprobante(pdfData);
@@ -377,12 +418,13 @@ export class AdminRetirosController {
         where.user_id = user_id;
       }
 
-      const [retiros, total] = await Promise.all([
+      const [retirosRaw, total] = await Promise.all([
         prisma.retiro.findMany({
           where,
           include: {
             user: {
               select: {
+                id: true,
                 email: true,
                 nombres: true,
                 apellidos: true,
@@ -392,6 +434,8 @@ export class AdminRetirosController {
             banco: {
               select: {
                 banco: true,
+                numero_cuenta: true,
+                cci: true,
                 alias: true
               }
             },
@@ -407,6 +451,30 @@ export class AdminRetirosController {
         }),
         prisma.retiro.count({ where })
       ]);
+
+      const retiros = retirosRaw.map(r => ({
+        id: r.id,
+        numero_operacion: r.numero_operacion,
+        monto: Number(r.monto),
+        estado: r.estado,
+        created_at: r.created_at.toISOString(),
+        processed_at: r.processed_at ? r.processed_at.toISOString() : null,
+        motivo_rechazo: r.motivo_rechazo,
+        usuario: {
+          id: r.user.id,
+          email: r.user.email,
+          nombres: r.user.nombres,
+          apellidos: r.user.apellidos,
+          dni: r.user.dni
+        },
+        banco: r.banco ? {
+          banco: r.banco.banco,
+          numero_cuenta: r.banco.numero_cuenta,
+          cci: r.banco.cci,
+          alias: r.banco.alias
+        } : null,
+        procesadoPor: r.admin?.nombre || null
+      }));
 
       return res.json({
         success: true,

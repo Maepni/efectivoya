@@ -122,8 +122,8 @@ export class UserDashboardController {
           tipo: 'retiro' as const,
           id: r.id,
           numero_operacion: r.numero_operacion,
-          banco: r.banco.banco,
-          alias: r.banco.alias,
+          banco: r.banco?.banco,
+          alias: r.banco?.alias,
           monto: r.monto.toNumber(),
           estado: r.estado,
           created_at: r.created_at

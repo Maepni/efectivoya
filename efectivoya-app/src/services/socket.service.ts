@@ -10,6 +10,12 @@ class SocketService {
     const token = await AsyncStorage.getItem('accessToken');
     if (!token) return;
 
+    // Si ya hay socket conectado, desconectar primero
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
+
     this.socket = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket'],
@@ -24,9 +30,17 @@ class SocketService {
       if (__DEV__) console.log('Socket disconnected');
     });
 
+    this.socket.on('connect_error', (error: Error) => {
+      if (__DEV__) console.error('Socket connect_error:', error.message);
+    });
+
     this.socket.on('error', (error: { message: string }) => {
       if (__DEV__) console.error('Socket error:', error.message);
     });
+  }
+
+  async reconnect(): Promise<void> {
+    await this.connect();
   }
 
   disconnect(): void {

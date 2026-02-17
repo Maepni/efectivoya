@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { PrismaClient, BancoEnum } from '@prisma/client';
+import { PrismaClient, BancoEnum, TipoCuenta } from '@prisma/client';
 import { AuthRequest } from '../types';
 import { Validators } from '../utils/validators.util';
 import { Logger } from '../utils/logger.util';
@@ -30,6 +30,7 @@ export class UserBanksController {
       const bancosEnmascarados = bancos.map(banco => ({
         id: banco.id,
         banco: banco.banco,
+        tipo_cuenta: banco.tipo_cuenta,
         numero_cuenta: MaskDataUtil.maskCuenta(banco.numero_cuenta),
         numero_cuenta_completo: banco.numero_cuenta,
         cci: MaskDataUtil.maskCCI(banco.cci),
@@ -82,6 +83,7 @@ export class UserBanksController {
       const bancoEnmascarado = {
         id: banco.id,
         banco: banco.banco,
+        tipo_cuenta: banco.tipo_cuenta,
         numero_cuenta: MaskDataUtil.maskCuenta(banco.numero_cuenta),
         numero_cuenta_completo: banco.numero_cuenta,
         cci: MaskDataUtil.maskCCI(banco.cci),
@@ -108,7 +110,7 @@ export class UserBanksController {
   static async registerBank(req: AuthRequest, res: Response): Promise<Response> {
     try {
       const userId = req.userId;
-      const { banco, numero_cuenta, cci, alias } = req.body;
+      const { banco, tipo_cuenta, numero_cuenta, cci, alias } = req.body;
 
       if (!userId) {
         return res.status(401).json({ success: false, message: 'No autorizado' });
@@ -123,11 +125,25 @@ export class UserBanksController {
         });
       }
 
-      // Validar número de cuenta
-      if (!Validators.isValidNumeroCuenta(numero_cuenta)) {
+      // Validar tipo_cuenta: requerido para BCP, no permitido para otros
+      if (banco === 'BCP' && !tipo_cuenta) {
         return res.status(400).json({
           success: false,
-          message: 'Número de cuenta inválido. Debe tener al menos 13 dígitos'
+          message: 'Para BCP debes seleccionar el tipo de cuenta (ahorros o corriente)'
+        });
+      }
+      if (banco !== 'BCP' && tipo_cuenta) {
+        return res.status(400).json({
+          success: false,
+          message: 'El tipo de cuenta solo aplica para BCP'
+        });
+      }
+
+      // Validar número de cuenta per-bank
+      if (!Validators.isValidNumeroCuenta(numero_cuenta, banco, tipo_cuenta)) {
+        return res.status(400).json({
+          success: false,
+          message: Validators.getNumeroCuentaErrorMessage(banco, tipo_cuenta)
         });
       }
 
@@ -168,6 +184,7 @@ export class UserBanksController {
         data: {
           user_id: userId,
           banco: banco as BancoEnum,
+          tipo_cuenta: banco === 'BCP' ? (tipo_cuenta as TipoCuenta) : null,
           numero_cuenta: numero_cuenta.trim(),
           cci: cci.trim(),
           alias: alias ? Validators.sanitizeString(alias) : null
@@ -191,6 +208,7 @@ export class UserBanksController {
           banco: {
             id: nuevoBanco.id,
             banco: nuevoBanco.banco,
+            tipo_cuenta: nuevoBanco.tipo_cuenta,
             numero_cuenta: MaskDataUtil.maskCuenta(nuevoBanco.numero_cuenta),
             cci: MaskDataUtil.maskCCI(nuevoBanco.cci),
             alias: nuevoBanco.alias,
@@ -212,7 +230,7 @@ export class UserBanksController {
     try {
       const userId = req.userId;
       const { id } = req.params;
-      const { numero_cuenta, cci, alias } = req.body;
+      const { tipo_cuenta, numero_cuenta, cci, alias } = req.body;
 
       if (!userId) {
         return res.status(401).json({ success: false, message: 'No autorizado' });
@@ -236,12 +254,28 @@ export class UserBanksController {
       // Preparar datos a actualizar
       const dataToUpdate: Record<string, string | null> = {};
 
-      // Validar y actualizar número de cuenta si se proporciona
-      if (numero_cuenta !== undefined) {
-        if (!Validators.isValidNumeroCuenta(numero_cuenta)) {
+      // Validar tipo_cuenta si se proporciona
+      if (tipo_cuenta !== undefined) {
+        if (bancoExistente.banco !== 'BCP') {
           return res.status(400).json({
             success: false,
-            message: 'Número de cuenta inválido. Debe tener al menos 13 dígitos'
+            message: 'El tipo de cuenta solo aplica para BCP'
+          });
+        }
+        dataToUpdate.tipo_cuenta = tipo_cuenta;
+      }
+
+      // Determinar tipo_cuenta efectivo para validar numero_cuenta
+      const effectiveTipoCuenta = tipo_cuenta !== undefined
+        ? tipo_cuenta
+        : bancoExistente.tipo_cuenta;
+
+      // Validar y actualizar número de cuenta si se proporciona
+      if (numero_cuenta !== undefined) {
+        if (!Validators.isValidNumeroCuenta(numero_cuenta, bancoExistente.banco, effectiveTipoCuenta)) {
+          return res.status(400).json({
+            success: false,
+            message: Validators.getNumeroCuentaErrorMessage(bancoExistente.banco, effectiveTipoCuenta)
           });
         }
         dataToUpdate.numero_cuenta = numero_cuenta.trim();
@@ -299,6 +333,7 @@ export class UserBanksController {
           banco: {
             id: bancoActualizado.id,
             banco: bancoActualizado.banco,
+            tipo_cuenta: bancoActualizado.tipo_cuenta,
             numero_cuenta: MaskDataUtil.maskCuenta(bancoActualizado.numero_cuenta),
             cci: MaskDataUtil.maskCCI(bancoActualizado.cci),
             alias: bancoActualizado.alias,
@@ -351,7 +386,7 @@ export class UserBanksController {
       if (retirosPendientes) {
         return res.status(400).json({
           success: false,
-          message: 'No puedes eliminar este banco porque tienes retiros pendientes asociados'
+          message: 'No puedes eliminar este banco porque tiene un retiro pendiente de aprobación. Espera a que sea procesado.'
         });
       }
 

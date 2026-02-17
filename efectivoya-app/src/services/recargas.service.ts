@@ -2,7 +2,7 @@ import { ApiService } from './api.service';
 import type { ApiResponse, PaginatedResponse, Recarga, RecargaConfig } from '../types';
 
 class RecargasService {
-  async getConfig(): Promise<ApiResponse<{ config: RecargaConfig }>> {
+  async getConfig(): Promise<ApiResponse<RecargaConfig>> {
     return await ApiService.get('/recargas/config');
   }
 

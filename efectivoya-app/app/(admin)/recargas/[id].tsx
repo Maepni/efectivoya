@@ -50,10 +50,10 @@ export default function AdminRecargaDetalleScreen() {
     setActionLoading(false);
     setShowAprobar(false);
     if (res.success) {
-      setMessage('Recarga aprobada exitosamente');
+      setMessage('✓ Recarga aprobada exitosamente. El saldo fue acreditado al usuario.');
       fetchDetalle();
     } else {
-      setMessage(res.message || 'Error al aprobar');
+      setMessage(res.message || 'No se pudo aprobar la recarga');
     }
   };
 
@@ -64,10 +64,10 @@ export default function AdminRecargaDetalleScreen() {
     setActionLoading(false);
     setShowRechazo(false);
     if (res.success) {
-      setMessage('Recarga rechazada');
+      setMessage('Recarga rechazada. Se notificó al usuario.');
       fetchDetalle();
     } else {
-      setMessage(res.message || 'Error al rechazar');
+      setMessage(res.message || 'No se pudo rechazar la recarga');
     }
   };
 
@@ -120,7 +120,7 @@ export default function AdminRecargaDetalleScreen() {
         ) : null}
 
         <View style={[styles.grid, isMobile && styles.gridMobile]}>
-          {/* Recarga info */}
+          {/* Left column: Recarga info + Usuario */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Información de Recarga</Text>
             <View style={styles.card}>
@@ -149,26 +149,8 @@ export default function AdminRecargaDetalleScreen() {
                 </TouchableOpacity>
               )}
             </View>
-          </View>
 
-          {/* Boucher */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Boucher</Text>
-            <View style={styles.card}>
-              {recarga.boucherUrl ? (
-                <TouchableOpacity onPress={() => Linking.openURL(recarga.boucherUrl)}>
-                  <Image
-                    source={{ uri: recarga.boucherUrl }}
-                    style={[styles.boucherImage, isMobile && styles.boucherImageMobile]}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-              ) : (
-                <Text style={styles.noBoucher}>Sin boucher</Text>
-              )}
-            </View>
-
-            {/* Usuario info */}
+            {/* Usuario info - below recarga info */}
             <Text style={[styles.sectionTitle, { marginTop: Layout.spacing.xl }]}>Usuario</Text>
             <View style={styles.card}>
               <InfoRow label="Nombre" value={`${usuario.nombres} ${usuario.apellidos}`} />
@@ -180,6 +162,24 @@ export default function AdminRecargaDetalleScreen() {
               <InfoRow label="Aprobadas" value={String(usuario.recargasAprobadas)} />
               {usuario.alertasActivas > 0 && (
                 <InfoRow label="Alertas Activas" value={String(usuario.alertasActivas)} highlight />
+              )}
+            </View>
+          </View>
+
+          {/* Right column: Boucher */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Boucher</Text>
+            <View style={styles.boucherCard}>
+              {recarga.boucherUrl ? (
+                <TouchableOpacity onPress={() => Linking.openURL(recarga.boucherUrl)}>
+                  <Image
+                    source={{ uri: recarga.boucherUrl }}
+                    style={[styles.boucherImage, isMobile && styles.boucherImageMobile]}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.noBoucher}>Sin boucher</Text>
               )}
             </View>
           </View>
@@ -305,9 +305,10 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     gap: Layout.spacing.xl,
+    alignItems: 'flex-start',
   },
   gridMobile: {
-    flexDirection: 'column',
+    flexDirection: 'column-reverse',
   },
   section: {
     flex: 1,
@@ -322,6 +323,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cardBackground,
     borderRadius: Layout.borderRadius.md,
     padding: Layout.spacing.lg,
+  },
+  boucherCard: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: Layout.borderRadius.md,
+    padding: Layout.spacing.sm,
   },
   infoRow: {
     flexDirection: 'row',
@@ -338,11 +344,11 @@ const styles = StyleSheet.create({
   },
   boucherImage: {
     width: '100%',
-    height: 400,
+    height: 750,
     borderRadius: Layout.borderRadius.sm,
   },
   boucherImageMobile: {
-    height: 250,
+    height: 550,
   },
   noBoucher: {
     color: Colors.gray,

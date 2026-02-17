@@ -80,8 +80,12 @@ class SocketService {
         }
 
         return next(new Error('Usuario no encontrado'));
-      } catch (_error) {
-        Logger.error('Error en autenticación socket:', _error);
+      } catch (_error: any) {
+        if (_error?.name === 'TokenExpiredError') {
+          Logger.debug('Socket: token expirado — cliente debe reconectar');
+        } else {
+          Logger.error('Error en autenticación socket:', _error);
+        }
         return next(new Error('Autenticación fallida'));
       }
     });

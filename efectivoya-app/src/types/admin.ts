@@ -157,6 +157,7 @@ export interface AdminRetiroDetalle {
     monto: number | string;
     estado: string;
     motivo_rechazo?: string;
+    referencia_banco?: string;
     comprobante_pdf_url?: string;
     created_at: string;
     processed_at?: string;
@@ -307,11 +308,12 @@ export interface AdminAlertaStats {
 export interface AdminConfig {
   id: number;
   porcentaje_comision: number;
+  comision_bcp: number;
+  comision_interbank: number;
+  comision_scotiabank: number;
+  comision_bbva: number;
   monto_minimo_recarga: number;
   monto_maximo_recarga: number;
-  cuenta_recaudadora_numero: string;
-  cuenta_recaudadora_banco: string;
-  cuenta_recaudadora_titular: string;
   mantenimiento_activo: boolean;
   version_minima_android: string;
   version_minima_ios: string;

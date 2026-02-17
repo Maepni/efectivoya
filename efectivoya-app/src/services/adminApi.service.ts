@@ -65,13 +65,19 @@ adminApi.interceptors.response.use(
 
       try {
         const refreshToken = await AsyncStorage.getItem('adminRefreshToken');
-        if (!refreshToken) throw new Error('No refresh token');
+        if (!refreshToken) {
+          await AsyncStorage.multiRemove(['adminAccessToken', 'adminRefreshToken', 'adminUser']);
+          return Promise.reject(new Error('No refresh token'));
+        }
 
         const { data } = await axios.post(`${API_URL}/api/admin/auth/refresh`, { refreshToken });
 
         if (data.success && data.data?.accessToken) {
           const newToken = data.data.accessToken;
           await AsyncStorage.setItem('adminAccessToken', newToken);
+          if (data.data.refreshToken) {
+            await AsyncStorage.setItem('adminRefreshToken', data.data.refreshToken);
+          }
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           processQueue(null, newToken);
           return adminApi(originalRequest);

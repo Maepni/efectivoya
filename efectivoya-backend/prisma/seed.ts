@@ -15,6 +15,10 @@ async function main() {
     create: {
       id: 1,
       porcentaje_comision: new Decimal(5.0),
+      comision_bcp: new Decimal(5.0),
+      comision_interbank: new Decimal(5.0),
+      comision_scotiabank: new Decimal(5.0),
+      comision_bbva: new Decimal(5.0),
       monto_minimo_recarga: new Decimal(1000),
       monto_maximo_recarga: new Decimal(100000),
       cuenta_recaudadora_numero: '191-0123456789-0-12',

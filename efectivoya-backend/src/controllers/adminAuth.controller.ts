@@ -157,11 +157,17 @@ export class AdminAuthController {
         });
       }
 
+      // Token rotation
       const newAccessToken = JWTUtil.generateAccessToken(admin.id, admin.email);
+      const newTokenId = uuidv4();
+      const newRefreshToken = JWTUtil.generateRefreshToken(admin.id, newTokenId);
 
       return res.json({
         success: true,
-        data: { accessToken: newAccessToken }
+        data: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken
+        }
       });
     } catch (error) {
       Logger.error('Error en admin refreshToken:', error);

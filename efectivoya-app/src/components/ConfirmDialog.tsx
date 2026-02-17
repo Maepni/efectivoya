@@ -68,6 +68,7 @@ export function ConfirmDialog({
                   styles.button,
                   isRow && styles.buttonFlex,
                   index > 0 && isRow && styles.buttonBorderLeft,
+                  index > 0 && !isRow && styles.buttonBorderTop,
                 ]}
                 onPress={() => handlePress(button)}
               >
@@ -140,6 +141,10 @@ const styles = StyleSheet.create({
   buttonBorderLeft: {
     borderLeftWidth: 1,
     borderLeftColor: Colors.border,
+  },
+  buttonBorderTop: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
   },
   buttonText: {
     fontSize: Layout.fontSize.md,

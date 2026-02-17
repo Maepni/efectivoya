@@ -12,16 +12,17 @@ import {
   Linking,
   Platform,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
 import { Card } from '../../src/components/Card';
 import { OperacionCard } from '../../src/components/OperacionCard';
-import { ConfirmDialog } from '../../src/components/ConfirmDialog';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import RecargasService from '../../src/services/recargas.service';
 import { useAuthStore } from '../../src/store/authStore';
@@ -59,7 +60,6 @@ export default function RecargasScreen() {
   } | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
 
-  const [imagePickerDialogVisible, setImagePickerDialogVisible] = useState(false);
   const [bancoOrigen, setBancoOrigen] = useState('');
   const [montoDepositado, setMontoDepositado] = useState('');
   const [boucherUri, setBoucherUri] = useState('');
@@ -76,7 +76,7 @@ export default function RecargasScreen() {
         setRecargas(historialRes.data.recargas || []);
       }
       if (configRes.success && configRes.data) {
-        setConfig(configRes.data.config);
+        setConfig(configRes.data);
       }
     } catch (error) {
       if (__DEV__) console.error('Error al cargar recargas:', error);
@@ -95,27 +95,6 @@ export default function RecargasScreen() {
     loadData();
   };
 
-  const pickImage = async () => {
-    const { status } =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permisos necesarios',
-        'Necesitamos acceso a tu galeria para subir el comprobante'
-      );
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
-    if (!result.canceled && result.assets[0]) {
-      setBoucherUri(result.assets[0].uri);
-    }
-  };
-
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -126,8 +105,6 @@ export default function RecargasScreen() {
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
@@ -135,8 +112,71 @@ export default function RecargasScreen() {
     }
   };
 
+  const pickFromGallery = async () => {
+    if (Platform.OS === 'android') {
+      // Android: usar DocumentPicker (abre el administrador de archivos nativo)
+      // que muestra TODOS los archivos/fotos sin las limitaciones del Android Photo Picker
+      try {
+        const result = await DocumentPicker.getDocumentAsync({
+          type: 'image/*',
+          copyToCacheDirectory: true,
+        });
+        if (!result.canceled && result.assets[0]) {
+          setBoucherUri(result.assets[0].uri);
+        }
+      } catch (_err) {
+        Alert.alert('Error', 'No se pudo abrir el selector de archivos');
+      }
+      return;
+    }
+    // iOS: usar ImagePicker con manejo de acceso limitado
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permission.status !== 'granted') {
+      Alert.alert(
+        'Permisos necesarios',
+        'Necesitamos acceso a tu galería para seleccionar el comprobante.',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Configuración', onPress: () => Linking.openSettings() },
+        ]
+      );
+      return;
+    }
+    if ((permission as any).accessPrivileges === 'limited') {
+      Alert.alert(
+        'Acceso limitado a fotos',
+        'Solo tienes acceso a fotos seleccionadas. Para ver todas, ve a Configuración > EfectivoYa > Fotos y elige "Todas las fotos".',
+        [
+          { text: 'Continuar así', onPress: () => launchGalleryIOS() },
+          { text: 'Configuración', onPress: () => Linking.openSettings() },
+        ]
+      );
+      return;
+    }
+    launchGalleryIOS();
+  };
+
+  const launchGalleryIOS = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.8,
+      allowsEditing: false,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setBoucherUri(result.assets[0].uri);
+    }
+  };
+
   const showImageOptions = () => {
-    setImagePickerDialogVisible(true);
+    Alert.alert(
+      'Seleccionar Comprobante',
+      'Elige una opción',
+      [
+        { text: 'Tomar Foto', onPress: takePhoto },
+        { text: 'Elegir de Galería', onPress: pickFromGallery },
+        { text: 'Cancelar', style: 'cancel' },
+      ]
+    );
   };
 
   const toggleVideoTutorial = async (banco: string) => {
@@ -158,11 +198,13 @@ export default function RecargasScreen() {
     }
   };
 
-  const comisionPct = config ? Number(config.porcentaje_comision) : 0;
+  const comisionPct = config && bancoOrigen
+    ? config.comisiones[bancoOrigen as keyof typeof config.comisiones] ?? 0
+    : 0;
 
   const calcularComision = () => {
     const monto = parseFloat(montoDepositado);
-    if (!montoDepositado || isNaN(monto) || !config) return 0;
+    if (!montoDepositado || isNaN(monto) || !config || !bancoOrigen) return 0;
     return (monto * comisionPct) / 100;
   };
 
@@ -187,8 +229,8 @@ export default function RecargasScreen() {
       return;
     }
     if (config) {
-      const minimo = Number(config.monto_minimo_recarga);
-      const maximo = Number(config.monto_maximo_recarga);
+      const minimo = config.limites.minimo;
+      const maximo = config.limites.maximo;
       if (monto < minimo) {
         Alert.alert('Error', `El monto minimo es S/. ${minimo.toFixed(2)}`);
         return;
@@ -241,22 +283,16 @@ export default function RecargasScreen() {
     setBoucherUri('');
   };
 
-  const handleVerComprobante = async (recarga: Recarga) => {
-    if (recarga.estado !== 'aprobado' || !recarga.comprobante_pdf_url) {
-      Alert.alert(
-        'Info',
-        'El comprobante estara disponible cuando se apruebe la recarga'
-      );
+  const handleVerComprobante = (recarga: Recarga) => {
+    if (recarga.estado !== 'aprobado') {
+      Alert.alert('Info', 'El comprobante estara disponible cuando se apruebe la recarga');
       return;
     }
-    try {
-      const response = await RecargasService.getComprobante(recarga.id);
-      if (response.success && response.data?.comprobante_url) {
-        Linking.openURL(response.data.comprobante_url);
-      }
-    } catch (_error) {
-      Alert.alert('Error', 'No se pudo descargar el comprobante');
+    if (!recarga.comprobante_pdf_url) {
+      Alert.alert('Info', 'El comprobante aún está siendo generado. Intenta de nuevo en un momento.');
+      return;
     }
+    Linking.openURL(recarga.comprobante_pdf_url);
   };
 
   if (loading) return <LoadingScreen />;
@@ -282,20 +318,23 @@ export default function RecargasScreen() {
         {config && (
           <Card style={styles.infoCard}>
             <Text style={styles.infoTitle}>Informacion de Recargas</Text>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Comision:</Text>
-              <Text style={styles.infoValue}>{comisionPct}%</Text>
-            </View>
-            <View style={styles.infoRow}>
+            <Text style={[styles.infoLabel, { marginBottom: 4 }]}>Comisiones por banco:</Text>
+            {BANCOS.map((banco) => (
+              <View key={banco} style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{banco}:</Text>
+                <Text style={styles.infoValue}>{config.comisiones[banco]}%</Text>
+              </View>
+            ))}
+            <View style={[styles.infoRow, { marginTop: 8 }]}>
               <Text style={styles.infoLabel}>Monto minimo:</Text>
               <Text style={styles.infoValue}>
-                S/. {Number(config.monto_minimo_recarga).toFixed(2)}
+                {config.limites.minimoFormateado}
               </Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Monto maximo:</Text>
               <Text style={styles.infoValue}>
-                S/. {Number(config.monto_maximo_recarga).toFixed(2)}
+                {config.limites.maximoFormateado}
               </Text>
             </View>
           </Card>
@@ -325,6 +364,7 @@ export default function RecargasScreen() {
                 estado={recarga.estado}
                 fecha={recarga.created_at}
                 banco={recarga.banco_origen}
+                motivo_rechazo={recarga.motivo_rechazo}
                 onPress={() => handleVerComprobante(recarga)}
               />
             ))
@@ -347,26 +387,6 @@ export default function RecargasScreen() {
           </View>
 
           <ScrollView style={styles.modalContent} contentContainerStyle={{ paddingBottom: insets.bottom }}>
-            {config?.cuenta_recaudadora_numero && (
-              <Card style={styles.cuentaCard}>
-                <View style={styles.cuentaHeader}>
-                  <Ionicons name="business" size={24} color={Colors.primary} />
-                  <Text style={styles.cuentaTitle}>
-                    Deposita a esta cuenta:
-                  </Text>
-                </View>
-                <Text style={styles.cuentaBanco}>
-                  {config.cuenta_recaudadora_banco}
-                </Text>
-                <Text style={styles.cuentaNumero}>
-                  {config.cuenta_recaudadora_numero}
-                </Text>
-                <Text style={styles.cuentaTitular}>
-                  {config.cuenta_recaudadora_titular}
-                </Text>
-              </Card>
-            )}
-
             <Text style={styles.label}>Banco de Origen *</Text>
             <View style={styles.bancosGrid}>
               {BANCOS.map((banco) => (
@@ -464,7 +484,8 @@ export default function RecargasScreen() {
               icon="cash"
             />
 
-            {montoDepositado !== '' &&
+            {bancoOrigen !== '' &&
+              montoDepositado !== '' &&
               !isNaN(parseFloat(montoDepositado)) && (
                 <Card style={styles.calculoCard}>
                   <View style={styles.calculoRow}>
@@ -500,8 +521,10 @@ export default function RecargasScreen() {
               {boucherUri ? (
                 <View style={styles.imagePreview}>
                   <Image
+                    key={boucherUri}
                     source={{ uri: boucherUri }}
                     style={styles.previewImage}
+                    resizeMode="contain"
                   />
                   <TouchableOpacity
                     style={styles.removeImageButton}
@@ -534,18 +557,6 @@ export default function RecargasScreen() {
           </ScrollView>
         </View>
       </Modal>
-
-      <ConfirmDialog
-        visible={imagePickerDialogVisible}
-        title="Seleccionar Comprobante"
-        message="Elige una opcion"
-        buttons={[
-          { text: 'Tomar Foto', onPress: takePhoto },
-          { text: 'Elegir de Galeria', onPress: pickImage },
-          { text: 'Cancelar', style: 'cancel' },
-        ]}
-        onDismiss={() => setImagePickerDialogVisible(false)}
-      />
 
     </View>
   );
@@ -625,34 +636,6 @@ const styles = StyleSheet.create({
     color: Colors.accent,
   },
   modalContent: { flex: 1, padding: Layout.spacing.lg },
-  cuentaCard: {
-    backgroundColor: Colors.secondary + '10',
-    marginBottom: Layout.spacing.lg,
-  },
-  cuentaHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Layout.spacing.sm,
-  },
-  cuentaTitle: {
-    fontSize: Layout.fontSize.md,
-    fontWeight: '600',
-    color: Colors.accent,
-    marginLeft: Layout.spacing.sm,
-  },
-  cuentaBanco: {
-    fontSize: Layout.fontSize.lg,
-    fontWeight: 'bold',
-    color: Colors.secondary,
-    marginBottom: Layout.spacing.xs,
-  },
-  cuentaNumero: {
-    fontSize: Layout.fontSize.xl,
-    fontWeight: 'bold',
-    color: Colors.accent,
-    marginBottom: Layout.spacing.xs,
-  },
-  cuentaTitular: { fontSize: Layout.fontSize.sm, color: Colors.gray },
   label: {
     fontSize: Layout.fontSize.sm,
     fontWeight: '600',
@@ -761,11 +744,15 @@ const styles = StyleSheet.create({
   },
   uploadButton: { marginBottom: Layout.spacing.md },
   imagePreview: {
-    position: 'relative',
+    alignItems: 'center',
     borderRadius: Layout.borderRadius.md,
-    overflow: 'hidden',
   },
-  previewImage: { width: '100%', height: 200, resizeMode: 'cover' },
+  previewImage: {
+    width: Dimensions.get('window').width - 80,
+    height: 300,
+    borderRadius: Layout.borderRadius.md,
+    backgroundColor: Colors.lightGray,
+  },
   removeImageButton: {
     position: 'absolute',
     top: Layout.spacing.sm,

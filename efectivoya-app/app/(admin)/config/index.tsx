@@ -7,6 +7,7 @@ import { Colors } from '../../../src/constants/colors';
 import { Layout } from '../../../src/constants/layout';
 import { adminConfigService } from '../../../src/services/adminConfig.service';
 import { adminVideosService, type VideoInstructivo } from '../../../src/services/adminVideos.service';
+import { useResponsive } from '../../../src/hooks/useResponsive';
 import type { AdminConfig } from '../../../src/types/admin';
 
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
@@ -14,6 +15,7 @@ const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
 
 export default function AdminConfigScreen() {
+  const { isMobile } = useResponsive();
   const [config, setConfig] = useState<AdminConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,14 +28,14 @@ export default function AdminConfigScreen() {
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   // Form state
-  const [porcentajeComision, setPorcentajeComision] = useState('');
+  const [comisionBcp, setComisionBcp] = useState('');
+  const [comisionInterbank, setComisionInterbank] = useState('');
+  const [comisionScotiabank, setComisionScotiabank] = useState('');
+  const [comisionBbva, setComisionBbva] = useState('');
   const [montoMinRecarga, setMontoMinRecarga] = useState('');
   const [montoMaxRecarga, setMontoMaxRecarga] = useState('');
   const [bonoReferido, setBonoReferido] = useState('');
   const [maxReferidos, setMaxReferidos] = useState('');
-  const [cuentaBanco, setCuentaBanco] = useState('');
-  const [cuentaNumero, setCuentaNumero] = useState('');
-  const [cuentaTitular, setCuentaTitular] = useState('');
   const [versionAndroid, setVersionAndroid] = useState('');
   const [versionIos, setVersionIos] = useState('');
   const [forzarActualizacion, setForzarActualizacion] = useState(false);
@@ -45,14 +47,14 @@ export default function AdminConfigScreen() {
     if (res.success && res.data) {
       const c = res.data.config;
       setConfig(c);
-      setPorcentajeComision(String(c.porcentaje_comision));
+      setComisionBcp(String(c.comision_bcp));
+      setComisionInterbank(String(c.comision_interbank));
+      setComisionScotiabank(String(c.comision_scotiabank));
+      setComisionBbva(String(c.comision_bbva));
       setMontoMinRecarga(String(c.monto_minimo_recarga));
       setMontoMaxRecarga(String(c.monto_maximo_recarga));
       setBonoReferido(String(c.bono_referido));
       setMaxReferidos(String(c.max_referidos_por_usuario));
-      setCuentaBanco(c.cuenta_recaudadora_banco);
-      setCuentaNumero(c.cuenta_recaudadora_numero);
-      setCuentaTitular(c.cuenta_recaudadora_titular);
       setVersionAndroid(c.version_minima_android);
       setVersionIos(c.version_minima_ios);
       setForzarActualizacion(c.forzar_actualizacion);
@@ -85,14 +87,14 @@ export default function AdminConfigScreen() {
     const doSave = async () => {
       setSaving(true);
       const res = await adminConfigService.updateConfig({
-        porcentaje_comision: Number(porcentajeComision),
+        comision_bcp: Number(comisionBcp),
+        comision_interbank: Number(comisionInterbank),
+        comision_scotiabank: Number(comisionScotiabank),
+        comision_bbva: Number(comisionBbva),
         monto_minimo_recarga: Number(montoMinRecarga),
         monto_maximo_recarga: Number(montoMaxRecarga),
         bono_referido: Number(bonoReferido),
         max_referidos_por_usuario: Number(maxReferidos),
-        cuenta_recaudadora_banco: cuentaBanco,
-        cuenta_recaudadora_numero: cuentaNumero,
-        cuenta_recaudadora_titular: cuentaTitular,
         version_minima_android: versionAndroid,
         version_minima_ios: versionIos,
         forzar_actualizacion: forzarActualizacion,
@@ -240,36 +242,45 @@ export default function AdminConfigScreen() {
     <View style={styles.container}>
       <AdminHeader title="Configuracion" />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {/* Card: Comisiones y Limites */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Comisiones y Limites</Text>
-          <FormField label="Comision (%)" value={porcentajeComision} onChangeText={setPorcentajeComision} keyboardType="numeric" />
-          <FormField label="Monto minimo recarga" value={montoMinRecarga} onChangeText={setMontoMinRecarga} keyboardType="numeric" />
-          <FormField label="Monto maximo recarga" value={montoMaxRecarga} onChangeText={setMontoMaxRecarga} keyboardType="numeric" />
-          <FormField label="Bono referido (S/.)" value={bonoReferido} onChangeText={setBonoReferido} keyboardType="numeric" />
-          <FormField label="Max. referidos por usuario" value={maxReferidos} onChangeText={setMaxReferidos} keyboardType="numeric" />
-        </View>
+        {/* Grid de 2 columnas en desktop */}
+        <View style={[styles.configGrid, isMobile && styles.configGridMobile]}>
+          {/* Columna izquierda */}
+          <View style={styles.configColumn}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Comisiones por Banco</Text>
+              <FormField label="Comision BCP (%)" value={comisionBcp} onChangeText={setComisionBcp} keyboardType="numeric" />
+              <FormField label="Comision Interbank (%)" value={comisionInterbank} onChangeText={setComisionInterbank} keyboardType="numeric" />
+              <FormField label="Comision Scotiabank (%)" value={comisionScotiabank} onChangeText={setComisionScotiabank} keyboardType="numeric" />
+              <FormField label="Comision BBVA (%)" value={comisionBbva} onChangeText={setComisionBbva} keyboardType="numeric" />
+            </View>
 
-        {/* Card: Cuenta Recaudadora */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Cuenta Recaudadora</Text>
-          <FormField label="Banco" value={cuentaBanco} onChangeText={setCuentaBanco} />
-          <FormField label="Numero de cuenta" value={cuentaNumero} onChangeText={setCuentaNumero} />
-          <FormField label="Titular" value={cuentaTitular} onChangeText={setCuentaTitular} />
-        </View>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Referidos</Text>
+              <FormField label="Bono referido (S/.)" value={bonoReferido} onChangeText={setBonoReferido} keyboardType="numeric" />
+              <FormField label="Max. referidos por usuario" value={maxReferidos} onChangeText={setMaxReferidos} keyboardType="numeric" />
+            </View>
+          </View>
 
-        {/* Card: App */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>App</Text>
-          <FormField label="Version minima Android" value={versionAndroid} onChangeText={setVersionAndroid} />
-          <FormField label="Version minima iOS" value={versionIos} onChangeText={setVersionIos} />
-          <SwitchField label="Forzar actualizacion" value={forzarActualizacion} onValueChange={setForzarActualizacion} />
-        </View>
+          {/* Columna derecha */}
+          <View style={styles.configColumn}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Limites de Recarga</Text>
+              <FormField label="Monto minimo recarga" value={montoMinRecarga} onChangeText={setMontoMinRecarga} keyboardType="numeric" />
+              <FormField label="Monto maximo recarga" value={montoMaxRecarga} onChangeText={setMontoMaxRecarga} keyboardType="numeric" />
+            </View>
 
-        {/* Card: Mantenimiento */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Mantenimiento</Text>
-          <SwitchField label="Modo mantenimiento" value={mantenimientoActivo} onValueChange={setMantenimientoActivo} />
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>App</Text>
+              <FormField label="Version minima Android" value={versionAndroid} onChangeText={setVersionAndroid} />
+              <FormField label="Version minima iOS" value={versionIos} onChangeText={setVersionIos} />
+              <SwitchField label="Forzar actualizacion" value={forzarActualizacion} onValueChange={setForzarActualizacion} />
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Mantenimiento</Text>
+              <SwitchField label="Modo mantenimiento" value={mantenimientoActivo} onValueChange={setMantenimientoActivo} />
+            </View>
+          </View>
         </View>
 
         {/* Guardar Config */}
@@ -527,6 +538,17 @@ const styles = StyleSheet.create({
     padding: Layout.spacing.xl,
     gap: Layout.spacing.lg,
     paddingBottom: Layout.spacing.xxl,
+  },
+  configGrid: {
+    flexDirection: 'row',
+    gap: Layout.spacing.lg,
+  },
+  configGridMobile: {
+    flexDirection: 'column',
+  },
+  configColumn: {
+    flex: 1,
+    gap: Layout.spacing.lg,
   },
   card: {
     backgroundColor: Colors.cardBackground,

@@ -1,16 +1,25 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
+const isLocalIp = (host: string) =>
+  host.startsWith('192.168.') ||
+  host.startsWith('10.') ||
+  host.startsWith('172.') ||
+  host === 'localhost';
+
 const getDevApiUrl = () => {
-  // 1. Override explicito via env var
+  // 1. Override explicito via env var (.env o EAS)
   const envUrl = process.env.EXPO_PUBLIC_API_URL;
   if (envUrl) return envUrl;
 
-  // 2. Auto-detectar IP del dev server (Expo Go en dispositivo fisico)
+  // 2. Auto-detectar IP del dev server solo si es una IP local (LAN mode)
+  // En tunnel mode debuggerHost es algo como "abc.ngrok.io" — no sirve para la API
   const debuggerHost = Constants.expoGoConfig?.debuggerHost;
   if (debuggerHost) {
     const host = debuggerHost.split(':')[0];
-    return `http://${host}:3000`;
+    if (isLocalIp(host)) {
+      return `http://${host}:3000`;
+    }
   }
 
   // 3. Fallback para emulador/web

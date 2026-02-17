@@ -17,6 +17,10 @@ router.patch(
   '/',
   [
     body('porcentaje_comision').optional().isFloat({ min: 0, max: 100 }),
+    body('comision_bcp').optional().isFloat({ min: 0, max: 100 }),
+    body('comision_interbank').optional().isFloat({ min: 0, max: 100 }),
+    body('comision_scotiabank').optional().isFloat({ min: 0, max: 100 }),
+    body('comision_bbva').optional().isFloat({ min: 0, max: 100 }),
     body('monto_minimo_recarga').optional().isFloat({ min: 0 }),
     body('monto_maximo_recarga').optional().isFloat({ min: 0 }),
     body('cuenta_recaudadora_numero').optional().isString(),

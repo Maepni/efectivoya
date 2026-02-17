@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   RefreshControl,
   Share,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { authService } from '../../src/services/auth.service';
 import { Card } from '../../src/components/Card';
@@ -40,6 +41,8 @@ export default function DashboardScreen() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  const { refreshUser } = useAuthStore();
+
   const fetchDashboard = useCallback(async () => {
     const response = await authService.getDashboard();
     if (response.success && response.data) {
@@ -47,9 +50,12 @@ export default function DashboardScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboard();
+      refreshUser();
+    }, [fetchDashboard, refreshUser])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -58,7 +64,7 @@ export default function DashboardScreen() {
   };
 
   const handleShare = async () => {
-    const code = dashboard?.referidos?.codigo || user?.codigo_referido || '';
+    const code = dashboard?.referidos?.codigo_propio || user?.codigo_referido || '';
     if (!code) return;
     await Share.share({
       message: `¡Únete a EfectivoYa y recibe S/. 10 de bono! Usa mi código de referido: ${code}. Descarga la app: https://efectivoya.com`,
@@ -85,7 +91,7 @@ export default function DashboardScreen() {
       <Card style={styles.saldoCard}>
         <Text style={styles.saldoLabel}>Saldo disponible</Text>
         <Text style={styles.saldoAmount}>
-          {formatCurrency(dashboard?.saldo ?? user?.saldo_actual ?? 0)}
+          {formatCurrency(dashboard?.saldo_disponible ?? user?.saldo_actual ?? 0)}
         </Text>
       </Card>
 
@@ -93,20 +99,20 @@ export default function DashboardScreen() {
       <View style={styles.statsRow}>
         <Card style={styles.statCard}>
           <Text style={styles.statValue}>
-            {dashboard?.recargas_mes ?? 0}
+            {dashboard?.este_mes?.cantidad_recargas ?? 0}
           </Text>
           <Text style={styles.statLabel}>Recargas</Text>
           <Text style={styles.statAmount}>
-            {formatCurrency(dashboard?.monto_recargas_mes ?? 0)}
+            {formatCurrency(dashboard?.este_mes?.total_recargado ?? 0)}
           </Text>
         </Card>
         <Card style={styles.statCard}>
           <Text style={styles.statValue}>
-            {dashboard?.retiros_mes ?? 0}
+            {dashboard?.este_mes?.cantidad_retiros ?? 0}
           </Text>
           <Text style={styles.statLabel}>Retiros</Text>
           <Text style={styles.statAmount}>
-            {formatCurrency(dashboard?.monto_retiros_mes ?? 0)}
+            {formatCurrency(dashboard?.este_mes?.total_retirado ?? 0)}
           </Text>
         </Card>
       </View>
@@ -117,14 +123,14 @@ export default function DashboardScreen() {
           <View style={styles.referidosHeader}>
             <Text style={styles.sectionTitle}>Referidos</Text>
             <Text style={styles.referidosCount}>
-              {dashboard.referidos.total} invitados
+              {dashboard.referidos.cantidad_referidos} invitados
             </Text>
           </View>
           <Text style={styles.referidosCodigo}>
-            Tu código: {dashboard.referidos.codigo}
+            Tu código: {dashboard.referidos.codigo_propio}
           </Text>
           <Text style={styles.referidosBono}>
-            Bono acumulado: {formatCurrency(dashboard.referidos.bono_total)}
+            Bono acumulado: {formatCurrency(dashboard.referidos.bonos_ganados)}
           </Text>
           <Button
             title="Invitar amigos"

@@ -26,8 +26,12 @@ export const authMiddleware = (
       req.userId = decoded.userId;
       req.email = decoded.email;
       next();
-    } catch (error) {
-      Logger.error('Token inválido:', error);
+    } catch (error: any) {
+      if (error?.name === 'TokenExpiredError') {
+        Logger.debug('Token expirado — cliente debe refrescar');
+      } else {
+        Logger.error('Token inválido:', error);
+      }
       res.status(401).json({
         success: false,
         message: 'Token inválido o expirado'

@@ -59,9 +59,9 @@ export const adminRetirosService = {
     }
   },
 
-  async aprobar(id: string): Promise<ApiResponse> {
+  async aprobar(id: string, referencia_banco?: string): Promise<ApiResponse> {
     try {
-      return await AdminApiService.post(`/admin/retiros/${id}/aprobar`);
+      return await AdminApiService.post(`/admin/retiros/${id}/aprobar`, { referencia_banco });
     } catch {
       return { success: false, message: 'Error al aprobar retiro' };
     }

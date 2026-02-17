@@ -11,6 +11,7 @@ interface OperacionCardProps {
   estado: 'pendiente' | 'aprobado' | 'rechazado';
   fecha: string;
   banco?: string;
+  motivo_rechazo?: string | null;
   onPress?: () => void;
 }
 
@@ -21,6 +22,7 @@ export function OperacionCard({
   estado,
   fecha,
   banco,
+  motivo_rechazo,
   onPress,
 }: OperacionCardProps) {
   const getEstadoColor = () => {
@@ -113,6 +115,10 @@ export function OperacionCard({
 
         {banco && <Text style={styles.banco}>Banco: {banco}</Text>}
 
+        {estado === 'rechazado' && motivo_rechazo && (
+          <Text style={styles.motivoRechazo}>Motivo: {motivo_rechazo}</Text>
+        )}
+
         <Text style={styles.fecha}>
           {new Date(fecha).toLocaleDateString('es-PE', {
             day: '2-digit',
@@ -183,6 +189,11 @@ const styles = StyleSheet.create({
   banco: {
     fontSize: Layout.fontSize.xs,
     color: Colors.gray,
+    marginTop: Layout.spacing.xs,
+  },
+  motivoRechazo: {
+    fontSize: Layout.fontSize.xs,
+    color: Colors.error,
     marginTop: Layout.spacing.xs,
   },
   fecha: {

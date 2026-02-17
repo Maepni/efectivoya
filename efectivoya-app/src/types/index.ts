@@ -35,16 +35,19 @@ export interface VerifyOTPData {
 }
 
 export interface DashboardData {
-  saldo: number;
-  recargas_mes: number;
-  retiros_mes: number;
-  monto_recargas_mes: number;
-  monto_retiros_mes: number;
+  saldo_disponible: number;
+  este_mes: {
+    total_recargado: number;
+    total_retirado: number;
+    cantidad_recargas: number;
+    cantidad_retiros: number;
+  };
   ultimas_operaciones: Operacion[];
   referidos: {
-    total: number;
-    codigo: string;
-    bono_total: number;
+    codigo_propio: string;
+    cantidad_referidos: number;
+    max_referidos: number;
+    bonos_ganados: number;
   };
 }
 
@@ -96,6 +99,7 @@ export interface PaginatedResponse<T = unknown> {
 export interface UserBank {
   id: string;
   banco: string;
+  tipo_cuenta?: 'ahorros' | 'corriente' | null;
   numero_cuenta: string;
   cci: string;
   alias?: string;
@@ -130,6 +134,7 @@ export interface Retiro {
   processed_at?: string;
   banco?: {
     banco: string;
+    tipo_cuenta?: 'ahorros' | 'corriente' | null;
     alias?: string;
     numero_cuenta: string;
     cci: string;
@@ -137,10 +142,22 @@ export interface Retiro {
 }
 
 export interface RecargaConfig {
-  porcentaje_comision: number;
-  monto_minimo_recarga: number;
-  monto_maximo_recarga: number;
-  cuenta_recaudadora_numero: string;
-  cuenta_recaudadora_banco: string;
-  cuenta_recaudadora_titular: string;
+  comisiones: {
+    BCP: number;
+    Interbank: number;
+    Scotiabank: number;
+    BBVA: number;
+  };
+  limites: {
+    minimo: number;
+    maximo: number;
+    minimoFormateado: string;
+    maximoFormateado: string;
+  };
+  cuentaRecaudadora: {
+    banco: string;
+    numero: string;
+    titular: string;
+  };
+  bancosPermitidos: string[];
 }

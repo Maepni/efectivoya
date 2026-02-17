@@ -8,6 +8,9 @@
     "scheme": "efectivoya",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "updates": {
+      "enabled": false
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -15,7 +18,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.efectivoya.app"
+      "bundleIdentifier": "com.efectivoya.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Necesitamos acceso a la cámara para tomar fotos del comprobante de depósito.",
+        "NSPhotoLibraryUsageDescription": "Necesitamos acceso a tu galería para seleccionar el comprobante de depósito.",
+        "NSPhotoLibraryAddUsageDescription": "Necesitamos permiso para guardar imágenes en tu galería."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +31,12 @@
         "backgroundColor": "#1f1f1f"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.efectivoya.app"
+      "package": "com.efectivoya.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -31,7 +44,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Necesitamos acceso a tu galería para seleccionar el comprobante de depósito.",
+          "cameraPermission": "Necesitamos acceso a la cámara para tomar fotos del comprobante de depósito."
+        }
+      ]
     ]
   }
 }

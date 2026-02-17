@@ -76,6 +76,22 @@ export class AdminConfigController {
         dataToUpdate.porcentaje_comision = porcentaje;
       }
 
+      // Comisiones por banco
+      const comisionFields = ['comision_bcp', 'comision_interbank', 'comision_scotiabank', 'comision_bbva'] as const;
+      for (const field of comisionFields) {
+        const val = req.body[field];
+        if (val !== undefined) {
+          const parsed = parseFloat(val);
+          if (parsed < 0 || parsed > 100) {
+            return res.status(400).json({
+              success: false,
+              message: `${field} debe estar entre 0 y 100`
+            });
+          }
+          dataToUpdate[field] = parsed;
+        }
+      }
+
       if (monto_minimo_recarga !== undefined) {
         dataToUpdate.monto_minimo_recarga = parseFloat(monto_minimo_recarga);
       }

@@ -17,6 +17,7 @@ export interface RetiroPDFData {
   monto: number;
   saldo_anterior: number;
   nuevo_saldo: number;
+  referencia_banco?: string;
 }
 
 export interface RecargaComprobanteData {
@@ -347,14 +348,21 @@ export class PDFService {
         doc.text(`CCI:`, 50, detallesY + 50 + offsetAlias);
         doc.text(data.cci, 200, detallesY + 50 + offsetAlias);
 
+        const offsetRef = data.referencia_banco ? 25 : 0;
+        if (data.referencia_banco) {
+          doc.text(`Ref. transferencia:`, 50, detallesY + 75 + offsetAlias);
+          doc.fillColor('#10B981').text(data.referencia_banco, 200, detallesY + 75 + offsetAlias);
+          doc.fillColor('#1f1f1f');
+        }
+
         // Monto retirado (destacado)
         doc
           .fontSize(12)
           .font('Helvetica-Bold')
           .fillColor('#1f1f1f');
 
-        doc.text(`Monto retirado:`, 50, detallesY + 80 + offsetAlias);
-        doc.fillColor('#e83733').text(Formatters.formatCurrency(data.monto), 200, detallesY + 80 + offsetAlias);
+        doc.text(`Monto retirado:`, 50, detallesY + 80 + offsetAlias + offsetRef);
+        doc.fillColor('#e83733').text(Formatters.formatCurrency(data.monto), 200, detallesY + 80 + offsetAlias + offsetRef);
 
         // Saldos
         doc
@@ -362,16 +370,16 @@ export class PDFService {
           .font('Helvetica')
           .fillColor('#1f1f1f');
 
-        doc.text(`Saldo anterior:`, 50, detallesY + 105 + offsetAlias);
-        doc.text(Formatters.formatCurrency(data.saldo_anterior), 200, detallesY + 105 + offsetAlias);
+        doc.text(`Saldo anterior:`, 50, detallesY + 105 + offsetAlias + offsetRef);
+        doc.text(Formatters.formatCurrency(data.saldo_anterior), 200, detallesY + 105 + offsetAlias + offsetRef);
 
-        doc.text(`Nuevo saldo:`, 50, detallesY + 130 + offsetAlias);
-        doc.fillColor('#dc993c').text(Formatters.formatCurrency(data.nuevo_saldo), 200, detallesY + 130 + offsetAlias);
+        doc.text(`Nuevo saldo:`, 50, detallesY + 130 + offsetAlias + offsetRef);
+        doc.fillColor('#dc993c').text(Formatters.formatCurrency(data.nuevo_saldo), 200, detallesY + 130 + offsetAlias + offsetRef);
 
         // Línea separadora
         doc
-          .moveTo(50, detallesY + 160 + offsetAlias)
-          .lineTo(550, detallesY + 160 + offsetAlias)
+          .moveTo(50, detallesY + 160 + offsetAlias + offsetRef)
+          .lineTo(550, detallesY + 160 + offsetAlias + offsetRef)
           .strokeColor('#acacae')
           .lineWidth(1)
           .stroke();
@@ -383,7 +391,7 @@ export class PDFService {
           .text(
             'Este comprobante es válido para fines informativos. El dinero será transferido a la cuenta indicada.',
             50,
-            detallesY + 180 + offsetAlias,
+            detallesY + 180 + offsetAlias + offsetRef,
             { align: 'center', width: 500 }
           );
 
