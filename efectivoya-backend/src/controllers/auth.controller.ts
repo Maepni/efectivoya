@@ -460,7 +460,60 @@ export class AuthController {
     }
   }
 
-  // 9. OBTENER PERFIL
+  // 9. ACTUALIZAR PERFIL
+  static async updateProfile(req: AuthRequest, res: Response): Promise<Response> {
+    try {
+      const { nombres, apellidos, whatsapp } = req.body;
+
+      if (!nombres || !apellidos) {
+        return res.status(400).json({ success: false, message: 'Nombres y apellidos son requeridos' });
+      }
+
+      if (whatsapp && !/^\d{9}$/.test(whatsapp)) {
+        return res.status(400).json({ success: false, message: 'WhatsApp debe tener 9 dígitos' });
+      }
+
+      const user = await prisma.user.update({
+        where: { id: req.userId },
+        data: {
+          nombres: Validators.sanitizeString(nombres),
+          apellidos: Validators.sanitizeString(apellidos),
+          ...(whatsapp ? { whatsapp } : {}),
+        },
+        select: {
+          id: true,
+          email: true,
+          nombres: true,
+          apellidos: true,
+          dni: true,
+          whatsapp: true,
+          saldo_actual: true,
+          codigo_referido: true,
+          email_verificado: true,
+          is_active: true,
+          created_at: true,
+        },
+      });
+
+      await AuditLogService.log('perfil_actualizado', req, req.userId, undefined, {
+        nombres: user.nombres,
+        apellidos: user.apellidos,
+      });
+
+      Logger.info(`Perfil actualizado: ${req.email}`);
+
+      return res.json({
+        success: true,
+        message: 'Perfil actualizado correctamente',
+        data: { user },
+      });
+    } catch (error) {
+      Logger.error('Error en updateProfile:', error);
+      return res.status(500).json({ success: false, message: 'Error al actualizar perfil' });
+    }
+  }
+
+  // 10. OBTENER PERFIL
   static async getProfile(req: AuthRequest, res: Response): Promise<Response> {
     try {
       const user = await prisma.user.findUnique({

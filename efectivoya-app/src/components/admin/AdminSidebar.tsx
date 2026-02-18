@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
@@ -34,8 +34,17 @@ export function AdminSidebar() {
   return (
     <View style={styles.sidebar}>
       <View style={styles.logoContainer}>
-        <Text style={styles.logo}>Efectivo<Text style={styles.logoAccent}>Ya</Text></Text>
-        <Text style={styles.logoSub}>Admin</Text>
+        <View style={styles.logoRow}>
+          <Image
+            source={require('../../../assets/icon.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+          <View>
+            <Text style={styles.logo}>Efectivo<Text style={styles.logoAccent}>Ya</Text></Text>
+            <Text style={styles.logoSub}>Admin</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.nav}>
@@ -74,10 +83,20 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     paddingHorizontal: Layout.spacing.xl,
-    paddingBottom: Layout.spacing.xxl,
+    paddingBottom: Layout.spacing.xl,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
     marginBottom: Layout.spacing.lg,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Layout.spacing.md,
+  },
+  logoImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
   },
   logo: {
     fontSize: Layout.fontSize.xl,

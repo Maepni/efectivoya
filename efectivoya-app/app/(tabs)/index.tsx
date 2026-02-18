@@ -5,13 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  Share,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { authService } from '../../src/services/auth.service';
 import { Card } from '../../src/components/Card';
-import { Button } from '../../src/components/Button';
 import { Colors } from '../../src/constants/colors';
 import { FontSize, Spacing } from '../../src/constants/layout';
 import type { DashboardData, Operacion } from '../../src/types';
@@ -63,14 +61,6 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
-  const handleShare = async () => {
-    const code = dashboard?.referidos?.codigo_propio || user?.codigo_referido || '';
-    if (!code) return;
-    await Share.share({
-      message: `¡Únete a EfectivoYa y recibe S/. 10 de bono! Usa mi código de referido: ${code}. Descarga la app: https://efectivoya.com`,
-    });
-  };
-
   return (
     <ScrollView
       style={styles.container}
@@ -116,30 +106,6 @@ export default function DashboardScreen() {
           </Text>
         </Card>
       </View>
-
-      {/* Referidos */}
-      {dashboard?.referidos && (
-        <Card style={styles.referidosCard}>
-          <View style={styles.referidosHeader}>
-            <Text style={styles.sectionTitle}>Referidos</Text>
-            <Text style={styles.referidosCount}>
-              {dashboard.referidos.cantidad_referidos} invitados
-            </Text>
-          </View>
-          <Text style={styles.referidosCodigo}>
-            Tu código: {dashboard.referidos.codigo_propio}
-          </Text>
-          <Text style={styles.referidosBono}>
-            Bono acumulado: {formatCurrency(dashboard.referidos.bonos_ganados)}
-          </Text>
-          <Button
-            title="Invitar amigos"
-            onPress={handleShare}
-            variant="secondary"
-            style={styles.shareButton}
-          />
-        </Card>
-      )}
 
       {/* Últimas operaciones */}
       <Text style={styles.sectionTitle}>Últimas operaciones</Text>
@@ -236,33 +202,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.caption,
     color: Colors.secondary,
     marginTop: Spacing.xs,
-  },
-  referidosCard: {
-    marginBottom: Spacing.lg,
-  },
-  referidosHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
-  },
-  referidosCount: {
-    fontSize: FontSize.caption,
-    color: Colors.gray,
-  },
-  referidosCodigo: {
-    fontSize: FontSize.body,
-    color: Colors.white,
-    fontWeight: '600',
-  },
-  referidosBono: {
-    fontSize: FontSize.caption,
-    color: Colors.secondary,
-    marginTop: Spacing.xs,
-    marginBottom: Spacing.md,
-  },
-  shareButton: {
-    marginTop: Spacing.sm,
   },
   sectionTitle: {
     fontSize: FontSize.h3,

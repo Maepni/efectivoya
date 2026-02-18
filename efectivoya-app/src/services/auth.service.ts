@@ -112,6 +112,19 @@ export const authService = {
     }
   },
 
+  async updateProfile(data: { nombres: string; apellidos: string; whatsapp?: string }): Promise<ApiResponse<{ user: User }>> {
+    try {
+      const { data: res } = await api.put<ApiResponse<{ user: User }>>('/auth/profile', data);
+      return res;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      return {
+        success: false,
+        message: axiosError.response?.data?.message || 'Error al actualizar perfil',
+      };
+    }
+  },
+
   async logout(): Promise<void> {
     try {
       await api.post('/auth/logout');

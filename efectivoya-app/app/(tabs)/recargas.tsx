@@ -307,13 +307,16 @@ export default function RecargasScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.title}>Recargas</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Ionicons name="add-circle" size={32} color={Colors.primary} />
-          </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={styles.mainActionButton}
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="add-circle-outline" size={24} color={Colors.white} />
+          <Text style={styles.mainActionButtonText}>Nueva Recarga</Text>
+        </TouchableOpacity>
 
         {config && (
           <Card style={styles.infoCard}>
@@ -576,7 +579,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.accent,
   },
-  addButton: { padding: Layout.spacing.xs },
+  mainActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: Layout.borderRadius.lg,
+    paddingVertical: Layout.spacing.lg,
+    marginHorizontal: Layout.spacing.lg,
+    marginBottom: Layout.spacing.lg,
+    gap: Layout.spacing.sm,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  mainActionButtonText: {
+    fontSize: Layout.fontSize.lg,
+    fontWeight: 'bold',
+    color: Colors.white,
+  },
   infoCard: {
     marginHorizontal: Layout.spacing.lg,
     marginBottom: Layout.spacing.lg,

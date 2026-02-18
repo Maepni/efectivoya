@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,11 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
@@ -19,8 +22,56 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, isLoading } = useAuthStore();
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricType, setBiometricType] = useState<'fingerprint' | 'face' | null>(null);
+  const { login, loginWithBiometric, hasBiometricToken, isLoading } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    checkBiometrics();
+  }, []);
+
+  const checkBiometrics = async () => {
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      if (!hasHardware) return;
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) return;
+      const hasToken = await hasBiometricToken();
+      if (!hasToken) return;
+
+      const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+        setBiometricType('face');
+      } else {
+        setBiometricType('fingerprint');
+      }
+      setBiometricAvailable(true);
+    } catch { /* sin biometría disponible */ }
+  };
+
+  const handleBiometricLogin = async () => {
+    setError('');
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Ingresa a EfectivoYa',
+        cancelLabel: 'Cancelar',
+        disableDeviceFallback: false,
+      });
+
+      if (!result.success) return;
+
+      const loginResult = await loginWithBiometric();
+      if (loginResult.success) {
+        router.replace('/(tabs)');
+      } else {
+        setError(loginResult.message || 'Error de autenticación');
+        setBiometricAvailable(false);
+      }
+    } catch {
+      setError('Error al usar biometría. Ingresa con tu contraseña.');
+    }
+  };
 
   const handleLogin = async () => {
     setError('');
@@ -54,6 +105,11 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
+          <Image
+            source={require('../../assets/icon.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <Text style={styles.logo}>
             Efectivo<Text style={styles.logoAccent}>Ya</Text>
           </Text>
@@ -91,6 +147,23 @@ export default function LoginScreen() {
             loading={isLoading}
           />
 
+          {biometricAvailable && (
+            <TouchableOpacity
+              style={styles.biometricButton}
+              onPress={handleBiometricLogin}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={biometricType === 'face' ? 'scan-outline' : 'finger-print-outline'}
+                size={28}
+                color={Colors.primary}
+              />
+              <Text style={styles.biometricText}>
+                {biometricType === 'face' ? 'Ingresar con Face ID' : 'Ingresar con huella'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.footer}>
             <Text style={styles.footerText}>¿No tienes cuenta? </Text>
             <Link href="/(auth)/register" asChild>
@@ -119,6 +192,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.xxl,
   },
+  logoImage: {
+    width: 100,
+    height: 100,
+    marginBottom: Spacing.sm,
+    borderRadius: 20,
+  },
   logo: {
     fontSize: FontSize.h1,
     fontWeight: 'bold',
@@ -146,6 +225,22 @@ const styles = StyleSheet.create({
     fontSize: FontSize.caption,
     textAlign: 'center',
     marginBottom: Spacing.sm,
+  },
+  biometricButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 12,
+    marginTop: Spacing.sm,
+  },
+  biometricText: {
+    color: Colors.primary,
+    fontSize: FontSize.body,
+    fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',

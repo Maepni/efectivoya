@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { Card } from '../../src/components/Card';
 import { BancoCard } from '../../src/components/BancoCard';
 import { ConfirmDialog } from '../../src/components/ConfirmDialog';
 import BancosService from '../../src/services/bancos.service';
+import { authService } from '../../src/services/auth.service';
 import { useAuthStore } from '../../src/store/authStore';
 import type { UserBank } from '../../src/types';
 import { Colors } from '../../src/constants/colors';
@@ -35,7 +36,7 @@ const BANK_ACCOUNT_RULES: Record<string, { lengths: number[]; label: string }> =
 
 export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuthStore();
+  const { user, logout, refreshUser } = useAuthStore();
   const [bancos, setBancos] = useState<UserBank[]>([]);
   const [bancosModalVisible, setBancosModalVisible] = useState(false);
   const [addBancoModalVisible, setAddBancoModalVisible] = useState(false);
@@ -46,7 +47,7 @@ export default function PerfilScreen() {
     apellidos: user?.apellidos || '',
     whatsapp: user?.whatsapp || '',
   });
-  const [_updating, setUpdating] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   const [nuevoBanco, setNuevoBanco] = useState({
     banco: '' as 'BCP' | 'Interbank' | 'Scotiabank' | 'BBVA' | '',
@@ -61,6 +62,15 @@ export default function PerfilScreen() {
   const [editingBanco, setEditingBanco] = useState<UserBank | null>(null);
   const [editBancoData, setEditBancoData] = useState({ alias: '', cci: '' });
   const [editingBancoLoading, setEditingBancoLoading] = useState(false);
+
+  // Sincronizar editData cuando el usuario cambia (ej. después de actualizar)
+  useEffect(() => {
+    setEditData({
+      nombres: user?.nombres || '',
+      apellidos: user?.apellidos || '',
+      whatsapp: user?.whatsapp || '',
+    });
+  }, [user]);
 
   const loadBancos = useCallback(async () => {
     try {
@@ -84,7 +94,7 @@ export default function PerfilScreen() {
   };
 
   const handleUpdateProfile = async () => {
-    if (!editData.nombres || !editData.apellidos) {
+    if (!editData.nombres.trim() || !editData.apellidos.trim()) {
       Alert.alert('Error', 'Nombres y apellidos son requeridos');
       return;
     }
@@ -95,16 +105,21 @@ export default function PerfilScreen() {
 
     setUpdating(true);
     try {
-      Alert.alert(
-        'Info',
-        'Función de actualización de perfil próximamente disponible'
-      );
-      setEditModalVisible(false);
+      const response = await authService.updateProfile({
+        nombres: editData.nombres.trim(),
+        apellidos: editData.apellidos.trim(),
+        ...(editData.whatsapp.trim() ? { whatsapp: editData.whatsapp.trim() } : {}),
+      });
+
+      if (response.success) {
+        setEditModalVisible(false);
+        await refreshUser();
+        Alert.alert('¡Listo!', 'Perfil actualizado correctamente');
+      } else {
+        Alert.alert('Error', response.message || 'Error al actualizar perfil');
+      }
     } catch (error: any) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Error al actualizar perfil'
-      );
+      Alert.alert('Error', error.response?.data?.message || 'Error al actualizar perfil');
     } finally {
       setUpdating(false);
     }
@@ -299,18 +314,6 @@ export default function PerfilScreen() {
 
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}>
-                <Ionicons name="gift" size={20} color={Colors.secondary} />
-              </View>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Código de Referido</Text>
-                <Text style={[styles.infoValue, { color: Colors.secondary }]}>
-                  {user?.codigo_referido}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.infoRow}>
-              <View style={styles.infoIcon}>
                 <Ionicons
                   name={
                     user?.email_verificado
@@ -451,6 +454,7 @@ export default function PerfilScreen() {
             <Button
               title="Guardar Cambios"
               onPress={handleUpdateProfile}
+              loading={updating}
               style={styles.submitButton}
             />
           </ScrollView>

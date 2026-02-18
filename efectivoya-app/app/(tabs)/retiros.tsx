@@ -270,17 +270,16 @@ export default function RetirosScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.title}>Retiros</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Ionicons
-              name="arrow-down-circle"
-              size={32}
-              color={Colors.secondary}
-            />
-          </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={styles.mainActionButton}
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="arrow-down-circle-outline" size={24} color={Colors.white} />
+          <Text style={styles.mainActionButtonText}>Solicitar Retiro</Text>
+        </TouchableOpacity>
 
         <Card style={styles.saldoCard}>
           <Text style={styles.saldoLabel}>Saldo Disponible</Text>
@@ -609,7 +608,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.accent,
   },
-  addButton: { padding: Layout.spacing.xs },
+  mainActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.secondary,
+    borderRadius: Layout.borderRadius.lg,
+    paddingVertical: Layout.spacing.lg,
+    marginHorizontal: Layout.spacing.lg,
+    marginBottom: Layout.spacing.lg,
+    gap: Layout.spacing.sm,
+    shadowColor: Colors.secondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  mainActionButtonText: {
+    fontSize: Layout.fontSize.lg,
+    fontWeight: 'bold',
+    color: Colors.background,
+  },
   saldoCard: {
     marginHorizontal: Layout.spacing.lg,
     marginBottom: Layout.spacing.lg,

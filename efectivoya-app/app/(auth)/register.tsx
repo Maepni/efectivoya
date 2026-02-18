@@ -37,7 +37,6 @@ export default function RegisterScreen() {
     whatsapp: '',
     password: '',
     confirmPassword: '',
-    codigo_referido_usado: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState('');
@@ -88,9 +87,6 @@ export default function RegisterScreen() {
       dni: form.dni.trim(),
       whatsapp: form.whatsapp.trim(),
       password: form.password,
-      ...(form.codigo_referido_usado.trim()
-        ? { codigo_referido_usado: form.codigo_referido_usado.trim().toUpperCase() }
-        : {}),
     });
 
     if (result.success && result.userId) {
@@ -187,15 +183,6 @@ export default function RegisterScreen() {
           onChangeText={(v) => updateField('confirmPassword', v)}
           error={errors.confirmPassword}
           isPassword
-        />
-
-        <Input
-          label="Código de referido (opcional)"
-          icon="gift-outline"
-          placeholder="ABC12345"
-          value={form.codigo_referido_usado}
-          onChangeText={(v) => updateField('codigo_referido_usado', v)}
-          autoCapitalize="characters"
         />
 
         <Button

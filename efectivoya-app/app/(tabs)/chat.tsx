@@ -9,7 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Keyboard,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import ChatService from '../../src/services/chat.service';
@@ -21,6 +23,7 @@ import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
 
 export default function ChatScreen() {
+  const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const { setUnreadMessages } = useStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -76,8 +79,21 @@ export default function ChatScreen() {
     return unsubscribe;
   }, [chatId, setUnreadMessages]);
 
+  // Scroll al bottom cuando sube el teclado en iOS
+  useEffect(() => {
+    if (Platform.OS !== 'ios') return;
+    const sub = Keyboard.addListener('keyboardDidShow', () => {
+      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 150);
+    });
+    return () => sub.remove();
+  }, []);
+
   const handleSend = () => {
     if (!inputText.trim() || sending) return;
+    if (!socketService.isConnected()) {
+      Alert.alert('Sin conexión', 'No hay conexión al servidor. Intenta de nuevo.');
+      return;
+    }
 
     const messageText = inputText.trim();
     setInputText('');
@@ -85,6 +101,7 @@ export default function ChatScreen() {
 
     try {
       socketService.sendMessage(chatId, messageText);
+      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (error) {
       if (__DEV__) console.error('Error al enviar mensaje:', error);
       Alert.alert('Error', 'No se pudo enviar el mensaje');
@@ -136,11 +153,14 @@ export default function ChatScreen() {
 
   if (loading) return <LoadingScreen />;
 
+  // Tab bar height + safe area: en iOS la tab bar ocupa ~49px + insets.bottom
+  const keyboardOffset = Platform.OS === 'ios' ? 49 + insets.bottom : 0;
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={100}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={keyboardOffset}
     >
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -188,7 +208,7 @@ export default function ChatScreen() {
         />
       )}
 
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { paddingBottom: Math.max(Layout.spacing.md, insets.bottom) }]}>
         <TextInput
           style={styles.input}
           placeholder="Escribe un mensaje..."
@@ -197,6 +217,9 @@ export default function ChatScreen() {
           onChangeText={setInputText}
           multiline
           maxLength={500}
+          returnKeyType="send"
+          onSubmitEditing={handleSend}
+          blurOnSubmit={false}
         />
         <TouchableOpacity
           style={[

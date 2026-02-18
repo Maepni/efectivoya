@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
@@ -16,6 +16,13 @@ export function AdminHeader({ title }: AdminHeaderProps) {
   return (
     <View style={styles.header}>
       <View style={styles.left}>
+        {isMobile && (
+          <Image
+            source={require('../../../assets/icon.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+        )}
         <Text style={styles.title}>{title}</Text>
       </View>
 
@@ -45,6 +52,12 @@ const styles = StyleSheet.create({
   left: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+  },
+  logoImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
   },
   title: {
     fontSize: Layout.fontSize.lg,

@@ -87,7 +87,20 @@ router.post(
 // 8. Logout (protegida)
 router.post('/logout', authMiddleware, AuthController.logout);
 
-// 9. Obtener perfil (protegida)
+// 9. Actualizar perfil (protegida)
+router.put(
+  '/profile',
+  authMiddleware,
+  [
+    body('nombres').isString().notEmpty().trim(),
+    body('apellidos').isString().notEmpty().trim(),
+    body('whatsapp').optional().isString().isLength({ min: 9, max: 9 }),
+  ],
+  validateRequest,
+  AuthController.updateProfile
+);
+
+// 10. Obtener perfil (protegida)
 router.get('/profile', authMiddleware, AuthController.getProfile);
 
 export default router;

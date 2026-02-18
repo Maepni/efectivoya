@@ -1,8 +1,13 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import { authService, LoginResult } from '../services/auth.service';
 import { socketService } from '../services/socket.service';
 import type { RegisterData, User } from '../types';
+
+const BIO_TOKEN_KEY = 'bio_refresh_token';
 
 interface AuthState {
   user: User | null;
@@ -19,6 +24,9 @@ interface AuthActions {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   clearAuth: () => Promise<void>;
+  saveBiometricToken: () => Promise<void>;
+  loginWithBiometric: () => Promise<{ success: boolean; message?: string }>;
+  hasBiometricToken: () => Promise<boolean>;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -67,6 +75,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         ]);
         set({ user, isAuthenticated: true });
         socketService.connect();
+        // Guardar token para biometría (silencioso — no bloquea el login)
+        try { await SecureStore.setItemAsync(BIO_TOKEN_KEY, refreshToken); } catch { /* ignorar */ }
         // Refrescar perfil completo en background (incluye email_verificado, is_active)
         get().refreshUser();
       }
@@ -145,6 +155,72 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch {
       // No bloquear el clear de estado si AsyncStorage falla
     }
+    try { await SecureStore.deleteItemAsync(BIO_TOKEN_KEY); } catch { /* ignorar */ }
     set({ user: null, isAuthenticated: false });
+  },
+
+  saveBiometricToken: async () => {
+    try {
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      if (refreshToken) {
+        await SecureStore.setItemAsync(BIO_TOKEN_KEY, refreshToken);
+      }
+    } catch { /* ignorar */ }
+  },
+
+  hasBiometricToken: async () => {
+    try {
+      const token = await SecureStore.getItemAsync(BIO_TOKEN_KEY);
+      return !!token;
+    } catch {
+      return false;
+    }
+  },
+
+  loginWithBiometric: async () => {
+    set({ isLoading: true });
+    try {
+      const bioToken = await SecureStore.getItemAsync(BIO_TOKEN_KEY);
+      if (!bioToken) {
+        return { success: false, message: 'No hay sesión guardada para biometría' };
+      }
+
+      const { data } = await axios.post(
+        `${API_URL}/api/auth/refresh`,
+        { refreshToken: bioToken },
+        { timeout: 10000 }
+      );
+
+      if (!data?.data?.accessToken) {
+        await SecureStore.deleteItemAsync(BIO_TOKEN_KEY);
+        return { success: false, message: 'Sesión expirada. Ingresa con tu contraseña.' };
+      }
+
+      const { accessToken, refreshToken } = data.data;
+      await AsyncStorage.multiSet([
+        ['accessToken', accessToken],
+        ['refreshToken', refreshToken || bioToken],
+      ]);
+      if (refreshToken) {
+        await SecureStore.setItemAsync(BIO_TOKEN_KEY, refreshToken);
+      }
+
+      // Cargar perfil completo
+      const response = await authService.getProfile();
+      if (response.success && response.data) {
+        const userData = (response.data as any).user ?? response.data;
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        set({ user: userData, isAuthenticated: true });
+        socketService.connect();
+        return { success: true };
+      }
+
+      return { success: false, message: 'Error al cargar el perfil' };
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || 'Error de conexión';
+      return { success: false, message: msg };
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));
