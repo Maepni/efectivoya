@@ -30,7 +30,7 @@ const getDevApiUrl = () => {
   })!;
 };
 
-const PROD_API_URL = 'https://api.efectivoya.com';
+const PROD_API_URL = 'https://api.efectivoya.net';
 
 export const API_URL = __DEV__ ? getDevApiUrl() : PROD_API_URL;
 export const SOCKET_URL = API_URL;

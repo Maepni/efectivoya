@@ -23,7 +23,8 @@
         "NSCameraUsageDescription": "Necesitamos acceso a la cámara para tomar fotos del comprobante de depósito.",
         "NSPhotoLibraryUsageDescription": "Necesitamos acceso a tu galería para seleccionar el comprobante de depósito.",
         "NSPhotoLibraryAddUsageDescription": "Necesitamos permiso para guardar imágenes en tu galería.",
-        "NSFaceIDUsageDescription": "Usa Face ID para ingresar a EfectivoYa de forma rápida y segura."
+        "NSFaceIDUsageDescription": "Usa Face ID para ingresar a EfectivoYa de forma rápida y segura.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -38,7 +39,8 @@
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
         "android.permission.USE_BIOMETRIC",
-        "android.permission.USE_FINGERPRINT"
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -56,6 +58,12 @@
           "cameraPermission": "Necesitamos acceso a la cámara para tomar fotos del comprobante de depósito."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7501c744-9f8c-4325-87a0-69ec20ce29e5"
+      }
+    }
   }
 }

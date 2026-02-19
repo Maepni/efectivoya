@@ -22,6 +22,7 @@ import adminChatRoutes from './routes/adminChat.routes';
 import notificationsRoutes from './routes/notifications.routes';
 
 const app: Application = express();
+app.set('trust proxy', 1);
 
 // Middlewares de seguridad
 app.use(helmet());
