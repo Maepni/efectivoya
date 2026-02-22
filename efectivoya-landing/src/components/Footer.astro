@@ -1,0 +1,288 @@
+---
+// No props
+---
+
+<footer class="footer">
+  <div class="footer-container">
+
+    <div class="footer-grid">
+
+      <!-- Col 1: Logo + description -->
+      <div class="footer-col footer-brand">
+        <a href="/" class="footer-logo" aria-label="EfectivoYa — Inicio">
+          <img src="/logo.png" alt="EfectivoYa" class="footer-logo-img" />
+        </a>
+        <p class="footer-desc">
+          Billetera digital fintech para el Perú. Gestiona tu dinero con seguridad,
+          transparencia y sin complicaciones.
+        </p>
+        <p class="footer-tagline">"Tu Dinero Al Instante"</p>
+      </div>
+
+      <!-- Col 2: Navigation links -->
+      <div class="footer-col">
+        <h3 class="footer-col-title">Navegar</h3>
+        <ul class="footer-links" role="list">
+          <li><a href="#que-es"        class="footer-link">¿Qué es EfectivoYa?</a></li>
+          <li><a href="#como-funciona" class="footer-link">Cómo funciona</a></li>
+          <li><a href="#bancos"        class="footer-link">Bancos compatibles</a></li>
+          <li><a href="#faq"           class="footer-link">Preguntas frecuentes</a></li>
+          <li><a href="https://tu-app.com" target="_blank" rel="noopener" class="footer-link footer-link-cta">Acceder a la App →</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Contact + social -->
+      <div class="footer-col">
+        <h3 class="footer-col-title">Contacto</h3>
+        <ul class="footer-links footer-contact" role="list">
+          <li>
+            <a href="https://tu-app.com" target="_blank" rel="noopener" class="footer-link footer-contact-item">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 13V5a2 2 0 012-2h6a2 2 0 012 2v8l-3-2-3 2z" stroke="#E09F3C" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+              Chat de soporte
+            </a>
+          </li>
+          <li>
+            <a href="https://wa.me/51000000000" target="_blank" rel="noopener" class="footer-link footer-contact-item">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 1.5A6.5 6.5 0 001.5 8c0 1.2.32 2.36.9 3.36L1.5 14.5l3.22-.87A6.5 6.5 0 108 1.5z" stroke="#E09F3C" stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M5.5 6.5c.3.8 1.2 2.3 2.5 3 .3.1.7 0 .9-.3l.4-.5c.1-.2.4-.2.6-.1l1.1.6c.2.1.3.4.2.6-.3.7-1.1 1.7-2.2 1.4C7 10.9 5.5 9 5 7.6" stroke="#E09F3C" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              WhatsApp
+            </a>
+          </li>
+        </ul>
+
+        <div class="footer-social" aria-label="Redes sociales">
+          <a href="#" class="social-btn" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+            </svg>
+          </a>
+          <a href="#" class="social-btn" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="#" class="social-btn" aria-label="TikTok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12a4 4 0 104 4V4a5 5 0 005 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="footer-divider" aria-hidden="true"></div>
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <p class="footer-copy">
+        &copy; <span id="footer-year"></span> EfectivoYa. Todos los derechos reservados.
+      </p>
+      <div class="footer-legal">
+        <a href="#" class="footer-legal-link">Términos y Condiciones</a>
+        <span aria-hidden="true">·</span>
+        <a href="#" class="footer-legal-link">Política de Privacidad</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: #161515;
+    padding: clamp(52px, 8vw, 80px) 24px 0;
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ── Grid ── */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+
+  @media (min-width: 640px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 1.8fr 1fr 1fr;
+    }
+
+    .footer-brand {
+      grid-column: auto;
+    }
+  }
+
+  /* ── Brand column ── */
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    margin-bottom: 16px;
+  }
+
+  .footer-logo-img {
+    height: 40px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .footer-desc {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #B2B3B3;
+    line-height: 1.65;
+    max-width: 320px;
+    margin-bottom: 10px;
+  }
+
+  .footer-tagline {
+    font-family: 'Sora', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(224,159,60,0.6);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Column ── */
+  .footer-col-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #E09F3C;
+    margin-bottom: 16px;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-link {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #B2B3B3;
+    text-decoration: none;
+    transition: color 0.18s;
+    line-height: 1.4;
+  }
+
+  .footer-link:hover { color: #fff; }
+
+  .footer-link-cta {
+    color: #ED323A;
+    font-weight: 600;
+  }
+
+  .footer-link-cta:hover { color: #f24048; }
+
+  /* ── Contact ── */
+  .footer-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── Social ── */
+  .footer-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: #B2B3B3;
+    text-decoration: none;
+    transition: color 0.18s, background 0.18s;
+  }
+
+  .social-btn:hover {
+    color: #fff;
+    background: rgba(224,159,60,0.15);
+  }
+
+  /* ── Divider ── */
+  .footer-divider {
+    height: 1px;
+    background: rgba(224,159,60,0.13);
+    margin-bottom: 24px;
+  }
+
+  /* ── Bottom ── */
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 28px;
+  }
+
+  .footer-copy {
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(178,179,179,0.45);
+  }
+
+  .footer-legal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: rgba(178,179,179,0.3);
+  }
+
+  .footer-legal-link {
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    color: rgba(178,179,179,0.45);
+    text-decoration: none;
+    transition: color 0.18s;
+  }
+
+  .footer-legal-link:hover { color: #B2B3B3; }
+</style>
+
+<script>
+  // Dynamic year
+  const yearEl = document.getElementById('footer-year');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+</script>

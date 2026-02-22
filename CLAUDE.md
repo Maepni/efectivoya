@@ -1,6 +1,6 @@
 # EfectivoYa
 
-**Actualizado:** 17 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
+**Actualizado:** 22 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
 
 ## Funcionalidades activas
 
@@ -21,6 +21,71 @@
 **Backend:** Node.js 18+, Express 4, TypeScript 5.7, Prisma 5, PostgreSQL, JWT (15m/7d), bcryptjs, Nodemailer, Multer, Cloudinary, PDFKit, Socket.io 4.8, Firebase Admin
 
 **Frontend:** Expo SDK 54, expo-router 6, React Native 0.81, Zustand 5, Axios, socket.io-client, expo-video, expo-document-picker, expo-local-authentication, expo-secure-store, TypeScript 5.9
+
+**Landing:** Astro 5, Tailwind CSS 3, output static → Vercel
+
+## Quick Start
+
+```bash
+# Backend
+cp efectivoya-backend/.env.example efectivoya-backend/.env  # editar vars requeridas
+cd efectivoya-backend && npm install
+npx prisma generate && npx prisma db push && npm run prisma:seed
+npm run dev          # http://localhost:3000
+
+# App móvil
+cd efectivoya-app && npm install --legacy-peer-deps
+npx expo start       # QR para dispositivo físico | 'w' para web en :8081
+
+# Landing
+cd efectivoya-landing && npm install && npm run dev  # http://localhost:4321
+```
+
+## Variables de entorno
+
+**Backend** (`efectivoya-backend/.env`) — requeridas:
+
+| Var | Descripción |
+|-----|-------------|
+| `DATABASE_URL` | `postgresql://user:pass@localhost:5432/efectivoya_db` |
+| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Strings distintos ≥32 chars |
+| `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | Dashboard Cloudinary |
+| `SMTP_USER` / `SMTP_PASS` | Gmail + App Password |
+
+Firebase (`FIREBASE_PROJECT_ID/PRIVATE_KEY/CLIENT_EMAIL`) es **opcional** — guard `FCMService.isConfigured()`.
+
+**App** (`efectivoya-app/.env`) — solo si LAN auto-detect falla:
+```
+EXPO_PUBLIC_API_URL=http://192.168.x.x:3000
+```
+
+## URLs dev / prod
+
+| Entorno | Backend API | Panel admin | Landing |
+|---------|------------|-------------|---------|
+| Dev | `http://localhost:3000` | Expo web `:8081` | `:4321` |
+| Prod | `https://api.efectivoya.net` | EAS Build | Vercel |
+
+Android emulador auto-usa `http://10.0.2.2:3000`. Cambiar `PROD_API_URL` en `efectivoya-app/src/config/api.ts`.
+
+## Deploy / Producción
+
+```bash
+# Backend
+cd efectivoya-backend && npm run build && node dist/server.js
+# En Railway/Render: start script = "node dist/server.js"
+
+# App móvil (EAS Build)
+cd efectivoya-app
+eas build --platform android --profile production
+eas build --platform ios     --profile production
+
+# Landing (Vercel)
+cd efectivoya-landing && npm run build   # genera dist/ (output static)
+vercel --prod                            # o CI en push a main
+```
+
+> `prisma migrate dev` no funciona en shells no-interactivos — usar `prisma db push`. Siempre `npm run build` en backend antes de commit.
 
 ## Estructura
 

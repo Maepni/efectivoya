@@ -1,0 +1,216 @@
+---
+// No props
+
+const faqs = [
+  {
+    q: '¿Es seguro usar EfectivoYa?',
+    a: 'Sí. Usamos tokens JWT con expiración corta, verificación manual de bouchers contra duplicados y alertas automáticas ante actividad sospechosa. Tu dinero y datos están protegidos en todo momento.',
+  },
+  {
+    q: '¿Cuánto tiempo demora aprobar una recarga?',
+    a: 'El equipo revisa los bouchers en horario hábil. El tiempo promedio de aprobación es de menos de 2 horas. Una vez aprobada, el saldo aparece inmediatamente en tu billetera.',
+  },
+  {
+    q: '¿Hay comisiones o cargos ocultos?',
+    a: 'Los retiros son siempre sin comisión. Las recargas pueden tener una pequeña comisión según el banco que uses (BCP, Interbank, Scotiabank o BBVA). Puedes ver las tarifas exactas dentro de la app antes de confirmar.',
+  },
+  {
+    q: '¿Qué bancos son compatibles?',
+    a: 'Actualmente operamos con BCP, Interbank, Scotiabank y BBVA. Estamos trabajando para incorporar más bancos y métodos de pago próximamente.',
+  },
+  {
+    q: '¿Cómo contacto al equipo de soporte?',
+    a: 'Dentro de la app tienes un chat de soporte en tiempo real con agentes humanos. También puedes escribirnos por WhatsApp. Estamos disponibles todos los días para ayudarte.',
+  },
+];
+---
+
+<section id="faq" class="faq-section">
+  <div class="faq-container">
+
+    <div class="faq-header reveal">
+      <span class="section-label">Preguntas frecuentes</span>
+      <h2 class="faq-title">FAQ</h2>
+      <p class="faq-subtitle">Encuentra respuestas a las dudas más comunes</p>
+    </div>
+
+    <div class="faq-list" id="faq-list">
+      {faqs.map((item, i) => (
+        <div class="faq-item reveal" style={`transition-delay: ${i * 0.08}s`} data-index={i}>
+          <button
+            class="faq-question"
+            aria-expanded="false"
+            aria-controls={`faq-answer-${i}`}
+          >
+            <span class="faq-q-text">{item.q}</span>
+            <span class="faq-arrow" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M5 7.5l5 5 5-5" stroke="#E09F3C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+          <div
+            id={`faq-answer-${i}`}
+            class="faq-answer"
+            role="region"
+            aria-hidden="true"
+          >
+            <p class="faq-answer-text">{item.a}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .faq-section {
+    background: #201F1F;
+    padding: clamp(64px, 10vw, 100px) 24px;
+  }
+
+  .faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  .faq-header {
+    text-align: center;
+    margin-bottom: clamp(44px, 6vw, 60px);
+  }
+
+  .faq-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 7vw, 68px);
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+
+  .faq-subtitle {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(14px, 1.8vw, 17px);
+    font-weight: 400;
+    color: #B2B3B3;
+    line-height: 1.6;
+  }
+
+  /* ── FAQ list ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid rgba(178,179,179,0.15);
+  }
+
+  /* ── Item ── */
+  .faq-item {
+    border-bottom: 1px solid rgba(178,179,179,0.15);
+    transition: background 0.25s ease;
+  }
+
+  .faq-item.open {
+    background: rgba(224,159,60,0.04);
+  }
+
+  /* ── Question button ── */
+  .faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .faq-q-text {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(15px, 2vw, 17px);
+    font-weight: 600;
+    color: #E5E5E5;
+    line-height: 1.4;
+    flex: 1;
+    transition: color 0.2s;
+  }
+
+  .faq-item.open .faq-q-text {
+    color: #fff;
+  }
+
+  /* ── Arrow ── */
+  .faq-arrow {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(224,159,60,0.08);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
+  }
+
+  .faq-item.open .faq-arrow {
+    transform: rotate(180deg);
+    background: rgba(224,159,60,0.18);
+  }
+
+  /* ── Answer ── */
+  .faq-answer {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+    opacity: 0;
+  }
+
+  .faq-item.open .faq-answer {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  .faq-answer-text {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(14px, 1.8vw, 16px);
+    font-weight: 400;
+    color: #B2B3B3;
+    line-height: 1.7;
+    padding: 0 0 24px 0;
+    padding-right: 48px;
+  }
+</style>
+
+<script>
+  // Vanilla JS accordion — single open at a time
+  const items = document.querySelectorAll('.faq-item');
+
+  items.forEach(item => {
+    const btn = item.querySelector('.faq-question') as HTMLButtonElement | null;
+
+    btn?.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+
+      // Close all
+      items.forEach(i => {
+        i.classList.remove('open');
+        const b = i.querySelector('.faq-question') as HTMLButtonElement | null;
+        b?.setAttribute('aria-expanded', 'false');
+        const ans = i.querySelector('.faq-answer');
+        ans?.setAttribute('aria-hidden', 'true');
+      });
+
+      // Open clicked if it was closed
+      if (!isOpen) {
+        item.classList.add('open');
+        btn?.setAttribute('aria-expanded', 'true');
+        const ans = item.querySelector('.faq-answer');
+        ans?.setAttribute('aria-hidden', 'false');
+      }
+    });
+  });
+</script>

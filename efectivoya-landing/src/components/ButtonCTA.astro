@@ -1,0 +1,111 @@
+---
+interface Props {
+  href: string;
+  text: string;
+  target?: string;
+  variant?: 'primary' | 'ghost';
+  size?: 'md' | 'lg';
+}
+
+const {
+  href,
+  text,
+  target = '_self',
+  variant = 'primary',
+  size = 'md',
+} = Astro.props;
+---
+
+<a
+  href={href}
+  target={target}
+  rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+  class={`btn-cta btn-${variant} btn-${size}`}
+>
+  {text}
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    class="btn-arrow"
+    aria-hidden="true"
+  >
+    <path
+      d="M2.5 8h11M9 3.5l5 4.5-5 4.5"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</a>
+
+<style>
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* ── Sizes ── */
+  .btn-md {
+    padding: 13px 26px;
+    font-size: 14.5px;
+  }
+
+  .btn-lg {
+    padding: 17px 40px;
+    font-size: 16px;
+  }
+
+  /* ── Primary ── */
+  .btn-primary {
+    background: #ED323A;
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(237, 50, 58, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: #f24048;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(237, 50, 58, 0.5);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* ── Ghost ── */
+  .btn-ghost {
+    background: transparent;
+    color: #B2B3B3;
+    border: 1px solid rgba(178, 179, 179, 0.28);
+  }
+
+  .btn-ghost:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+  }
+
+  /* ── Arrow micro-interaction ── */
+  .btn-arrow {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+  }
+
+  .btn-cta:hover .btn-arrow {
+    transform: translateX(5px);
+  }
+</style>
