@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { Validators } from '../utils/validators.util';
+import { Validators, DEPARTAMENTOS_PERU } from '../utils/validators.util';
 import { JWTUtil } from '../utils/jwt.util';
 import { Logger } from '../utils/logger.util';
 import { OTPService } from '../services/otp.service';
@@ -26,7 +26,7 @@ export class AuthController {
   // 1. REGISTRO
   static async register(req: Request, res: Response): Promise<Response> {
     try {
-      const { email, password, nombres, apellidos, dni, whatsapp, codigo_referido_usado } = req.body;
+      const { email, password, nombres, apellidos, dni, whatsapp, direccion, distrito, departamento, codigo_referido_usado } = req.body;
 
       // Validaciones
       if (!Validators.isValidEmail(email)) {
@@ -46,6 +46,18 @@ export class AuthController {
 
       if (!Validators.isValidWhatsApp(whatsapp)) {
         return res.status(400).json({ success: false, message: 'WhatsApp debe tener 9 dígitos' });
+      }
+
+      if (!direccion || !direccion.trim()) {
+        return res.status(400).json({ success: false, message: 'La dirección es requerida' });
+      }
+
+      if (!distrito || !distrito.trim()) {
+        return res.status(400).json({ success: false, message: 'El distrito es requerido' });
+      }
+
+      if (!departamento || !DEPARTAMENTOS_PERU.includes(departamento)) {
+        return res.status(400).json({ success: false, message: 'Departamento inválido' });
       }
 
       // Verificar email único
@@ -92,6 +104,9 @@ export class AuthController {
           apellidos: Validators.sanitizeString(apellidos),
           dni,
           whatsapp,
+          direccion: Validators.sanitizeString(direccion),
+          distrito: Validators.sanitizeString(distrito),
+          departamento,
           codigo_referido,
           referido_por: referrerUser?.id || null
         }
