@@ -153,6 +153,9 @@ export default function AdminClienteDetalleScreen() {
           <InfoRow label="Email" value={user.email} />
           <InfoRow label="DNI" value={user.dni} />
           <InfoRow label="WhatsApp" value={user.whatsapp} />
+          <InfoRow label="Departamento" value={user.departamento || '—'} />
+          <InfoRow label="Distrito" value={user.distrito || '—'} />
+          <InfoRow label="Dirección" value={user.direccion || '—'} />
           <InfoRow label="Código referido" value={user.codigo_referido} />
           <InfoRow label="Saldo" value={formatCurrency(user.saldo_actual)} highlight />
           <InfoRow label="Registrado" value={formatDate(user.created_at)} />
