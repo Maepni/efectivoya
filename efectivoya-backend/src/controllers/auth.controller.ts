@@ -207,7 +207,10 @@ export class AuthController {
             saldo_actual: user.saldo_actual,
             codigo_referido: user.codigo_referido,
             email_verificado: true,
-            is_active: user.is_active
+            is_active: user.is_active,
+            direccion: user.direccion,
+            distrito: user.distrito,
+            departamento: user.departamento,
           }
         }
       });
@@ -282,7 +285,10 @@ export class AuthController {
             saldo_actual: user.saldo_actual,
             codigo_referido: user.codigo_referido,
             email_verificado: user.email_verificado,
-            is_active: user.is_active
+            is_active: user.is_active,
+            direccion: user.direccion,
+            distrito: user.distrito,
+            departamento: user.departamento,
           }
         }
       });
@@ -478,7 +484,7 @@ export class AuthController {
   // 9. ACTUALIZAR PERFIL
   static async updateProfile(req: AuthRequest, res: Response): Promise<Response> {
     try {
-      const { nombres, apellidos, whatsapp } = req.body;
+      const { nombres, apellidos, whatsapp, direccion, distrito, departamento } = req.body;
 
       if (!nombres || !apellidos) {
         return res.status(400).json({ success: false, message: 'Nombres y apellidos son requeridos' });
@@ -488,12 +494,19 @@ export class AuthController {
         return res.status(400).json({ success: false, message: 'WhatsApp debe tener 9 dígitos' });
       }
 
+      if (departamento !== undefined && !DEPARTAMENTOS_PERU.includes(departamento)) {
+        return res.status(400).json({ success: false, message: 'Departamento inválido' });
+      }
+
       const user = await prisma.user.update({
         where: { id: req.userId },
         data: {
           nombres: Validators.sanitizeString(nombres),
           apellidos: Validators.sanitizeString(apellidos),
           ...(whatsapp ? { whatsapp } : {}),
+          ...(direccion !== undefined ? { direccion: Validators.sanitizeString(direccion) } : {}),
+          ...(distrito !== undefined ? { distrito: Validators.sanitizeString(distrito) } : {}),
+          ...(departamento !== undefined ? { departamento } : {}),
         },
         select: {
           id: true,
@@ -507,6 +520,9 @@ export class AuthController {
           email_verificado: true,
           is_active: true,
           created_at: true,
+          direccion: true,
+          distrito: true,
+          departamento: true,
         },
       });
 
@@ -544,7 +560,10 @@ export class AuthController {
           codigo_referido: true,
           email_verificado: true,
           is_active: true,
-          created_at: true
+          created_at: true,
+          direccion: true,
+          distrito: true,
+          departamento: true,
         }
       });
 
