@@ -465,6 +465,7 @@ export default function PerfilScreen() {
             <DepartamentoPicker
               value={editData.departamento}
               onSelect={(dep) => setEditData({ ...editData, departamento: dep })}
+              noInnerScroll
             />
 
             <Input

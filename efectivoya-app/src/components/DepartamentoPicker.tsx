@@ -16,9 +16,10 @@ interface DepartamentoPickerProps {
   value: string;
   onSelect: (departamento: string) => void;
   error?: string;
+  noInnerScroll?: boolean;
 }
 
-export function DepartamentoPicker({ value, onSelect, error }: DepartamentoPickerProps) {
+export function DepartamentoPicker({ value, onSelect, error, noInnerScroll }: DepartamentoPickerProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -38,30 +39,53 @@ export function DepartamentoPicker({ value, onSelect, error }: DepartamentoPicke
       {!!error && <Text style={styles.errorText}>{error}</Text>}
       {open && (
         <View style={styles.list}>
-          <ScrollView
-            nestedScrollEnabled
-            style={styles.listScroll}
-            keyboardShouldPersistTaps="handled"
-          >
-            {DEPARTAMENTOS_PERU.map((dep) => (
-              <TouchableOpacity
-                key={dep}
-                style={[styles.item, value === dep && styles.itemSelected]}
-                onPress={() => {
-                  onSelect(dep);
-                  setOpen(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.itemText, value === dep && styles.itemTextSelected]}>
-                  {dep}
-                </Text>
-                {value === dep && (
-                  <Ionicons name="checkmark" size={16} color={Colors.primary} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {noInnerScroll ? (
+            <View>
+              {DEPARTAMENTOS_PERU.map((dep) => (
+                <TouchableOpacity
+                  key={dep}
+                  style={[styles.item, value === dep && styles.itemSelected]}
+                  onPress={() => {
+                    onSelect(dep);
+                    setOpen(false);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.itemText, value === dep && styles.itemTextSelected]}>
+                    {dep}
+                  </Text>
+                  {value === dep && (
+                    <Ionicons name="checkmark" size={16} color={Colors.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <ScrollView
+              nestedScrollEnabled
+              style={styles.listScroll}
+              keyboardShouldPersistTaps="handled"
+            >
+              {DEPARTAMENTOS_PERU.map((dep) => (
+                <TouchableOpacity
+                  key={dep}
+                  style={[styles.item, value === dep && styles.itemSelected]}
+                  onPress={() => {
+                    onSelect(dep);
+                    setOpen(false);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.itemText, value === dep && styles.itemTextSelected]}>
+                    {dep}
+                  </Text>
+                  {value === dep && (
+                    <Ionicons name="checkmark" size={16} color={Colors.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
         </View>
       )}
     </View>
@@ -114,7 +138,6 @@ const styles = StyleSheet.create({
     borderRadius: Layout.borderRadius.md,
     marginTop: 4,
     backgroundColor: Colors.cardBackground,
-    maxHeight: 200,
   },
   listScroll: {
     maxHeight: 200,
