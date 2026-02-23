@@ -498,6 +498,14 @@ export class AuthController {
         return res.status(400).json({ success: false, message: 'Departamento inválido' });
       }
 
+      if (direccion !== undefined && !direccion.trim()) {
+        return res.status(400).json({ success: false, message: 'La dirección no puede estar vacía' });
+      }
+
+      if (distrito !== undefined && !distrito.trim()) {
+        return res.status(400).json({ success: false, message: 'El distrito no puede estar vacío' });
+      }
+
       const user = await prisma.user.update({
         where: { id: req.userId },
         data: {
