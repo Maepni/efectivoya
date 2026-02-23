@@ -71,3 +71,11 @@ export class Validators {
     return str.trim().replace(/[<>]/g, '');
   }
 }
+
+export const DEPARTAMENTOS_PERU: readonly string[] = [
+  'Amazonas', 'Áncash', 'Apurímac', 'Arequipa', 'Ayacucho',
+  'Cajamarca', 'Callao', 'Cusco', 'Huancavelica', 'Huánuco',
+  'Ica', 'Junín', 'La Libertad', 'Lambayeque', 'Lima',
+  'Loreto', 'Madre de Dios', 'Moquegua', 'Pasco', 'Piura',
+  'Puno', 'San Martín', 'Tacna', 'Tumbes', 'Ucayali',
+] as const;
