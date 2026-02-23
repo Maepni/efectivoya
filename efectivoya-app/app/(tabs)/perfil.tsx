@@ -14,6 +14,7 @@ import { useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
+import { DepartamentoPicker } from '../../src/components/DepartamentoPicker';
 import { Card } from '../../src/components/Card';
 import { BancoCard } from '../../src/components/BancoCard';
 import { ConfirmDialog } from '../../src/components/ConfirmDialog';
@@ -46,6 +47,9 @@ export default function PerfilScreen() {
     nombres: user?.nombres || '',
     apellidos: user?.apellidos || '',
     whatsapp: user?.whatsapp || '',
+    departamento: user?.departamento || '',
+    distrito: user?.distrito || '',
+    direccion: user?.direccion || '',
   });
   const [updating, setUpdating] = useState(false);
 
@@ -69,6 +73,9 @@ export default function PerfilScreen() {
       nombres: user?.nombres || '',
       apellidos: user?.apellidos || '',
       whatsapp: user?.whatsapp || '',
+      departamento: user?.departamento || '',
+      distrito: user?.distrito || '',
+      direccion: user?.direccion || '',
     });
   }, [user]);
 
@@ -109,6 +116,9 @@ export default function PerfilScreen() {
         nombres: editData.nombres.trim(),
         apellidos: editData.apellidos.trim(),
         ...(editData.whatsapp.trim() ? { whatsapp: editData.whatsapp.trim() } : {}),
+        ...(editData.departamento ? { departamento: editData.departamento } : {}),
+        ...(editData.distrito.trim() ? { distrito: editData.distrito.trim() } : {}),
+        ...(editData.direccion.trim() ? { direccion: editData.direccion.trim() } : {}),
       });
 
       if (response.success) {
@@ -451,6 +461,30 @@ export default function PerfilScreen() {
               keyboardType="phone-pad"
               icon="logo-whatsapp"
             />
+
+            <DepartamentoPicker
+              value={editData.departamento}
+              onSelect={(dep) => setEditData({ ...editData, departamento: dep })}
+            />
+
+            <Input
+              label="Distrito"
+              placeholder="Ej: Miraflores"
+              value={editData.distrito}
+              onChangeText={(text) => setEditData({ ...editData, distrito: text })}
+              icon="map-outline"
+              autoCapitalize="words"
+            />
+
+            <Input
+              label="Dirección"
+              placeholder="Ej: Av. Principal 123"
+              value={editData.direccion}
+              onChangeText={(text) => setEditData({ ...editData, direccion: text })}
+              icon="home-outline"
+              autoCapitalize="sentences"
+            />
+
             <Button
               title="Guardar Cambios"
               onPress={handleUpdateProfile}
