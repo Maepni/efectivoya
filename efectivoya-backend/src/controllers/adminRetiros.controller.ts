@@ -78,7 +78,10 @@ export class AdminRetirosController {
               dni: true,
               whatsapp: true,
               saldo_actual: true,
-              created_at: true
+              created_at: true,
+              direccion: true,
+              distrito: true,
+              departamento: true
             }
           },
           banco: true,
@@ -119,7 +122,10 @@ export class AdminRetirosController {
               apellidos: retiro.user.apellidos,
               dni: retiro.user.dni,
               whatsapp: retiro.user.whatsapp,
-              saldo_actual: Number(retiro.user.saldo_actual)
+              saldo_actual: Number(retiro.user.saldo_actual),
+              direccion: retiro.user.direccion,
+              distrito: retiro.user.distrito,
+              departamento: retiro.user.departamento
             },
             banco: retiro.banco ? {
               banco: retiro.banco.banco,
