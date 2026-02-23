@@ -1,6 +1,6 @@
 # EfectivoYa
 
-**Actualizado:** 22 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
+**Actualizado:** 23 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
 
 ## Funcionalidades activas
 
@@ -13,7 +13,8 @@
 - **Videos instructivos:** Videos por banco en Cloudinary (MP4/MOV/WEBM, max 50MB). `expo-video`
 - **Panel admin:** Dashboard, recargas, retiros, chats, clientes, alertas, config, logs, contenido, admins
 - **Bancos usuario:** CRUD completo (crear, editar alias/CCI, eliminar). `useFocusEffect` sincroniza pantallas
-- **Editar perfil usuario:** `PUT /api/auth/profile` — nombres, apellidos, whatsapp
+- **Editar perfil usuario:** `PUT /api/auth/profile` — nombres, apellidos, whatsapp, direccion?, distrito?, departamento?
+- **Ubicación usuario:** `direccion`, `distrito`, `departamento` en registro (obligatorios) y editables desde perfil. Admin los ve en detalle de cliente, recarga y retiro para decidir banco de transferencia con menor comision
 - **Biometria login:** `expo-local-authentication` + `expo-secure-store`. Huella/Face ID. Requiere build nativo (no funciona en Expo Go)
 
 ## Stack
@@ -161,18 +162,20 @@ npm install --legacy-peer-deps  # REQUERIDO por conflicto react 19.1 vs 19.2
 - Prisma Decimal se serializa como string en JSON — controllers deben usar `Number()` o `.toNumber()` antes de enviar
 - `auth.middleware.ts`: `TokenExpiredError` usa `Logger.debug` (no `.error`) — es esperado, el cliente refresca
 - `prisma migrate dev` no funciona en non-interactive shells — usar `prisma db push`
+- **`DEPARTAMENTOS_PERU`:** Constante duplicada en `src/utils/validators.util.ts` (backend) y `src/components/DepartamentoPicker.tsx` (frontend). Si se actualiza en uno, actualizar en el otro
+- **Usuarios pre-ubicación:** `direccion/distrito/departamento` tienen `@default("")`. Usuarios existentes tendrán strings vacíos. La UI admin usa `|| '—'` para mostrarlos correctamente
 
 ### Backend — Rutas criticas
 
 - Perfil usuario (GET): `GET /api/auth/profile` — unico con todos los campos, wrapeado `{ data: { user: {...} } }`
-- Perfil usuario (PUT): `PUT /api/auth/profile` — `{ nombres, apellidos, whatsapp? }` (autenticado)
+- Perfil usuario (PUT): `PUT /api/auth/profile` — `{ nombres, apellidos, whatsapp?, direccion?, distrito?, departamento? }` (autenticado)
 - Login admin: `POST /api/admin/auth/login` (NO `/api/auth/login`)
 - `POST /auth/login` retorna user SIN: `email_verificado`, `is_active`
 - `POST /auth/verify-email` retorna user SIN: `email_verificado`, `is_active`, `dni`, `whatsapp`
 
 ### Frontend — rutas y campos
 
-- Register: campos `nombres`/`apellidos` (plural). Sin `codigo_referido_usado` (referidos desactivados en UI)
+- Register: campos `nombres`/`apellidos` (plural), `direccion`/`distrito`/`departamento` (obligatorios). Sin `codigo_referido_usado` (referidos desactivados en UI)
 - Verify OTP: `{ userId, otp }` (NO `{ email, otp }`)
 - Dashboard: backend envia `saldo_disponible`, `este_mes.cantidad_recargas` (referidos presentes en response pero no se muestran en UI)
 - `authStore.refreshUser()` extrae `response.data.user` (doble wrapper)
@@ -194,6 +197,7 @@ npm install --legacy-peer-deps  # REQUERIDO por conflicto react 19.1 vs 19.2
 - **Android galeria:** `expo-document-picker` con `type: 'image/*'`. NO usar `expo-image-picker` en Android (Photo Picker no muestra fotos de WhatsApp/SD)
 - **iOS galeria:** `expo-image-picker.launchImageLibraryAsync`. Manejar `accessPrivileges === 'limited'` con Alert + `Linking.openSettings()`
 - **Modal anidado iOS:** NO usar `Modal`/ConfirmDialog dentro de otro Modal. Usar `Alert.alert` nativo
+- **`DepartamentoPicker` en Modal iOS:** Pasar prop `noInnerScroll` cuando el picker está dentro de un `Modal` (ej: modal editar perfil). Sin ella el `ScrollView` anidado puede bloquearse en iOS. En pantallas normales no hace falta
 - **Video:** `expo-video` (NO `expo-av`). Hook `useVideoPlayer` + `VideoView`. Web usa `<video>` HTML5
 - **Comprobantes PDF:** Usar `operacion.comprobante_pdf_url` con `Linking.openURL()`. Los endpoints retornan bytes crudos
 - **UserBank eliminable:** `user_bank_id` en Retiro es `String?` con `onDelete: SetNull`
