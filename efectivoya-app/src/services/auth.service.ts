@@ -112,7 +112,14 @@ export const authService = {
     }
   },
 
-  async updateProfile(data: { nombres: string; apellidos: string; whatsapp?: string }): Promise<ApiResponse<{ user: User }>> {
+  async updateProfile(data: {
+    nombres: string;
+    apellidos: string;
+    whatsapp?: string;
+    direccion?: string;
+    distrito?: string;
+    departamento?: string;
+  }): Promise<ApiResponse<{ user: User }>> {
     try {
       const { data: res } = await api.put<ApiResponse<{ user: User }>>('/auth/profile', data);
       return res;
