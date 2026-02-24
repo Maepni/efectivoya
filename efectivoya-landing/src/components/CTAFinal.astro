@@ -10,19 +10,31 @@ import ButtonCTA from './ButtonCTA.astro';
   <div class="cta-deco cta-deco-1" aria-hidden="true"></div>
   <div class="cta-deco cta-deco-2" aria-hidden="true"></div>
 
+  <!-- Floating money elements -->
+  <div class="cta-money-field" aria-hidden="true">
+    <span class="cta-coin" style="left:5%;  animation-delay:1s;   animation-duration:10s">S/.</span>
+    <span class="cta-coin" style="left:22%; animation-delay:0s;   animation-duration:13s">+</span>
+    <span class="cta-coin" style="left:35%; animation-delay:2.8s; animation-duration:9s">S/.</span>
+    <span class="cta-coin" style="left:55%; animation-delay:4s;   animation-duration:12s">💰</span>
+    <span class="cta-coin" style="left:68%; animation-delay:1.5s; animation-duration:11s">S/.</span>
+    <span class="cta-coin" style="left:82%; animation-delay:3.3s; animation-duration:14s">+</span>
+    <span class="cta-coin" style="left:92%; animation-delay:0.6s; animation-duration:10s">💵</span>
+    <span class="cta-coin" style="left:47%; animation-delay:5.5s; animation-duration:8s">S/.</span>
+  </div>
+
   <div class="cta-container">
 
     <div class="cta-content reveal">
       <span class="section-label">Empieza hoy</span>
 
       <h2 class="cta-title">
-        Tu dinero,<br/>
-        <span class="cta-title-accent">al instante</span>
+        Tu dinero.<br/>
+        <span class="cta-title-accent">Ahora mismo.</span>
       </h2>
 
       <p class="cta-desc">
-        Únete a miles de peruanos que ya gestionan su dinero con EfectivoYa.
-        Registro gratuito, sin complicaciones.
+        Únete a miles de peruanos que ya gestionan su dinero con Efectivo<span class="cta-ya">Ya</span>.
+        Aprobación en segundos, retiros sin comisión.
       </p>
 
       <div class="cta-action">
@@ -248,5 +260,36 @@ import ButtonCTA from './ButtonCTA.astro';
     border-radius: 11px;
     position: relative;
     z-index: 0;
+  }
+
+  /* ── Floating money ── */
+  .cta-money-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .cta-coin {
+    position: absolute;
+    bottom: -40px;
+    font-family: 'Bebas Neue', 'Sora', sans-serif;
+    font-size: clamp(14px, 1.8vw, 20px);
+    color: #E09F3C;
+    opacity: 0;
+    animation: ctaCoinFloat linear infinite;
+    user-select: none;
+  }
+
+  @keyframes ctaCoinFloat {
+    0%   { opacity: 0;    transform: translateY(0)    rotate(-10deg); }
+    8%   { opacity: 0.10; }
+    88%  { opacity: 0.06; }
+    100% { opacity: 0;    transform: translateY(-90vh) rotate(15deg); }
+  }
+
+  .cta-ya {
+    color: #ED323A;
   }
 </style>
