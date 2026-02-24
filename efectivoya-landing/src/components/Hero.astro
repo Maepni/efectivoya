@@ -16,18 +16,20 @@ import ButtonCTA from './ButtonCTA.astro';
 
   <!-- Floating money elements -->
   <div class="money-field" aria-hidden="true">
-    <span class="coin" style="left:8%;  animation-delay:0s;   animation-duration:9s">S/.</span>
-    <span class="coin" style="left:18%; animation-delay:1.2s; animation-duration:12s">+</span>
-    <span class="coin" style="left:27%; animation-delay:2.5s; animation-duration:8s">S/.</span>
-    <span class="coin" style="left:38%; animation-delay:0.8s; animation-duration:14s">💰</span>
-    <span class="coin" style="left:52%; animation-delay:3.1s; animation-duration:10s">S/.</span>
-    <span class="coin" style="left:63%; animation-delay:1.7s; animation-duration:11s">+</span>
-    <span class="coin" style="left:72%; animation-delay:0.4s; animation-duration:13s">S/.</span>
-    <span class="coin" style="left:83%; animation-delay:2.2s; animation-duration:9s">💵</span>
-    <span class="coin" style="left:91%; animation-delay:3.8s; animation-duration:12s">S/.</span>
-    <span class="coin" style="left:45%; animation-delay:5s;   animation-duration:15s">+</span>
-    <span class="coin" style="left:12%; animation-delay:6s;   animation-duration:11s">💰</span>
-    <span class="coin" style="left:77%; animation-delay:4.5s; animation-duration:10s">S/.</span>
+    <!-- Billetes grandes con denominaciones reales -->
+    <span class="coin coin-bill" style="left:4%;  animation-delay:0s;   animation-duration:9s;  --rot-end:14deg">S/. 100</span>
+    <span class="coin coin-bill" style="left:22%; animation-delay:3.2s; animation-duration:11s; --rot-end:-10deg">S/. 50</span>
+    <span class="coin coin-bill" style="left:55%; animation-delay:1.5s; animation-duration:10s; --rot-end:18deg">S/. 200</span>
+    <span class="coin coin-bill" style="left:76%; animation-delay:5.0s; animation-duration:8s;  --rot-end:-14deg">S/. 100</span>
+    <span class="coin coin-bill" style="left:88%; animation-delay:2.4s; animation-duration:12s; --rot-end:8deg">S/. 50</span>
+    <span class="coin coin-bill" style="left:38%; animation-delay:7.0s; animation-duration:9s;  --rot-end:-16deg">S/. 200</span>
+    <!-- Símbolos medianos -->
+    <span class="coin coin-md" style="left:13%; animation-delay:1.8s; animation-duration:13s; --rot-end:20deg">S/.</span>
+    <span class="coin coin-md" style="left:32%; animation-delay:4.5s; animation-duration:10s; --rot-end:-12deg">💰</span>
+    <span class="coin coin-md" style="left:48%; animation-delay:6.2s; animation-duration:14s; --rot-end:16deg">S/.</span>
+    <span class="coin coin-md" style="left:67%; animation-delay:0.7s; animation-duration:11s; --rot-end:-20deg">💵</span>
+    <span class="coin coin-md" style="left:82%; animation-delay:3.8s; animation-duration:9s;  --rot-end:12deg">S/.</span>
+    <span class="coin coin-md" style="left:93%; animation-delay:5.8s; animation-duration:12s; --rot-end:-8deg">💰</span>
   </div>
 
   <div class="hero-content">
@@ -439,20 +441,38 @@ import ButtonCTA from './ButtonCTA.astro';
 
   .coin {
     position: absolute;
-    bottom: -40px;
-    font-family: 'Bebas Neue', 'Sora', sans-serif;
-    font-size: clamp(13px, 1.6vw, 18px);
-    color: #E09F3C;
+    bottom: -80px;
+    font-family: 'Bebas Neue', sans-serif;
     opacity: 0;
     animation: coinFloat linear infinite;
     user-select: none;
+    letter-spacing: 0.03em;
+  }
+
+  /* Billetes grandes — denominaciones reales */
+  .coin-bill {
+    font-size: clamp(20px, 3.2vw, 44px);
+    color: #E09F3C;
+    text-shadow:
+      0 0 18px rgba(224, 159, 60, 0.75),
+      0 0 40px rgba(224, 159, 60, 0.35),
+      0 0 80px rgba(224, 159, 60, 0.15);
+  }
+
+  /* Símbolos medianos */
+  .coin-md {
+    font-size: clamp(16px, 2.4vw, 30px);
+    color: #C8921E;
+    text-shadow:
+      0 0 12px rgba(200, 146, 30, 0.6),
+      0 0 28px rgba(200, 146, 30, 0.25);
   }
 
   @keyframes coinFloat {
-    0%   { opacity: 0;    transform: translateY(0)    rotate(0deg);  }
-    8%   { opacity: 0.13; }
-    88%  { opacity: 0.07; }
-    100% { opacity: 0;    transform: translateY(-95vh) rotate(25deg); }
+    0%   { opacity: 0;    transform: translateY(0)           rotate(-8deg); }
+    6%   { opacity: 0.28; }
+    85%  { opacity: 0.14; }
+    100% { opacity: 0;    transform: translateY(-100vh)      rotate(var(--rot-end, 16deg)); }
   }
 
   /* ── Speed badge ── */

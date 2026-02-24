@@ -12,14 +12,16 @@ import ButtonCTA from './ButtonCTA.astro';
 
   <!-- Floating money elements -->
   <div class="cta-money-field" aria-hidden="true">
-    <span class="cta-coin" style="left:5%;  animation-delay:1s;   animation-duration:10s">S/.</span>
-    <span class="cta-coin" style="left:22%; animation-delay:0s;   animation-duration:13s">+</span>
-    <span class="cta-coin" style="left:35%; animation-delay:2.8s; animation-duration:9s">S/.</span>
-    <span class="cta-coin" style="left:55%; animation-delay:4s;   animation-duration:12s">💰</span>
-    <span class="cta-coin" style="left:68%; animation-delay:1.5s; animation-duration:11s">S/.</span>
-    <span class="cta-coin" style="left:82%; animation-delay:3.3s; animation-duration:14s">+</span>
-    <span class="cta-coin" style="left:92%; animation-delay:0.6s; animation-duration:10s">💵</span>
-    <span class="cta-coin" style="left:47%; animation-delay:5.5s; animation-duration:8s">S/.</span>
+    <!-- Billetes grandes -->
+    <span class="cta-coin cta-bill" style="left:3%;  animation-delay:0.5s; animation-duration:10s; --cta-rot:12deg">S/. 200</span>
+    <span class="cta-coin cta-bill" style="left:28%; animation-delay:3.5s; animation-duration:8s;  --cta-rot:-14deg">S/. 100</span>
+    <span class="cta-coin cta-bill" style="left:60%; animation-delay:1.2s; animation-duration:12s; --cta-rot:16deg">S/. 50</span>
+    <span class="cta-coin cta-bill" style="left:84%; animation-delay:4.8s; animation-duration:9s;  --cta-rot:-10deg">S/. 200</span>
+    <!-- Símbolos -->
+    <span class="cta-coin cta-md" style="left:15%; animation-delay:2.0s; animation-duration:11s; --cta-rot:20deg">S/.</span>
+    <span class="cta-coin cta-md" style="left:44%; animation-delay:5.5s; animation-duration:9s;  --cta-rot:-18deg">💰</span>
+    <span class="cta-coin cta-md" style="left:72%; animation-delay:0.8s; animation-duration:13s; --cta-rot:14deg">💵</span>
+    <span class="cta-coin cta-md" style="left:93%; animation-delay:6.2s; animation-duration:10s; --cta-rot:-12deg">S/.</span>
   </div>
 
   <div class="cta-container">
@@ -33,7 +35,7 @@ import ButtonCTA from './ButtonCTA.astro';
       </h2>
 
       <p class="cta-desc">
-        Únete a miles de peruanos que ya gestionan su dinero con Efectivo<span class="cta-ya">Ya</span>.
+        Únete a miles de peruanos que ya gestionan su dinero con EfectivoYa.
         Aprobación en segundos, retiros sin comisión.
       </p>
 
@@ -273,23 +275,34 @@ import ButtonCTA from './ButtonCTA.astro';
 
   .cta-coin {
     position: absolute;
-    bottom: -40px;
-    font-family: 'Bebas Neue', 'Sora', sans-serif;
-    font-size: clamp(14px, 1.8vw, 20px);
-    color: #E09F3C;
+    bottom: -80px;
+    font-family: 'Bebas Neue', sans-serif;
     opacity: 0;
     animation: ctaCoinFloat linear infinite;
     user-select: none;
+    letter-spacing: 0.03em;
+  }
+
+  .cta-bill {
+    font-size: clamp(18px, 3vw, 40px);
+    color: #E09F3C;
+    text-shadow:
+      0 0 18px rgba(224, 159, 60, 0.75),
+      0 0 40px rgba(224, 159, 60, 0.35);
+  }
+
+  .cta-md {
+    font-size: clamp(14px, 2.2vw, 26px);
+    color: #C8921E;
+    text-shadow:
+      0 0 12px rgba(200, 146, 30, 0.55),
+      0 0 24px rgba(200, 146, 30, 0.2);
   }
 
   @keyframes ctaCoinFloat {
-    0%   { opacity: 0;    transform: translateY(0)    rotate(-10deg); }
-    8%   { opacity: 0.10; }
-    88%  { opacity: 0.06; }
-    100% { opacity: 0;    transform: translateY(-90vh) rotate(15deg); }
-  }
-
-  .cta-ya {
-    color: #ED323A;
+    0%   { opacity: 0;    transform: translateY(0)    rotate(-8deg); }
+    6%   { opacity: 0.26; }
+    85%  { opacity: 0.12; }
+    100% { opacity: 0;    transform: translateY(-90vh) rotate(var(--cta-rot, 15deg)); }
   }
 </style>
