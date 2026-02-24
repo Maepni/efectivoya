@@ -10,7 +10,9 @@
       <!-- Col 1: Logo + description -->
       <div class="footer-col footer-brand">
         <a href="/" class="footer-logo" aria-label="EfectivoYa — Inicio">
-          <img src="/logo.png" alt="EfectivoYa" class="footer-logo-img" />
+          <span class="footer-logo-text" aria-label="EfectivoYa">
+            Efectivo<span class="footer-logo-ya">Ya</span>
+          </span>
         </a>
         <p class="footer-desc">
           Billetera digital fintech para el Perú. Gestiona tu dinero con seguridad,
@@ -142,12 +144,19 @@
     margin-bottom: 16px;
   }
 
-  .footer-logo-img {
-    height: 40px;
-    width: auto;
-    max-width: 200px;
-    object-fit: contain;
-    display: block;
+  .footer-logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: #fff;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    user-select: none;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+
+  .footer-logo-ya {
+    color: #ED323A;
   }
 
   .footer-desc {
