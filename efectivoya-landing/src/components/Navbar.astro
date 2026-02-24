@@ -7,7 +7,9 @@
 
     <!-- Logo -->
     <a href="/" class="navbar-logo" aria-label="EfectivoYa — Inicio">
-      <img src="/logo.png" alt="EfectivoYa" class="navbar-logo-img" />
+      <span class="navbar-logo-text" aria-label="EfectivoYa">
+        Efectivo<span class="navbar-logo-ya">Ya</span>
+      </span>
     </a>
 
     <!-- Desktop links -->
@@ -92,12 +94,17 @@
     flex-shrink: 0;
   }
 
-  .navbar-logo-img {
-    height: 44px;
-    width: auto;
-    max-width: 220px;
-    object-fit: contain;
-    display: block;
+  .navbar-logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #fff;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .navbar-logo-ya {
+    color: #ED323A;
   }
 
   /* ── Desktop nav ── */
