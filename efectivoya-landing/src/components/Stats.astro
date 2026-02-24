@@ -61,6 +61,24 @@
       </div>
     </div>
 
+    <div class="stat-divider" aria-hidden="true"></div>
+
+    <!-- Stat 4 -->
+    <div class="stat-item reveal" style="transition-delay: 0.36s">
+      <div class="stat-number stat-number--lt">
+        <span class="stat-lt">&lt;</span>
+        <span class="counter"
+          data-count="60"
+          data-suffix="s"
+          aria-label="Menos de 60 segundos"
+        >0</span>
+      </div>
+      <div class="stat-meta">
+        <div class="stat-label">Aprobación de recarga</div>
+        <div class="stat-sub">no horas, no minutos</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -80,7 +98,7 @@
 
   @media (min-width: 640px) {
     .stats-container {
-      grid-template-columns: 1fr auto 1fr auto 1fr;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
       align-items: center;
     }
   }
@@ -168,6 +186,23 @@
     font-weight: 400;
     color: #B2B3B3;
     letter-spacing: 0.01em;
+  }
+
+  .stat-number--lt {
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+  }
+
+  .stat-lt {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 4vw, 38px);
+    color: #ED323A;
+    letter-spacing: 0.02em;
+  }
+
+  .stat-number--lt .counter {
+    color: #ED323A;
   }
 
   /* ── Counter animation ── */
