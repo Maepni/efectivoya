@@ -35,6 +35,12 @@ import ButtonCTA from './ButtonCTA.astro';
       tus cuentas bancarias y gestiona tus finanzas sin complicaciones.
     </p>
 
+    <!-- Speed badge -->
+    <div class="speed-badge fade-up delay-350" role="presentation">
+      <span class="speed-icon" aria-hidden="true">⚡</span>
+      <span>Aprobación en segundos&nbsp;—&nbsp;no horas, no minutos</span>
+    </div>
+
     <!-- CTA buttons -->
     <div class="hero-ctas fade-up delay-400">
       <ButtonCTA
@@ -404,6 +410,38 @@ import ButtonCTA from './ButtonCTA.astro';
   @keyframes scrollLine {
     0%   { opacity: 1; transform: scaleY(1) translateY(0); }
     100% { opacity: 0; transform: scaleY(0.3) translateY(100%); }
+  }
+
+  /* ── Speed badge ── */
+  .speed-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(237, 50, 58, 0.12);
+    border: 1px solid rgba(237, 50, 58, 0.4);
+    border-radius: 100px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ff6b70;
+    margin-bottom: 28px;
+    animation: speedPulse 2.8s ease-in-out infinite;
+  }
+
+  .speed-icon {
+    font-size: 15px;
+    animation: boltFlash 2.8s ease-in-out infinite;
+  }
+
+  @keyframes speedPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(237, 50, 58, 0); }
+    50%       { box-shadow: 0 0 0 6px rgba(237, 50, 58, 0); border-color: rgba(237, 50, 58, 0.7); }
+  }
+
+  @keyframes boltFlash {
+    0%, 80%, 100% { opacity: 1; }
+    90%           { opacity: 0.4; }
   }
 
   /* ── Responsive ── */
