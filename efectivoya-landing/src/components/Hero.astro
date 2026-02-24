@@ -14,6 +14,22 @@ import ButtonCTA from './ButtonCTA.astro';
   <div class="corner-accent corner-tl" aria-hidden="true"></div>
   <div class="corner-accent corner-br" aria-hidden="true"></div>
 
+  <!-- Floating money elements -->
+  <div class="money-field" aria-hidden="true">
+    <span class="coin" style="left:8%;  animation-delay:0s;   animation-duration:9s">S/.</span>
+    <span class="coin" style="left:18%; animation-delay:1.2s; animation-duration:12s">+</span>
+    <span class="coin" style="left:27%; animation-delay:2.5s; animation-duration:8s">S/.</span>
+    <span class="coin" style="left:38%; animation-delay:0.8s; animation-duration:14s">💰</span>
+    <span class="coin" style="left:52%; animation-delay:3.1s; animation-duration:10s">S/.</span>
+    <span class="coin" style="left:63%; animation-delay:1.7s; animation-duration:11s">+</span>
+    <span class="coin" style="left:72%; animation-delay:0.4s; animation-duration:13s">S/.</span>
+    <span class="coin" style="left:83%; animation-delay:2.2s; animation-duration:9s">💵</span>
+    <span class="coin" style="left:91%; animation-delay:3.8s; animation-duration:12s">S/.</span>
+    <span class="coin" style="left:45%; animation-delay:5s;   animation-duration:15s">+</span>
+    <span class="coin" style="left:12%; animation-delay:6s;   animation-duration:11s">💰</span>
+    <span class="coin" style="left:77%; animation-delay:4.5s; animation-duration:10s">S/.</span>
+  </div>
+
   <div class="hero-content">
 
     <!-- Badge -->
@@ -410,6 +426,33 @@ import ButtonCTA from './ButtonCTA.astro';
   @keyframes scrollLine {
     0%   { opacity: 1; transform: scaleY(1) translateY(0); }
     100% { opacity: 0; transform: scaleY(0.3) translateY(100%); }
+  }
+
+  /* ── Floating money ── */
+  .money-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .coin {
+    position: absolute;
+    bottom: -40px;
+    font-family: 'Bebas Neue', 'Sora', sans-serif;
+    font-size: clamp(13px, 1.6vw, 18px);
+    color: #E09F3C;
+    opacity: 0;
+    animation: coinFloat linear infinite;
+    user-select: none;
+  }
+
+  @keyframes coinFloat {
+    0%   { opacity: 0;    transform: translateY(0)    rotate(0deg);  }
+    8%   { opacity: 0.13; }
+    88%  { opacity: 0.07; }
+    100% { opacity: 0;    transform: translateY(-95vh) rotate(25deg); }
   }
 
   /* ── Speed badge ── */
