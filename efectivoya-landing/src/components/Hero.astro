@@ -4,124 +4,194 @@ import ButtonCTA from './ButtonCTA.astro';
 
 <section id="que-es" class="hero">
 
-  <!-- Subtle gold grid -->
+  <!-- Background grid -->
   <div class="hero-grid" aria-hidden="true"></div>
 
-  <!-- Radial glow behind title -->
+  <!-- Radial glow -->
   <div class="hero-glow" aria-hidden="true"></div>
 
-  <!-- Secondary corner accents -->
+  <!-- Corner accents -->
   <div class="corner-accent corner-tl" aria-hidden="true"></div>
   <div class="corner-accent corner-br" aria-hidden="true"></div>
 
-  <!-- Floating money elements -->
-  <div class="money-field" aria-hidden="true">
-    <!-- Billetes grandes con denominaciones reales -->
-    <span class="coin coin-bill" style="left:4%;  animation-delay:0s;   animation-duration:9s;  --rot-end:14deg">S/. 100</span>
-    <span class="coin coin-bill" style="left:22%; animation-delay:3.2s; animation-duration:11s; --rot-end:-10deg">S/. 50</span>
-    <span class="coin coin-bill" style="left:55%; animation-delay:1.5s; animation-duration:10s; --rot-end:18deg">S/. 200</span>
-    <span class="coin coin-bill" style="left:76%; animation-delay:5.0s; animation-duration:8s;  --rot-end:-14deg">S/. 100</span>
-    <span class="coin coin-bill" style="left:88%; animation-delay:2.4s; animation-duration:12s; --rot-end:8deg">S/. 50</span>
-    <span class="coin coin-bill" style="left:38%; animation-delay:7.0s; animation-duration:9s;  --rot-end:-16deg">S/. 200</span>
-    <!-- Símbolos medianos -->
-    <span class="coin coin-md" style="left:13%; animation-delay:1.8s; animation-duration:13s; --rot-end:20deg">S/.</span>
-    <span class="coin coin-md" style="left:32%; animation-delay:4.5s; animation-duration:10s; --rot-end:-12deg">💰</span>
-    <span class="coin coin-md" style="left:48%; animation-delay:6.2s; animation-duration:14s; --rot-end:16deg">S/.</span>
-    <span class="coin coin-md" style="left:67%; animation-delay:0.7s; animation-duration:11s; --rot-end:-20deg">💵</span>
-    <span class="coin coin-md" style="left:82%; animation-delay:3.8s; animation-duration:9s;  --rot-end:12deg">S/.</span>
-    <span class="coin coin-md" style="left:93%; animation-delay:5.8s; animation-duration:12s; --rot-end:-8deg">💰</span>
-  </div>
+  <!-- ── 2-col inner ── -->
+  <div class="hero-inner">
 
-  <div class="hero-content">
+    <!-- LEFT: content -->
+    <div class="hero-content">
 
-    <!-- Badge -->
-    <div class="hero-badge fade-up delay-100" role="presentation">
-      <span class="badge-dot pulse-dot" aria-hidden="true"></span>
-      <span>Billetera Digital&nbsp;·&nbsp;Perú</span>
-    </div>
+      <!-- Badge -->
+      <div class="hero-badge fade-up delay-100" role="presentation">
+        <span class="badge-dot pulse-dot" aria-hidden="true"></span>
+        <span>Billetera Digital&nbsp;·&nbsp;Perú</span>
+      </div>
 
-    <!-- Main title -->
-    <h1 class="hero-title fade-up delay-200">
-      <span class="title-white">EFECTIVO</span>
-      <br aria-hidden="true" />
-      <span class="title-red">YA</span>
-    </h1>
+      <!-- Main title -->
+      <h1 class="hero-title fade-up delay-200">
+        <span class="title-white">EFECTIVO</span>
+        <br aria-hidden="true" />
+        <span class="title-red">YA</span>
+      </h1>
 
-    <!-- Tagline -->
-    <p class="hero-tagline fade-up delay-300">
-      Tu dinero al instante. Recarga tu billetera digital, retira a cualquiera de
-      tus cuentas bancarias y gestiona tus finanzas sin complicaciones.
-    </p>
+      <!-- Tagline -->
+      <p class="hero-tagline fade-up delay-300">
+        Tu dinero al instante. Recarga tu billetera digital, retira a cualquiera de
+        tus cuentas bancarias y gestiona tus finanzas sin complicaciones.
+      </p>
 
-    <!-- Speed badge -->
-    <div class="speed-badge fade-up delay-350" role="presentation">
-      <span class="speed-icon" aria-hidden="true">⚡</span>
-      <span>Aprobación en segundos&nbsp;—&nbsp;no horas, no minutos</span>
-    </div>
+      <!-- Speed badge -->
+      <div class="speed-badge fade-up delay-350" role="presentation">
+        <span class="speed-icon" aria-hidden="true">⚡</span>
+        <span>Aprobación en segundos&nbsp;—&nbsp;no horas, no minutos</span>
+      </div>
 
-    <!-- CTA buttons -->
-    <div class="hero-ctas fade-up delay-400">
-      <ButtonCTA
-        href="https://tu-app.com"
-        text="Acceder a la App"
-        target="_blank"
-        variant="primary"
-        size="lg"
-      />
-      <a href="#como-funciona" class="cta-ghost">
-        Cómo funciona
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M8 2v12M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </div>
-
-    <!-- Store badges -->
-    <div class="store-badges fade-up delay-500">
-      <span class="store-label">Disponible en</span>
-      <div class="store-buttons">
-        <a
-          href="#"
+      <!-- CTA buttons -->
+      <div class="hero-ctas fade-up delay-400">
+        <ButtonCTA
+          href="https://tu-app.com"
+          text="Acceder a la App"
           target="_blank"
-          rel="noopener noreferrer"
-          class="store-btn"
-          aria-label="Descargar en App Store"
-        >
-          <img src="/stores/appstore.png" alt="Descargar en App Store" class="store-badge-img" loading="lazy" />
-        </a>
-        <a
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="store-btn"
-          aria-label="Disponible en Google Play"
-        >
-          <img src="/stores/playstore.png" alt="Disponible en Google Play" class="store-badge-img" loading="lazy" />
+          variant="primary"
+          size="lg"
+        />
+        <a href="#como-funciona" class="cta-ghost">
+          Cómo funciona
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 2v12M3 9l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </a>
       </div>
+
+      <!-- Store badges -->
+      <div class="store-badges fade-up delay-500">
+        <span class="store-label">Disponible en</span>
+        <div class="store-buttons">
+          <a href="#" target="_blank" rel="noopener noreferrer" class="store-btn" aria-label="Descargar en App Store">
+            <img src="/stores/appstore.png" alt="Descargar en App Store" class="store-badge-img" loading="lazy" />
+          </a>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="store-btn" aria-label="Disponible en Google Play">
+            <img src="/stores/playstore.png" alt="Disponible en Google Play" class="store-badge-img" loading="lazy" />
+          </a>
+        </div>
+      </div>
+
+      <!-- Trust strip -->
+      <div class="hero-trust fade-up delay-600">
+        <div class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 1l1.5 4.5H15l-4 3 1.5 4.5L8 10.5 3.5 13 5 8.5l-4-3h5.5z" fill="#E09F3C"/>
+          </svg>
+          Sin costo de registro
+        </div>
+        <span class="trust-sep" aria-hidden="true">·</span>
+        <div class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 1l1.5 4.5H15l-4 3 1.5 4.5L8 10.5 3.5 13 5 8.5l-4-3h5.5z" fill="#E09F3C"/>
+          </svg>
+          Retiros sin comisión
+        </div>
+        <span class="trust-sep" aria-hidden="true">·</span>
+        <div class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 1l1.5 4.5H15l-4 3 1.5 4.5L8 10.5 3.5 13 5 8.5l-4-3h5.5z" fill="#E09F3C"/>
+          </svg>
+          Soporte humano 24/7
+        </div>
+      </div>
+
     </div>
 
-    <!-- Trust strip -->
-    <div class="hero-trust fade-up delay-600">
-      <div class="trust-item">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M8 1l1.5 4.5H15l-4 3 1.5 4.5L8 10.5 3.5 13 5 8.5l-4-3h5.5z" fill="#E09F3C"/>
-        </svg>
-        Sin costo de registro
-      </div>
-      <span class="trust-sep" aria-hidden="true">·</span>
-      <div class="trust-item">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M8 1l1.5 4.5H15l-4 3 1.5 4.5L8 10.5 3.5 13 5 8.5l-4-3h5.5z" fill="#E09F3C"/>
-        </svg>
-        Retiros sin comisión
-      </div>
-      <span class="trust-sep" aria-hidden="true">·</span>
-      <div class="trust-item">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M8 1l1.5 4.5H15l-4 3 1.5 4.5L8 10.5 3.5 13 5 8.5l-4-3h5.5z" fill="#E09F3C"/>
-        </svg>
-        Soporte humano 24/7
+    <!-- RIGHT: fan of bills -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="abanico">
+
+        <!-- 6 billetes en abanico (izq → der, --b-rot de ±32°) -->
+        <div class="billete billete-1" style="--b-rot:-32deg; --b-delay:0.05s">
+          <div class="b-security"></div>
+          <div class="b-watermark">200</div>
+          <div class="b-body">
+            <div class="b-top">
+              <span class="b-currency">S/.</span>
+              <span class="b-amount">200</span>
+            </div>
+            <span class="b-label">DOSCIENTOS SOLES</span>
+          </div>
+          <div class="b-strip"></div>
+          <div class="b-border"></div>
+        </div>
+
+        <div class="billete billete-2" style="--b-rot:-19deg; --b-delay:0.10s">
+          <div class="b-security"></div>
+          <div class="b-watermark">50</div>
+          <div class="b-body">
+            <div class="b-top">
+              <span class="b-currency">S/.</span>
+              <span class="b-amount">50</span>
+            </div>
+            <span class="b-label">CINCUENTA SOLES</span>
+          </div>
+          <div class="b-strip"></div>
+          <div class="b-border"></div>
+        </div>
+
+        <div class="billete billete-3" style="--b-rot:-6deg; --b-delay:0.15s">
+          <div class="b-security"></div>
+          <div class="b-watermark">100</div>
+          <div class="b-body">
+            <div class="b-top">
+              <span class="b-currency">S/.</span>
+              <span class="b-amount">100</span>
+            </div>
+            <span class="b-label">CIEN SOLES</span>
+          </div>
+          <div class="b-strip"></div>
+          <div class="b-border"></div>
+        </div>
+
+        <div class="billete billete-4" style="--b-rot:7deg; --b-delay:0.20s">
+          <div class="b-security"></div>
+          <div class="b-watermark">20</div>
+          <div class="b-body">
+            <div class="b-top">
+              <span class="b-currency">S/.</span>
+              <span class="b-amount">20</span>
+            </div>
+            <span class="b-label">VEINTE SOLES</span>
+          </div>
+          <div class="b-strip"></div>
+          <div class="b-border"></div>
+        </div>
+
+        <div class="billete billete-5" style="--b-rot:20deg; --b-delay:0.25s">
+          <div class="b-security"></div>
+          <div class="b-watermark">100</div>
+          <div class="b-body">
+            <div class="b-top">
+              <span class="b-currency">S/.</span>
+              <span class="b-amount">100</span>
+            </div>
+            <span class="b-label">CIEN SOLES</span>
+          </div>
+          <div class="b-strip"></div>
+          <div class="b-border"></div>
+        </div>
+
+        <div class="billete billete-6" style="--b-rot:32deg; --b-delay:0.30s">
+          <div class="b-security"></div>
+          <div class="b-watermark">200</div>
+          <div class="b-body">
+            <div class="b-top">
+              <span class="b-currency">S/.</span>
+              <span class="b-amount">200</span>
+            </div>
+            <span class="b-label">DOSCIENTOS SOLES</span>
+          </div>
+          <div class="b-strip"></div>
+          <div class="b-border"></div>
+        </div>
+
+        <!-- Glow debajo del abanico -->
+        <div class="abanico-glow"></div>
       </div>
     </div>
 
@@ -135,7 +205,9 @@ import ButtonCTA from './ButtonCTA.astro';
 </section>
 
 <style>
-  /* ── Layout ── */
+  /* ────────────────────────────────────────────
+     HERO — layout
+  ──────────────────────────────────────────── */
   .hero {
     position: relative;
     min-height: 100dvh;
@@ -145,10 +217,29 @@ import ButtonCTA from './ButtonCTA.astro';
     justify-content: center;
     overflow: hidden;
     background-color: #201F1F;
-    padding: clamp(100px, 14vh, 140px) 24px clamp(60px, 8vh, 80px);
+    padding: clamp(100px, 14vh, 140px) clamp(20px, 4vw, 60px) clamp(60px, 8vh, 80px);
   }
 
-  /* ── Grid lines ── */
+  /* 2-col grid wrapper */
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1280px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (max-width: 960px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 52px;
+    }
+  }
+
+  /* ── Background elements ── */
   .hero-grid {
     position: absolute;
     inset: 0;
@@ -160,7 +251,6 @@ import ButtonCTA from './ButtonCTA.astro';
     pointer-events: none;
   }
 
-  /* ── Radial glow ── */
   .hero-glow {
     position: absolute;
     top: 42%;
@@ -176,7 +266,6 @@ import ButtonCTA from './ButtonCTA.astro';
     border-radius: 50%;
   }
 
-  /* ── Corner accents ── */
   .corner-accent {
     position: absolute;
     width: 300px;
@@ -185,27 +274,32 @@ import ButtonCTA from './ButtonCTA.astro';
   }
 
   .corner-tl {
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     background: radial-gradient(circle at top left, rgba(224,159,60,0.07) 0%, transparent 60%);
   }
 
   .corner-br {
-    bottom: 0;
-    right: 0;
+    bottom: 0; right: 0;
     background: radial-gradient(circle at bottom right, rgba(237,50,58,0.06) 0%, transparent 60%);
   }
 
-  /* ── Content ── */
+  /* ────────────────────────────────────────────
+     LEFT column — content
+  ──────────────────────────────────────────── */
   .hero-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 820px;
-    width: 100%;
+    text-align: left;
+    max-width: 560px;
   }
 
-  /* ── Badge ── */
+  @media (max-width: 960px) {
+    .hero-content {
+      text-align: center;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+  }
+
+  /* Badge */
   .hero-badge {
     display: inline-flex;
     align-items: center;
@@ -220,7 +314,7 @@ import ButtonCTA from './ButtonCTA.astro';
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #E09F3C;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
   }
 
   .badge-dot {
@@ -231,37 +325,77 @@ import ButtonCTA from './ButtonCTA.astro';
     flex-shrink: 0;
   }
 
-  /* ── Title ── */
+  /* Title */
   .hero-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 16vw, 168px);
+    font-size: clamp(72px, 12vw, 148px);
     line-height: 0.88;
     letter-spacing: -0.01em;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
 
   .title-white { color: #fff; }
   .title-red   { color: #ED323A; }
 
-  /* ── Tagline ── */
+  /* Tagline */
   .hero-tagline {
     font-family: 'Sora', sans-serif;
     font-weight: 300;
-    font-size: clamp(16px, 2.4vw, 20px);
+    font-size: clamp(15px, 1.8vw, 18px);
     color: #B2B3B3;
-    max-width: 500px;
-    margin: 0 auto 42px;
+    max-width: 480px;
+    margin: 0 0 36px;
     line-height: 1.68;
   }
 
-  /* ── CTAs ── */
+  @media (max-width: 960px) {
+    .hero-tagline { margin: 0 auto 36px; }
+  }
+
+  /* Speed badge */
+  .speed-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(237, 50, 58, 0.12);
+    border: 1px solid rgba(237, 50, 58, 0.4);
+    border-radius: 100px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ff6b70;
+    margin-bottom: 28px;
+    animation: speedPulse 2.8s ease-in-out infinite;
+  }
+
+  .speed-icon {
+    font-size: 15px;
+    animation: boltFlash 2.8s ease-in-out infinite;
+  }
+
+  @keyframes speedPulse {
+    0%, 100% { border-color: rgba(237, 50, 58, 0.4); }
+    50%       { border-color: rgba(237, 50, 58, 0.7); }
+  }
+
+  @keyframes boltFlash {
+    0%, 80%, 100% { opacity: 1; }
+    90%           { opacity: 0.4; }
+  }
+
+  /* CTAs */
   .hero-ctas {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 960px) {
+    .hero-ctas { justify-content: center; }
   }
 
   .cta-ghost {
@@ -286,21 +420,20 @@ import ButtonCTA from './ButtonCTA.astro';
     transform: translateY(-2px);
   }
 
-  .cta-ghost svg {
-    transition: transform 0.22s ease;
-  }
+  .cta-ghost svg { transition: transform 0.22s ease; }
+  .cta-ghost:hover svg { transform: translateY(3px); }
 
-  .cta-ghost:hover svg {
-    transform: translateY(3px);
-  }
-
-  /* ── Store badges ── */
+  /* Store badges */
   .store-badges {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 36px;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 960px) {
+    .store-badges { align-items: center; }
   }
 
   .store-label {
@@ -317,10 +450,8 @@ import ButtonCTA from './ButtonCTA.astro';
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    justify-content: center;
   }
 
-  /* ── Shimmer border keyframe ── */
   @keyframes badgeBeam {
     0%   { background-position: 220% center; }
     100% { background-position: -120% center; }
@@ -339,17 +470,14 @@ import ButtonCTA from './ButtonCTA.astro';
     transition: transform 0.2s ease;
   }
 
-  .store-btn:hover {
-    transform: translateY(-2px);
-  }
+  .store-btn:hover { transform: translateY(-2px); }
 
-  /* Thin border ring with sweeping light beam via CSS mask */
   .store-btn::before {
     content: '';
     position: absolute;
     inset: -1px;
     border-radius: 12px;
-    padding: 1px;                /* controls border thickness */
+    padding: 1px;
     background: linear-gradient(
       90deg,
       rgba(224, 159, 60, 0.18)  0%,
@@ -362,10 +490,7 @@ import ButtonCTA from './ButtonCTA.astro';
     );
     background-size: 300% 100%;
     animation: badgeBeam 3.5s ease-in-out infinite;
-    /* Mask: show gradient ONLY in the 1px border ring */
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -383,13 +508,17 @@ import ButtonCTA from './ButtonCTA.astro';
     z-index: 0;
   }
 
-  /* ── Trust strip ── */
+  /* Trust strip */
   .hero-trust {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 18px;
+    justify-content: flex-start;
+    gap: 16px;
     flex-wrap: wrap;
+  }
+
+  @media (max-width: 960px) {
+    .hero-trust { justify-content: center; }
   }
 
   .trust-item {
@@ -408,7 +537,195 @@ import ButtonCTA from './ButtonCTA.astro';
     line-height: 1;
   }
 
-  /* ── Scroll indicator ── */
+  /* ────────────────────────────────────────────
+     RIGHT column — ABANICO de billetes
+  ──────────────────────────────────────────── */
+  .hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0 60px;
+  }
+
+  @media (max-width: 960px) {
+    .hero-visual {
+      padding: 0 0 20px;
+      order: 2; /* siempre debajo del contenido en mobile */
+    }
+  }
+
+  /* Contenedor del abanico — punto de pivote en el centro-inferior */
+  .abanico {
+    position: relative;
+    width: clamp(300px, 46vw, 540px);
+    height: clamp(180px, 28vw, 320px);
+    animation: fanFloat 6s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+
+  @keyframes fanFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-12px); }
+  }
+
+  /* ── Billete base ── */
+  .billete {
+    position: absolute;
+    width: clamp(170px, 28vw, 310px);
+    height: clamp(85px, 14vw, 155px);
+    border-radius: 8px;
+    bottom: 20px;
+    /* Centrar horizontalmente: left 50% - mitad del ancho */
+    left: calc(50% - clamp(85px, 14vw, 155px));
+    transform-origin: center bottom;
+    transform: rotate(var(--b-rot, 0deg));
+    animation: billFanIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--b-delay, 0s) both;
+    overflow: hidden;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 2px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  @keyframes billFanIn {
+    from {
+      transform: rotate(0deg);
+      opacity: 0;
+    }
+    to {
+      transform: rotate(var(--b-rot, 0deg));
+      opacity: 1;
+    }
+  }
+
+  /* Colores inspirados en billetes peruanos */
+  .billete-1 { background: linear-gradient(145deg, #3E0C0C 0%, #6A1A1A 60%, #3E0C0C 100%); z-index: 1; }  /* S/. 200 — vino */
+  .billete-2 { background: linear-gradient(145deg, #08263C 0%, #0C4468 60%, #08263C 100%); z-index: 2; }  /* S/. 50  — azul */
+  .billete-3 { background: linear-gradient(145deg, #0A2F18 0%, #145C2A 60%, #0A2F18 100%); z-index: 3; }  /* S/. 100 — verde */
+  .billete-4 { background: linear-gradient(145deg, #3A1500 0%, #6B2A00 60%, #3A1500 100%); z-index: 4; }  /* S/. 20  — naranja */
+  .billete-5 { background: linear-gradient(145deg, #0A2F18 0%, #145C2A 60%, #0A2F18 100%); z-index: 5; }  /* S/. 100 — verde */
+  .billete-6 { background: linear-gradient(145deg, #3E0C0C 0%, #6A1A1A 60%, #3E0C0C 100%); z-index: 6; }  /* S/. 200 — vino */
+
+  /* Patrón de seguridad (líneas diagonales) */
+  .b-security {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -50deg,
+      transparent,
+      transparent 5px,
+      rgba(255,255,255,0.018) 5px,
+      rgba(255,255,255,0.018) 6px
+    );
+    pointer-events: none;
+  }
+
+  /* Número fantasma de fondo (watermark) */
+  .b-watermark {
+    position: absolute;
+    right: 6px;
+    bottom: -8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 9vw, 110px);
+    line-height: 1;
+    color: rgba(255,255,255,0.04);
+    user-select: none;
+    pointer-events: none;
+    letter-spacing: -0.02em;
+  }
+
+  /* Contenido central del billete */
+  .b-body {
+    position: absolute;
+    top: 50%;
+    left: clamp(12px, 1.8vw, 22px);
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .b-top {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+
+  .b-currency {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(13px, 2vw, 22px);
+    color: rgba(224,159,60,0.85);
+    line-height: 1;
+  }
+
+  .b-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 58px);
+    color: #E09F3C;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-shadow:
+      0 0 14px rgba(224,159,60,0.55),
+      0 0 32px rgba(224,159,60,0.25);
+  }
+
+  .b-label {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(5px, 0.7vw, 9px);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(224,159,60,0.4);
+  }
+
+  /* Banda de seguridad vertical (como los billetes reales) */
+  .b-strip {
+    position: absolute;
+    right: clamp(22px, 4vw, 48px);
+    top: 12%;
+    bottom: 12%;
+    width: 3px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(224,159,60,0.55) 20%,
+      rgba(255,220,100,0.8) 50%,
+      rgba(224,159,60,0.55) 80%,
+      transparent 100%
+    );
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  /* Borde interior decorativo */
+  .b-border {
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(224,159,60,0.16);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  /* Glow debajo del abanico */
+  .abanico-glow {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 60px;
+    background: radial-gradient(
+      ellipse at center bottom,
+      rgba(224,159,60,0.22) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ────────────────────────────────────────────
+     Scroll indicator
+  ──────────────────────────────────────────── */
   .scroll-indicator {
     position: absolute;
     bottom: 32px;
@@ -430,87 +747,25 @@ import ButtonCTA from './ButtonCTA.astro';
     100% { opacity: 0; transform: scaleY(0.3) translateY(100%); }
   }
 
-  /* ── Floating money ── */
-  .money-field {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-  }
-
-  .coin {
-    position: absolute;
-    bottom: -80px;
-    font-family: 'Bebas Neue', sans-serif;
-    opacity: 0;
-    animation: coinFloat linear infinite;
-    user-select: none;
-    letter-spacing: 0.03em;
-  }
-
-  /* Billetes grandes — denominaciones reales */
-  .coin-bill {
-    font-size: clamp(20px, 3.2vw, 44px);
-    color: #E09F3C;
-    text-shadow:
-      0 0 18px rgba(224, 159, 60, 0.75),
-      0 0 40px rgba(224, 159, 60, 0.35),
-      0 0 80px rgba(224, 159, 60, 0.15);
-  }
-
-  /* Símbolos medianos */
-  .coin-md {
-    font-size: clamp(16px, 2.4vw, 30px);
-    color: #C8921E;
-    text-shadow:
-      0 0 12px rgba(200, 146, 30, 0.6),
-      0 0 28px rgba(200, 146, 30, 0.25);
-  }
-
-  @keyframes coinFloat {
-    0%   { opacity: 0;    transform: translateY(0)           rotate(-8deg); }
-    6%   { opacity: 0.28; }
-    85%  { opacity: 0.14; }
-    100% { opacity: 0;    transform: translateY(-100vh)      rotate(var(--rot-end, 16deg)); }
-  }
-
-  /* ── Speed badge ── */
-  .speed-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: rgba(237, 50, 58, 0.12);
-    border: 1px solid rgba(237, 50, 58, 0.4);
-    border-radius: 100px;
-    font-family: 'Sora', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #ff6b70;
-    margin-bottom: 28px;
-    animation: speedPulse 2.8s ease-in-out infinite;
-  }
-
-  .speed-icon {
-    font-size: 15px;
-    animation: boltFlash 2.8s ease-in-out infinite;
-  }
-
-  @keyframes speedPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(237, 50, 58, 0); }
-    50%       { box-shadow: 0 0 0 6px rgba(237, 50, 58, 0); border-color: rgba(237, 50, 58, 0.7); }
-  }
-
-  @keyframes boltFlash {
-    0%, 80%, 100% { opacity: 1; }
-    90%           { opacity: 0.4; }
-  }
-
-  /* ── Responsive ── */
+  /* ────────────────────────────────────────────
+     Responsive
+  ──────────────────────────────────────────── */
   @media (max-width: 480px) {
-    .trust-sep     { display: none; }
-    .hero-trust    { flex-direction: column; gap: 10px; }
+    .trust-sep        { display: none; }
+    .hero-trust       { flex-direction: column; gap: 8px; }
     .scroll-indicator { display: none; }
+
+    .billete {
+      width: 150px;
+      height: 75px;
+      left: calc(50% - 75px);
+    }
+
+    .abanico {
+      width: 280px;
+      height: 160px;
+    }
+
+    .b-watermark { font-size: 56px; }
   }
 </style>
