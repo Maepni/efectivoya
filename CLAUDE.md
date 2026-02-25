@@ -1,6 +1,6 @@
 # EfectivoYa
 
-**Actualizado:** 24 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
+**Actualizado:** 25 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
 
 ## Funcionalidades activas
 
@@ -23,7 +23,7 @@
 
 **Frontend:** Expo SDK 54, expo-router 6, React Native 0.81, Zustand 5, Axios, socket.io-client, expo-video, expo-document-picker, expo-local-authentication, expo-secure-store, TypeScript 5.9
 
-**Landing:** Astro 5, Tailwind CSS 3, output static → Vercel
+**Landing:** Astro 5, Tailwind CSS 3, output static → VPS (nginx en `/var/www/efectivoya/landing`)
 
 ## Quick Start
 
@@ -62,28 +62,33 @@ EXPO_PUBLIC_API_URL=http://192.168.x.x:3000
 
 ## URLs dev / prod
 
-| Entorno | Backend API | Panel admin | Landing |
-|---------|------------|-------------|---------|
+| Entorno | Backend API | App web | Landing |
+|---------|------------|---------|---------|
 | Dev | `http://localhost:3000` | Expo web `:8081` | `:4321` |
-| Prod | `https://api.efectivoya.net` | EAS Build | Vercel |
+| Prod | `https://api.efectivoya.net` | `https://app.efectivoya.net` | `https://efectivoya.net` |
 
+Panel admin prod: `https://app.efectivoya.net/(admin)/signin`
 Android emulador auto-usa `http://10.0.2.2:3000`. Cambiar `PROD_API_URL` en `efectivoya-app/src/config/api.ts`.
 
 ## Deploy / Producción
 
+Ver **`docs/deploy.md`** para el flujo completo según tipo de cambio.
+
 ```bash
-# Backend
-cd efectivoya-backend && npm run build && node dist/server.js
-# En Railway/Render: start script = "node dist/server.js"
+# Resumen rápido — VPS: bryam@<IP> /var/www/efectivoya
 
-# App móvil (EAS Build)
-cd efectivoya-app
-eas build --platform android --profile production
-eas build --platform ios     --profile production
+# Backend (sin cambio de schema)
+git pull origin master && npm run build && pm2 restart efectivoya-backend
 
-# Landing (Vercel)
-cd efectivoya-landing && npm run build   # genera dist/ (output static)
-vercel --prod                            # o CI en push a main
+# Backend (con cambio de schema Prisma)
+git pull origin master && npx prisma generate && npx prisma db push && npm run build && pm2 restart efectivoya-backend
+
+# App web (Expo) — ejecutar LOCAL, luego subir
+npx expo export --platform web
+rsync -avz --delete dist/ bryam@<IP>:/var/www/efectivoya/admin-web/
+
+# Landing — ejecutar en VPS
+git pull origin master && npm run build && cp -r dist/* /var/www/efectivoya/landing/
 ```
 
 > `prisma migrate dev` no funciona en shells no-interactivos — usar `prisma db push`. Siempre `npm run build` en backend antes de commit.
@@ -193,6 +198,7 @@ npm run preview          # Sirve el build estático para testear localmente
 - Perfil usuario (GET): `GET /api/auth/profile` — unico con todos los campos, wrapeado `{ data: { user: {...} } }`
 - Perfil usuario (PUT): `PUT /api/auth/profile` — `{ nombres, apellidos, whatsapp?, direccion?, distrito?, departamento? }` (autenticado)
 - Login admin: `POST /api/admin/auth/login` (NO `/api/auth/login`)
+- Ruta admin login: `app/(admin)/signin.tsx` → URL `/signin` (renombrado de `login` para evitar colisión con user `/login`)
 - `POST /auth/login` retorna user SIN: `email_verificado`, `is_active`
 - `POST /auth/verify-email` retorna user SIN: `email_verificado`, `is_active`, `dni`, `whatsapp`
 
@@ -248,7 +254,7 @@ npm run preview          # Sirve el build estático para testear localmente
 ### Admin panel
 
 - Componentes: `AdminHeader`, `AdminSidebar`, `AdminTabBar`, `DataTable`, `FilterBar`, `StatusBadge`, `Pagination`, `MetricCard`, `RechazoModal`
-- Sidebar: Desktop (>768px). TabBar: Mobile (<768px). Hook: `useResponsive()`
+- Sidebar: Desktop (>768px). TabBar: Mobile (<768px). Hook: `useResponsive()` → `isMobile` (<768), `isDesktop` (≥1024), `isWide` (≥1440)
 - `adminSocketService` se conecta/desconecta en `_layout.tsx` segun `isAuthenticated`
 - Chat admin: burbujas invertidas (admin=derecha, user=izquierda)
 - Config: 2 columnas desktop. Videos debajo. Sin cuenta recaudadora en UI. `cuenta_recaudadora_*` existe en schema pero no se expone
@@ -284,6 +290,7 @@ npm run preview          # Sirve el build estático para testear localmente
 
 | Archivo | Contenido |
 |---------|-----------|
+| `docs/deploy.md` | **Flujo de deploy por tipo de cambio** (backend, app web, landing, schema, nginx) |
 | `docs/api-endpoints.md` | Endpoints completos (usuario + admin) |
 | `docs/modelo-datos.md` | Schema Prisma detallado |
 | `docs/flujos-negocio.md` | Flujos recarga, retiro, referidos |
