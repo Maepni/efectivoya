@@ -171,6 +171,9 @@ export default function AdminRetiroDetalleScreen() {
               <InfoRow label="Email" value={retiro.usuario.email} />
               <InfoRow label="DNI" value={retiro.usuario.dni} />
               <InfoRow label="WhatsApp" value={retiro.usuario.whatsapp} />
+              <InfoRow label="Departamento" value={retiro.usuario.departamento || '—'} />
+              <InfoRow label="Distrito" value={retiro.usuario.distrito || '—'} />
+              <InfoRow label="Dirección" value={retiro.usuario.direccion || '—'} />
               <InfoRow label="Saldo Actual" value={formatCurrency(retiro.usuario.saldo_actual)} />
             </View>
           </View>

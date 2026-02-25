@@ -111,7 +111,10 @@ export class AdminRecargasController {
               saldo_actual: true,
               created_at: true,
               referido_por: true,
-              bono_referido_usado: true
+              bono_referido_usado: true,
+              direccion: true,
+              distrito: true,
+              departamento: true
             }
           },
           admin: {
@@ -177,7 +180,10 @@ export class AdminRecargasController {
             saldoActual: Number(recarga.user.saldo_actual),
             totalRecargas: historialUsuario,
             recargasAprobadas,
-            alertasActivas
+            alertasActivas,
+            direccion: recarga.user.direccion,
+            distrito: recarga.user.distrito,
+            departamento: recarga.user.departamento
           }
         }
       });

@@ -17,6 +17,7 @@ import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { Colors } from '../../src/constants/colors';
 import { FontSize, Spacing } from '../../src/constants/layout';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -26,6 +27,7 @@ export default function LoginScreen() {
   const [biometricType, setBiometricType] = useState<'fingerprint' | 'face' | null>(null);
   const { login, loginWithBiometric, hasBiometricToken, isLoading } = useAuthStore();
   const router = useRouter();
+  const { isDesktop } = useResponsive();
 
   useEffect(() => {
     checkBiometrics();
@@ -101,7 +103,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, isDesktop && styles.scrollContentDesktop]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
@@ -187,6 +189,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: Spacing.xl,
+  },
+  scrollContentDesktop: {
+    maxWidth: 460,
+    alignSelf: 'center',
+    width: '100%',
   },
   header: {
     alignItems: 'center',

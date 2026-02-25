@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { Validators } from '../utils/validators.util';
+import { Validators, DEPARTAMENTOS_PERU } from '../utils/validators.util';
 import { JWTUtil } from '../utils/jwt.util';
 import { Logger } from '../utils/logger.util';
 import { OTPService } from '../services/otp.service';
@@ -26,7 +26,7 @@ export class AuthController {
   // 1. REGISTRO
   static async register(req: Request, res: Response): Promise<Response> {
     try {
-      const { email, password, nombres, apellidos, dni, whatsapp, codigo_referido_usado } = req.body;
+      const { email, password, nombres, apellidos, dni, whatsapp, direccion, distrito, departamento, codigo_referido_usado } = req.body;
 
       // Validaciones
       if (!Validators.isValidEmail(email)) {
@@ -46,6 +46,18 @@ export class AuthController {
 
       if (!Validators.isValidWhatsApp(whatsapp)) {
         return res.status(400).json({ success: false, message: 'WhatsApp debe tener 9 dígitos' });
+      }
+
+      if (!direccion || !direccion.trim()) {
+        return res.status(400).json({ success: false, message: 'La dirección es requerida' });
+      }
+
+      if (!distrito || !distrito.trim()) {
+        return res.status(400).json({ success: false, message: 'El distrito es requerido' });
+      }
+
+      if (!departamento || !DEPARTAMENTOS_PERU.includes(departamento)) {
+        return res.status(400).json({ success: false, message: 'Departamento inválido' });
       }
 
       // Verificar email único
@@ -92,6 +104,9 @@ export class AuthController {
           apellidos: Validators.sanitizeString(apellidos),
           dni,
           whatsapp,
+          direccion: Validators.sanitizeString(direccion),
+          distrito: Validators.sanitizeString(distrito),
+          departamento,
           codigo_referido,
           referido_por: referrerUser?.id || null
         }
@@ -192,7 +207,10 @@ export class AuthController {
             saldo_actual: user.saldo_actual,
             codigo_referido: user.codigo_referido,
             email_verificado: true,
-            is_active: user.is_active
+            is_active: user.is_active,
+            direccion: user.direccion,
+            distrito: user.distrito,
+            departamento: user.departamento,
           }
         }
       });
@@ -267,7 +285,10 @@ export class AuthController {
             saldo_actual: user.saldo_actual,
             codigo_referido: user.codigo_referido,
             email_verificado: user.email_verificado,
-            is_active: user.is_active
+            is_active: user.is_active,
+            direccion: user.direccion,
+            distrito: user.distrito,
+            departamento: user.departamento,
           }
         }
       });
@@ -463,7 +484,7 @@ export class AuthController {
   // 9. ACTUALIZAR PERFIL
   static async updateProfile(req: AuthRequest, res: Response): Promise<Response> {
     try {
-      const { nombres, apellidos, whatsapp } = req.body;
+      const { nombres, apellidos, whatsapp, direccion, distrito, departamento } = req.body;
 
       if (!nombres || !apellidos) {
         return res.status(400).json({ success: false, message: 'Nombres y apellidos son requeridos' });
@@ -473,12 +494,27 @@ export class AuthController {
         return res.status(400).json({ success: false, message: 'WhatsApp debe tener 9 dígitos' });
       }
 
+      if (departamento !== undefined && !DEPARTAMENTOS_PERU.includes(departamento)) {
+        return res.status(400).json({ success: false, message: 'Departamento inválido' });
+      }
+
+      if (direccion !== undefined && !direccion.trim()) {
+        return res.status(400).json({ success: false, message: 'La dirección no puede estar vacía' });
+      }
+
+      if (distrito !== undefined && !distrito.trim()) {
+        return res.status(400).json({ success: false, message: 'El distrito no puede estar vacío' });
+      }
+
       const user = await prisma.user.update({
         where: { id: req.userId },
         data: {
           nombres: Validators.sanitizeString(nombres),
           apellidos: Validators.sanitizeString(apellidos),
           ...(whatsapp ? { whatsapp } : {}),
+          ...(direccion !== undefined ? { direccion: Validators.sanitizeString(direccion) } : {}),
+          ...(distrito !== undefined ? { distrito: Validators.sanitizeString(distrito) } : {}),
+          ...(departamento !== undefined ? { departamento } : {}),
         },
         select: {
           id: true,
@@ -492,6 +528,9 @@ export class AuthController {
           email_verificado: true,
           is_active: true,
           created_at: true,
+          direccion: true,
+          distrito: true,
+          departamento: true,
         },
       });
 
@@ -529,7 +568,10 @@ export class AuthController {
           codigo_referido: true,
           email_verificado: true,
           is_active: true,
-          created_at: true
+          created_at: true,
+          direccion: true,
+          distrito: true,
+          departamento: true,
         }
       });
 

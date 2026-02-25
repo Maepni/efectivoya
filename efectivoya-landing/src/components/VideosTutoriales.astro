@@ -1,0 +1,234 @@
+---
+// Reemplaza los youtubeId con los IDs reales de YouTube cuando tengas los videos.
+// El ID es la parte final de la URL: youtube.com/watch?v=ESTE_ES_EL_ID
+const banks = [
+  {
+    id: 'bcp',
+    nombre: 'BCP',
+    youtubeId: 'dQw4w9WgXcQ', // ← reemplazar con ID real
+    desc: 'Cómo depositar desde la app o agencia BCP a tu billetera EfectivoYa.',
+  },
+  {
+    id: 'interbank',
+    nombre: 'Interbank',
+    youtubeId: 'dQw4w9WgXcQ', // ← reemplazar con ID real
+    desc: 'Paso a paso para recargar desde Interbank en menos de 2 minutos.',
+  },
+  {
+    id: 'scotiabank',
+    nombre: 'Scotiabank',
+    youtubeId: 'dQw4w9WgXcQ', // ← reemplazar con ID real
+    desc: 'Tutorial para hacer tu depósito desde Scotiabank rápidamente.',
+  },
+  {
+    id: 'bbva',
+    nombre: 'BBVA',
+    youtubeId: 'dQw4w9WgXcQ', // ← reemplazar con ID real
+    desc: 'Cómo transferir desde BBVA y recibir tu saldo al instante.',
+  },
+];
+---
+
+<section id="tutoriales" class="videos-section">
+  <div class="videos-container">
+
+    <div class="videos-header reveal">
+      <span class="section-label">Guías en video</span>
+      <h2 class="videos-title">Así se hace en cada banco</h2>
+      <p class="videos-subtitle">
+        Tutoriales paso a paso para recargar desde tu banco favorito en segundos.
+      </p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bank-tabs" role="tablist" aria-label="Seleccionar banco">
+      {banks.map((bank, i) => (
+        <button
+          class={`bank-tab${i === 0 ? ' active' : ''}`}
+          role="tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`panel-${bank.id}`}
+          id={`tab-${bank.id}`}
+          data-bank={bank.id}
+        >
+          {bank.nombre}
+        </button>
+      ))}
+    </div>
+
+    <!-- Panels -->
+    {banks.map((bank, i) => (
+      <div
+        class={`bank-panel${i === 0 ? ' active' : ''}`}
+        role="tabpanel"
+        id={`panel-${bank.id}`}
+        aria-labelledby={`tab-${bank.id}`}
+        hidden={i !== 0}
+      >
+        <div class="video-wrapper reveal">
+          <iframe
+            src={`https://www.youtube.com/embed/${bank.youtubeId}?rel=0&modestbranding=1`}
+            title={`Tutorial ${bank.nombre} — EfectivoYa`}
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+        <p class="video-desc">{bank.desc}</p>
+      </div>
+    ))}
+
+  </div>
+</section>
+
+<style>
+  .videos-section {
+    background: #1A1919;
+    padding: clamp(32px, 4vw, 48px) 24px clamp(64px, 10vw, 100px);
+    border-top: 1px solid rgba(224, 159, 60, 0.12);
+  }
+
+  .videos-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  .videos-header {
+    text-align: center;
+    margin-bottom: clamp(40px, 6vw, 60px);
+  }
+
+  .videos-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 6vw, 60px);
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+
+  .videos-subtitle {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(15px, 2vw, 18px);
+    font-weight: 400;
+    color: #B2B3B3;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .videos-header .section-label {
+    color: #E09F3C;
+  }
+
+  /* ── Tabs ── */
+  .bank-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  .bank-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bank-tab {
+    flex-shrink: 0;
+    padding: 10px 24px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #B2B3B3;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .bank-tab:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .bank-tab.active {
+    background: rgba(237, 50, 58, 0.15);
+    border-color: #ED323A;
+    color: #ff6b70;
+  }
+
+  /* ── Panels ── */
+  .bank-panel {
+    display: none;
+  }
+
+  .bank-panel.active {
+    display: block;
+  }
+
+  /* ── Video iframe wrapper 16:9 ── */
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 */
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0f0f0f;
+    border: 1px solid rgba(224,159,60,0.15);
+    margin-bottom: 20px;
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-desc {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: #B2B3B3;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+</style>
+
+<script>
+  const tabs = document.querySelectorAll('.bank-tab');
+  const panels = document.querySelectorAll('.bank-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = (tab as HTMLElement).dataset.bank;
+
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      panels.forEach(p => {
+        p.classList.remove('active');
+        (p as HTMLElement).hidden = true;
+      });
+
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+
+      const panel = document.getElementById(`panel-${target}`);
+      if (panel) {
+        panel.classList.add('active');
+        panel.hidden = false;
+      }
+    });
+  });
+</script>

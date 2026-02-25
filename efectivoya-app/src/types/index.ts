@@ -5,6 +5,9 @@ export interface User {
   email: string;
   dni: string;
   whatsapp: string;
+  direccion: string;
+  distrito: string;
+  departamento: string;
   saldo_actual: number | string;
   codigo_referido: string;
   email_verificado: boolean;
@@ -25,6 +28,9 @@ export interface RegisterData {
   email: string;
   dni: string;
   whatsapp: string;
+  direccion: string;
+  distrito: string;
+  departamento: string;
   password: string;
   codigo_referido_usado?: string;
 }

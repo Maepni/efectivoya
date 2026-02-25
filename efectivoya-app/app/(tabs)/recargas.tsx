@@ -29,6 +29,7 @@ import { useAuthStore } from '../../src/store/authStore';
 import type { Recarga, RecargaConfig } from '../../src/types';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
@@ -46,6 +47,7 @@ function NativeVideoPlayer({ url }: { url: string }) {
 
 export default function RecargasScreen() {
   const insets = useSafeAreaInsets();
+  const { isDesktop } = useResponsive();
   const { refreshUser } = useAuthStore();
   const [recargas, setRecargas] = useState<Recarga[]>([]);
   const [config, setConfig] = useState<RecargaConfig | null>(null);
@@ -378,10 +380,11 @@ export default function RecargasScreen() {
       {/* Modal Nueva Recarga */}
       <Modal
         visible={modalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Nueva Recarga</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -558,6 +561,7 @@ export default function RecargasScreen() {
               style={styles.submitButton}
             />
           </ScrollView>
+          </View>{/* /modalDialog */}
         </View>
       </Modal>
 
@@ -645,6 +649,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalContainer: { flex: 1, backgroundColor: Colors.background },
+  // Desktop: overlay oscuro semitransparente
+  modalOverlay: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.75)',
+  },
+  // Dialog centrado en desktop
+  modalDialog: {
+    width: '90%',
+    maxWidth: 560,
+    maxHeight: '88%' as any,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  modalDialogFull: { flex: 1 },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -157,6 +157,9 @@ export default function AdminRecargaDetalleScreen() {
               <InfoRow label="Email" value={usuario.email} />
               <InfoRow label="DNI" value={usuario.dni} />
               <InfoRow label="WhatsApp" value={usuario.whatsapp} />
+              <InfoRow label="Departamento" value={usuario.departamento || '—'} />
+              <InfoRow label="Distrito" value={usuario.distrito || '—'} />
+              <InfoRow label="Dirección" value={usuario.direccion || '—'} />
               <InfoRow label="Saldo Actual" value={formatCurrency(usuario.saldoActual)} />
               <InfoRow label="Total Recargas" value={String(usuario.totalRecargas)} />
               <InfoRow label="Aprobadas" value={String(usuario.recargasAprobadas)} />

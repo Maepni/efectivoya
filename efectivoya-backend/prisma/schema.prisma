@@ -16,6 +16,9 @@ model User {
   apellidos             String
   dni                   String    @unique
   whatsapp              String
+  direccion             String    @default("")
+  distrito              String    @default("")
+  departamento          String    @default("")
   saldo_actual          Decimal   @default(0) @db.Decimal(12, 2)
   email_verificado      Boolean   @default(false)
   is_active             Boolean   @default(true)

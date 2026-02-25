@@ -124,6 +124,9 @@ export interface AdminRecargaDetalle {
     totalRecargas: number;
     recargasAprobadas: number;
     alertasActivas: number;
+    direccion: string;
+    distrito: string;
+    departamento: string;
   };
 }
 
@@ -169,6 +172,9 @@ export interface AdminRetiroDetalle {
       dni: string;
       whatsapp: string;
       saldo_actual: number | string;
+      direccion: string;
+      distrito: string;
+      departamento: string;
     };
     banco: {
       banco: string;
@@ -233,6 +239,9 @@ export interface AdminUserDetail {
     dni: string;
     dni_completo: string;
     whatsapp: string;
+    direccion: string;
+    distrito: string;
+    departamento: string;
     saldo_actual: number | string;
     email_verificado: boolean;
     is_active: boolean;

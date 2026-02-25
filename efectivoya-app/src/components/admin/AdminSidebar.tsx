@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { Layout } from '../../constants/layout';
+import { useAdminAuthStore } from '../../store/adminAuthStore';
 
 interface NavItem {
   label: string;
@@ -23,6 +24,7 @@ const navItems: NavItem[] = [
 export function AdminSidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const { admin, logout } = useAdminAuthStore();
 
   const isActive = (path: string) => {
     if (path === '/(admin)') {
@@ -30,6 +32,9 @@ export function AdminSidebar() {
     }
     return pathname.startsWith(path.replace('/(admin)', ''));
   };
+
+  // En web, cursor pointer mejora la UX de desktop
+  const webCursor = Platform.OS === 'web' ? ({ cursor: 'pointer' } as any) : {};
 
   return (
     <View style={styles.sidebar}>
@@ -53,7 +58,7 @@ export function AdminSidebar() {
           return (
             <TouchableOpacity
               key={item.path}
-              style={[styles.navItem, active && styles.navItemActive]}
+              style={[styles.navItem, active && styles.navItemActive, webCursor]}
               onPress={() => router.push(item.path as any)}
               activeOpacity={0.7}
             >
@@ -69,6 +74,24 @@ export function AdminSidebar() {
           );
         })}
       </View>
+
+      {/* Pie del sidebar: nombre del admin + logout */}
+      <View style={styles.sidebarFooter}>
+        <View style={styles.adminInfo}>
+          <Ionicons name="person-circle-outline" size={24} color={Colors.gray} />
+          <Text style={styles.adminName} numberOfLines={1}>
+            {admin?.nombre || admin?.email || 'Admin'}
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={logout}
+          style={[styles.logoutButton, webCursor]}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="log-out-outline" size={18} color={Colors.gray} />
+          <Text style={styles.logoutLabel}>Salir</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -80,6 +103,9 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: Colors.border,
     paddingTop: Layout.spacing.xl,
+    // Flex column para que el footer quede en el fondo
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
   },
   logoContainer: {
     paddingHorizontal: Layout.spacing.xl,
@@ -134,5 +160,39 @@ const styles = StyleSheet.create({
   navLabelActive: {
     color: Colors.primary,
     fontWeight: '600',
+  },
+  // Footer del sidebar
+  sidebarFooter: {
+    marginTop: 'auto' as any,
+    paddingHorizontal: Layout.spacing.md,
+    paddingVertical: Layout.spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    gap: Layout.spacing.sm,
+  },
+  adminInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Layout.spacing.sm,
+    paddingHorizontal: Layout.spacing.xs,
+    marginBottom: Layout.spacing.xs,
+  },
+  adminName: {
+    fontSize: Layout.fontSize.xs,
+    color: Colors.gray,
+    flex: 1,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Layout.spacing.sm,
+    paddingVertical: Layout.spacing.sm,
+    paddingHorizontal: Layout.spacing.md,
+    borderRadius: Layout.borderRadius.md,
+  },
+  logoutLabel: {
+    fontSize: Layout.fontSize.sm,
+    color: Colors.gray,
+    fontWeight: '500',
   },
 });

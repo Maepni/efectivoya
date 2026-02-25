@@ -12,6 +12,7 @@ import { authService } from '../../src/services/auth.service';
 import { Card } from '../../src/components/Card';
 import { Colors } from '../../src/constants/colors';
 import { FontSize, Spacing } from '../../src/constants/layout';
+import { useResponsive } from '../../src/hooks/useResponsive';
 import type { DashboardData, Operacion } from '../../src/types';
 
 const estadoColor: Record<string, string> = {
@@ -38,8 +39,8 @@ export default function DashboardScreen() {
   const { user } = useAuthStore();
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-
   const { refreshUser } = useAuthStore();
+  const { isDesktop } = useResponsive();
 
   const fetchDashboard = useCallback(async () => {
     const response = await authService.getDashboard();
@@ -61,56 +62,45 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={Colors.primary}
-        />
-      }
-    >
-      <Text style={styles.greeting}>
-        Hola, {user?.nombres || 'Usuario'}
-      </Text>
+  const operaciones = dashboard?.ultimas_operaciones ?? [];
 
-      {/* Saldo */}
-      <Card style={styles.saldoCard}>
-        <Text style={styles.saldoLabel}>Saldo disponible</Text>
-        <Text style={styles.saldoAmount}>
-          {formatCurrency(dashboard?.saldo_disponible ?? user?.saldo_actual ?? 0)}
+  const saldoBlock = (
+    <Card style={isDesktop ? [styles.saldoCard, styles.saldoCardDesktop] : styles.saldoCard}>
+      <Text style={styles.saldoLabel}>Saldo disponible</Text>
+      <Text style={styles.saldoAmount}>
+        {formatCurrency(dashboard?.saldo_disponible ?? user?.saldo_actual ?? 0)}
+      </Text>
+    </Card>
+  );
+
+  const statsBlock = (
+    <View style={styles.statsRow}>
+      <Card style={styles.statCard}>
+        <Text style={styles.statValue}>
+          {dashboard?.este_mes?.cantidad_recargas ?? 0}
+        </Text>
+        <Text style={styles.statLabel}>Recargas</Text>
+        <Text style={styles.statAmount}>
+          {formatCurrency(dashboard?.este_mes?.total_recargado ?? 0)}
         </Text>
       </Card>
+      <Card style={styles.statCard}>
+        <Text style={styles.statValue}>
+          {dashboard?.este_mes?.cantidad_retiros ?? 0}
+        </Text>
+        <Text style={styles.statLabel}>Retiros</Text>
+        <Text style={styles.statAmount}>
+          {formatCurrency(dashboard?.este_mes?.total_retirado ?? 0)}
+        </Text>
+      </Card>
+    </View>
+  );
 
-      {/* Stats del mes */}
-      <View style={styles.statsRow}>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>
-            {dashboard?.este_mes?.cantidad_recargas ?? 0}
-          </Text>
-          <Text style={styles.statLabel}>Recargas</Text>
-          <Text style={styles.statAmount}>
-            {formatCurrency(dashboard?.este_mes?.total_recargado ?? 0)}
-          </Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>
-            {dashboard?.este_mes?.cantidad_retiros ?? 0}
-          </Text>
-          <Text style={styles.statLabel}>Retiros</Text>
-          <Text style={styles.statAmount}>
-            {formatCurrency(dashboard?.este_mes?.total_retirado ?? 0)}
-          </Text>
-        </Card>
-      </View>
-
-      {/* Últimas operaciones */}
+  const operacionesBlock = (
+    <>
       <Text style={styles.sectionTitle}>Últimas operaciones</Text>
-      {dashboard?.ultimas_operaciones?.length ? (
-        dashboard.ultimas_operaciones.map((op: Operacion) => (
+      {operaciones.length ? (
+        operaciones.map((op: Operacion) => (
           <Card key={op.id} style={styles.operacionCard}>
             <View style={styles.operacionRow}>
               <View>
@@ -145,6 +135,44 @@ export default function DashboardScreen() {
           </Text>
         </Card>
       )}
+    </>
+  );
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={Colors.primary}
+        />
+      }
+    >
+      <Text style={styles.greeting}>
+        Hola, {user?.nombres || 'Usuario'}
+      </Text>
+
+      {isDesktop ? (
+        // Escritorio: 2 columnas — izquierda saldo+stats, derecha operaciones
+        <View style={styles.desktopGrid}>
+          <View style={styles.desktopLeft}>
+            {saldoBlock}
+            {statsBlock}
+          </View>
+          <View style={styles.desktopRight}>
+            {operacionesBlock}
+          </View>
+        </View>
+      ) : (
+        // Móvil: layout lineal original
+        <>
+          {saldoBlock}
+          {statsBlock}
+          {operacionesBlock}
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -164,10 +192,25 @@ const styles = StyleSheet.create({
     color: Colors.white,
     marginBottom: Spacing.lg,
   },
+  // Layout 2 columnas para escritorio
+  desktopGrid: {
+    flexDirection: 'row',
+    gap: Spacing.xl,
+    alignItems: 'flex-start',
+  },
+  desktopLeft: {
+    flex: 1,
+  },
+  desktopRight: {
+    flex: 1,
+  },
   saldoCard: {
     alignItems: 'center',
     marginBottom: Spacing.lg,
     paddingVertical: Spacing.xl,
+  },
+  saldoCardDesktop: {
+    paddingVertical: Spacing.xxl,
   },
   saldoLabel: {
     fontSize: FontSize.caption,

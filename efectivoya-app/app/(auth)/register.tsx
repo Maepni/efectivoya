@@ -12,6 +12,7 @@ import { Link, useRouter } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
+import { DepartamentoPicker } from '../../src/components/DepartamentoPicker';
 import { Colors } from '../../src/constants/colors';
 import { FontSize, Spacing } from '../../src/constants/layout';
 
@@ -35,6 +36,9 @@ export default function RegisterScreen() {
     email: '',
     dni: '',
     whatsapp: '',
+    departamento: '',
+    distrito: '',
+    direccion: '',
     password: '',
     confirmPassword: '',
   });
@@ -65,6 +69,10 @@ export default function RegisterScreen() {
     const whatsappErr = validators.whatsapp(form.whatsapp);
     if (whatsappErr) newErrors.whatsapp = whatsappErr;
 
+    if (!form.departamento) newErrors.departamento = 'Departamento requerido';
+    if (!form.distrito.trim()) newErrors.distrito = 'Distrito requerido';
+    if (!form.direccion.trim()) newErrors.direccion = 'Dirección requerida';
+
     const passwordErr = validators.password(form.password);
     if (passwordErr) newErrors.password = passwordErr;
 
@@ -86,6 +94,9 @@ export default function RegisterScreen() {
       email: form.email.trim().toLowerCase(),
       dni: form.dni.trim(),
       whatsapp: form.whatsapp.trim(),
+      departamento: form.departamento,
+      distrito: form.distrito.trim(),
+      direccion: form.direccion.trim(),
       password: form.password,
     });
 
@@ -163,6 +174,37 @@ export default function RegisterScreen() {
           error={errors.whatsapp}
           keyboardType="phone-pad"
           maxLength={9}
+        />
+
+        <DepartamentoPicker
+          value={form.departamento}
+          onSelect={(dep) => {
+            setForm((prev) => ({ ...prev, departamento: dep }));
+            if (errors.departamento) {
+              setErrors((prev) => ({ ...prev, departamento: '' }));
+            }
+          }}
+          error={errors.departamento}
+        />
+
+        <Input
+          label="Distrito"
+          icon="map-outline"
+          placeholder="Ej: Miraflores"
+          value={form.distrito}
+          onChangeText={(v) => updateField('distrito', v)}
+          error={errors.distrito}
+          autoCapitalize="words"
+        />
+
+        <Input
+          label="Dirección"
+          icon="home-outline"
+          placeholder="Ej: Av. Principal 123"
+          value={form.direccion}
+          onChangeText={(v) => updateField('direccion', v)}
+          error={errors.direccion}
+          autoCapitalize="sentences"
         />
 
         <Input
