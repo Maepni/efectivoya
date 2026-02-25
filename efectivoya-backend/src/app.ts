@@ -26,8 +26,19 @@ app.set('trust proxy', 1);
 
 // Middlewares de seguridad
 app.use(helmet());
+const allowedOrigins = [
+  'http://localhost:8081',
+  'http://localhost:19006',
+  ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) : []),
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8081',
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (apps móviles, Postman, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: origen no permitido: ${origin}`));
+  },
   credentials: true
 }));
 
