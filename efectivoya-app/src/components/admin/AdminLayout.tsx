@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { isMobile } = useResponsive();
+  const { isMobile, isWide } = useResponsive();
 
   if (isMobile) {
     return (
@@ -24,7 +24,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <View style={styles.containerDesktop}>
       <AdminSidebar />
-      <View style={styles.content}>{children}</View>
+      {/* En pantallas muy anchas (>=1440px) cap el contenido para evitar líneas kilométricas */}
+      <View style={[styles.content, isWide && styles.contentWide]}>
+        {children}
+      </View>
     </View>
   );
 }
@@ -42,5 +45,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  // En monitores muy anchos limitamos el área de contenido a 1400px
+  contentWide: {
+    maxWidth: 1400,
   },
 });

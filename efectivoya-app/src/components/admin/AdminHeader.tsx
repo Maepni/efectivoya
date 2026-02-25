@@ -27,12 +27,12 @@ export function AdminHeader({ title }: AdminHeaderProps) {
       </View>
 
       <View style={styles.right}>
-        {!isMobile ? (
-          <Text style={styles.adminName}>{admin?.nombre || admin?.email}</Text>
-        ) : null}
-        <TouchableOpacity onPress={logout} style={styles.logoutButton} activeOpacity={0.7}>
-          <Ionicons name="log-out-outline" size={20} color={Colors.gray} />
-        </TouchableOpacity>
+        {/* En móvil: nombre + logout en header. En desktop: están en el pie del sidebar */}
+        {isMobile && (
+          <TouchableOpacity onPress={logout} style={styles.logoutButton} activeOpacity={0.7}>
+            <Ionicons name="log-out-outline" size={20} color={Colors.gray} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

@@ -25,6 +25,7 @@ import { useAuthStore } from '../../src/store/authStore';
 import type { Retiro, UserBank } from '../../src/types';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
@@ -38,6 +39,7 @@ const BANK_ACCOUNT_RULES: Record<string, { lengths: number[]; label: string }> =
 
 export default function RetirosScreen() {
   const insets = useSafeAreaInsets();
+  const { isDesktop } = useResponsive();
   const { user, refreshUser } = useAuthStore();
   const [retiros, setRetiros] = useState<Retiro[]>([]);
   const [bancos, setBancos] = useState<UserBank[]>([]);
@@ -350,10 +352,11 @@ export default function RetirosScreen() {
       {/* Modal Nuevo Retiro */}
       <Modal
         visible={modalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Nuevo Retiro</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -451,16 +454,18 @@ export default function RetirosScreen() {
               style={styles.submitButton}
             />
           </ScrollView>
+          </View>{/* /modalDialog retiro */}
         </View>
       </Modal>
 
       {/* Modal Gestionar Bancos */}
       <Modal
         visible={bancosModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Mis Cuentas Bancarias</Text>
             <TouchableOpacity onPress={() => setBancosModalVisible(false)}>
@@ -485,16 +490,18 @@ export default function RetirosScreen() {
               />
             ))}
           </ScrollView>
+          </View>{/* /modalDialog bancos */}
         </View>
       </Modal>
 
       {/* Modal Agregar Banco */}
       <Modal
         visible={addBancoModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Agregar Cuenta</Text>
             <TouchableOpacity onPress={() => setAddBancoModalVisible(false)}>
@@ -588,6 +595,7 @@ export default function RetirosScreen() {
               style={styles.submitButton}
             />
           </ScrollView>
+          </View>{/* /modalDialog agregar banco */}
         </View>
       </Modal>
     </View>
@@ -666,6 +674,20 @@ const styles = StyleSheet.create({
   addCuentaButton: { marginTop: Layout.spacing.sm },
   emptyState: { alignItems: 'center', paddingVertical: Layout.spacing.xl * 2 },
   modalContainer: { flex: 1, backgroundColor: Colors.background },
+  modalOverlay: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.75)',
+  },
+  modalDialog: {
+    width: '90%',
+    maxWidth: 560,
+    maxHeight: '88%' as any,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  modalDialogFull: { flex: 1 },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

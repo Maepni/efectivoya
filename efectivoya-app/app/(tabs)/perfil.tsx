@@ -24,6 +24,7 @@ import { useAuthStore } from '../../src/store/authStore';
 import type { UserBank } from '../../src/types';
 import { Colors } from '../../src/constants/colors';
 import { Layout } from '../../src/constants/layout';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 const BANCOS = ['BCP', 'Interbank', 'Scotiabank', 'BBVA'] as const;
 
@@ -37,6 +38,7 @@ const BANK_ACCOUNT_RULES: Record<string, { lengths: number[]; label: string }> =
 
 export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
+  const { isDesktop } = useResponsive();
   const { user, logout, refreshUser } = useAuthStore();
   const [bancos, setBancos] = useState<UserBank[]>([]);
   const [bancosModalVisible, setBancosModalVisible] = useState(false);
@@ -421,10 +423,11 @@ export default function PerfilScreen() {
       {/* Modal Editar Perfil */}
       <Modal
         visible={editModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Editar Perfil</Text>
             <TouchableOpacity onPress={() => setEditModalVisible(false)}>
@@ -493,16 +496,18 @@ export default function PerfilScreen() {
               style={styles.submitButton}
             />
           </ScrollView>
+          </View>{/* /modalDialog editar perfil */}
         </View>
       </Modal>
 
       {/* Modal Gestionar Bancos */}
       <Modal
         visible={bancosModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Mis Cuentas Bancarias</Text>
             <TouchableOpacity onPress={() => setBancosModalVisible(false)}>
@@ -527,16 +532,18 @@ export default function PerfilScreen() {
               />
             ))}
           </ScrollView>
+          </View>{/* /modalDialog gestionar bancos */}
         </View>
       </Modal>
 
       {/* Modal Agregar Banco */}
       <Modal
         visible={addBancoModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Agregar Cuenta</Text>
             <TouchableOpacity onPress={() => setAddBancoModalVisible(false)}>
@@ -630,16 +637,18 @@ export default function PerfilScreen() {
               style={styles.submitButton}
             />
           </ScrollView>
+          </View>{/* /modalDialog agregar banco */}
         </View>
       </Modal>
 
       {/* Modal Editar Banco */}
       <Modal
         visible={editBancoModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
+        animationType={isDesktop ? 'fade' : 'slide'}
+        transparent={isDesktop}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, isDesktop && styles.modalOverlay]}>
+          <View style={isDesktop ? styles.modalDialog : styles.modalDialogFull}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Editar Cuenta</Text>
             <TouchableOpacity onPress={() => setEditBancoModalVisible(false)}>
@@ -687,6 +696,7 @@ export default function PerfilScreen() {
               </>
             )}
           </ScrollView>
+          </View>{/* /modalDialog editar banco */}
         </View>
       </Modal>
 
@@ -824,6 +834,20 @@ const styles = StyleSheet.create({
     paddingVertical: Layout.spacing.xl,
   },
   modalContainer: { flex: 1, backgroundColor: Colors.background },
+  modalOverlay: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.75)',
+  },
+  modalDialog: {
+    width: '90%',
+    maxWidth: 560,
+    maxHeight: '88%' as any,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  modalDialogFull: { flex: 1 },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

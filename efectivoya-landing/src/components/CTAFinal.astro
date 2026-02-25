@@ -1,5 +1,16 @@
 ---
 import ButtonCTA from './ButtonCTA.astro';
+
+const ctaCoins = [
+  { left: '2%',  cls: 'lg', delay: '0.5s',  dur: '10s',  sway: '12px',  gold: true  },
+  { left: '12%', cls: 'sm', delay: '3s',    dur: '7.5s', sway: '-8px',  gold: false },
+  { left: '22%', cls: 'md', delay: '1.5s',  dur: '8.5s', sway: '10px',  gold: true  },
+  { left: '35%', cls: 'xl', delay: '4.5s',  dur: '9s',   sway: '-14px', gold: false },
+  { left: '65%', cls: 'lg', delay: '2s',    dur: '11s',  sway: '16px',  gold: true  },
+  { left: '78%', cls: 'md', delay: '0.8s',  dur: '8s',   sway: '-10px', gold: false },
+  { left: '88%', cls: 'xl', delay: '5s',    dur: '9.5s', sway: '8px',   gold: true  },
+  { left: '96%', cls: 'sm', delay: '2.5s',  dur: '7s',   sway: '-12px', gold: false },
+];
 ---
 
 <section class="cta-section">
@@ -10,18 +21,25 @@ import ButtonCTA from './ButtonCTA.astro';
   <div class="cta-deco cta-deco-1" aria-hidden="true"></div>
   <div class="cta-deco cta-deco-2" aria-hidden="true"></div>
 
-  <!-- Floating money elements -->
-  <div class="cta-money-field" aria-hidden="true">
-    <!-- Billetes grandes -->
-    <span class="cta-coin cta-bill" style="left:3%;  animation-delay:0.5s; animation-duration:10s; --cta-rot:12deg">S/. 200</span>
-    <span class="cta-coin cta-bill" style="left:28%; animation-delay:3.5s; animation-duration:8s;  --cta-rot:-14deg">S/. 100</span>
-    <span class="cta-coin cta-bill" style="left:60%; animation-delay:1.2s; animation-duration:12s; --cta-rot:16deg">S/. 50</span>
-    <span class="cta-coin cta-bill" style="left:84%; animation-delay:4.8s; animation-duration:9s;  --cta-rot:-10deg">S/. 200</span>
-    <!-- Símbolos -->
-    <span class="cta-coin cta-md" style="left:15%; animation-delay:2.0s; animation-duration:11s; --cta-rot:20deg">S/.</span>
-    <span class="cta-coin cta-md" style="left:44%; animation-delay:5.5s; animation-duration:9s;  --cta-rot:-18deg">💰</span>
-    <span class="cta-coin cta-md" style="left:72%; animation-delay:0.8s; animation-duration:13s; --cta-rot:14deg">💵</span>
-    <span class="cta-coin cta-md" style="left:93%; animation-delay:6.2s; animation-duration:10s; --cta-rot:-12deg">S/.</span>
+  <!-- Monedas cayendo con signo $ de una línea -->
+  <div class="cta-coins-bg" aria-hidden="true">
+    {ctaCoins.map(c => (
+      <div
+        class={`cta-coin coin-${c.cls}`}
+        style={`left:${c.left}; animation-delay:${c.delay}; animation-duration:${c.dur}; --coin-sway:${c.sway};`}
+      >
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" fill="#1C1200"/>
+          <circle cx="24" cy="24" r="22" fill="none" stroke={c.gold ? '#E09F3C' : '#C8921E'} stroke-width="1.8"/>
+          <circle cx="24" cy="24" r="18" fill="none" stroke={c.gold ? 'rgba(224,159,60,0.2)' : 'rgba(200,146,30,0.2)'} stroke-width="1"/>
+          <line x1="24" y1="8" x2="24" y2="40" stroke={c.gold ? '#E09F3C' : '#C8921E'} stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M33 16C33 12 29 10 24 10C19 10 15 12 15 16C15 21 19 23 24 24C29 25 33 28 33 32C33 36 29 38 24 38C19 38 15 36 15 32"
+                stroke={c.gold ? '#E09F3C' : '#C8921E'} stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    ))}
+    <!-- Vignette central para proteger la legibilidad del texto -->
+    <div class="cta-coins-vignette" aria-hidden="true"></div>
   </div>
 
   <div class="cta-container">
@@ -41,7 +59,7 @@ import ButtonCTA from './ButtonCTA.astro';
 
       <div class="cta-action">
         <ButtonCTA
-          href="https://tu-app.com"
+          href="https://app.efectivoya.net"
           text="Crear cuenta gratis"
           target="_blank"
           variant="primary"
@@ -264,45 +282,49 @@ import ButtonCTA from './ButtonCTA.astro';
     z-index: 0;
   }
 
-  /* ── Floating money ── */
-  .cta-money-field {
+  /* ── Coins background ── */
+  .cta-coins-bg {
     position: absolute;
     inset: 0;
-    pointer-events: none;
     overflow: hidden;
+    pointer-events: none;
     z-index: 0;
+  }
+
+  /* Vignette radial: oscurece el centro donde está el texto */
+  .cta-coins-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 55% 65% at center,
+      rgba(32,31,31,0.78) 0%,
+      rgba(32,31,31,0.42) 45%,
+      transparent 75%
+    );
+    pointer-events: none;
   }
 
   .cta-coin {
     position: absolute;
-    bottom: -80px;
-    font-family: 'Bebas Neue', sans-serif;
+    top: -90px;
     opacity: 0;
-    animation: ctaCoinFloat linear infinite;
-    user-select: none;
-    letter-spacing: 0.03em;
+    animation: ctaCoinFall linear infinite;
+    animation-fill-mode: backwards;
+    filter: drop-shadow(0 0 10px rgba(224,159,60,0.38));
   }
 
-  .cta-bill {
-    font-size: clamp(18px, 3vw, 40px);
-    color: #E09F3C;
-    text-shadow:
-      0 0 18px rgba(224, 159, 60, 0.75),
-      0 0 40px rgba(224, 159, 60, 0.35);
-  }
+  .cta-coin svg { display: block; width: 100%; height: auto; }
 
-  .cta-md {
-    font-size: clamp(14px, 2.2vw, 26px);
-    color: #C8921E;
-    text-shadow:
-      0 0 12px rgba(200, 146, 30, 0.55),
-      0 0 24px rgba(200, 146, 30, 0.2);
-  }
+  .cta-coin.coin-sm  { width: 40px; }
+  .cta-coin.coin-md  { width: 56px; }
+  .cta-coin.coin-lg  { width: 70px; }
+  .cta-coin.coin-xl  { width: 88px; }
 
-  @keyframes ctaCoinFloat {
-    0%   { opacity: 0;    transform: translateY(0)    rotate(-8deg); }
-    6%   { opacity: 0.26; }
-    85%  { opacity: 0.12; }
-    100% { opacity: 0;    transform: translateY(-90vh) rotate(var(--cta-rot, 15deg)); }
+  @keyframes ctaCoinFall {
+    0%   { top: -90px; opacity: 0;    transform: rotate(-6deg) translateX(0); }
+    8%   {              opacity: 0.62; }
+    50%  {                              transform: rotate(4deg) translateX(var(--coin-sway, 12px)); }
+    88%  {              opacity: 0.28; }
+    100% { top: calc(100% + 30px); opacity: 0; transform: rotate(10deg) translateX(0); }
   }
 </style>

@@ -1,6 +1,6 @@
 # EfectivoYa
 
-**Actualizado:** 23 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
+**Actualizado:** 24 Feb 2026 | Billetera digital fintech para Peru — "Tu Dinero Al Instante."
 
 ## Funcionalidades activas
 
@@ -114,6 +114,24 @@ efectivoya-app/
     ├── hooks/                 # useResponsive.ts
     ├── constants/             # colors (tema dark), layout (spacing, fonts)
     └── config/                # api.ts (URL config dev/prod)
+
+efectivoya-landing/src/
+├── pages/index.astro          # Única página: ensambla todos los componentes
+├── layouts/BaseLayout.astro   # HTML base, Google Fonts (Bebas Neue + Sora), estilos globales
+└── components/
+    ├── Navbar.astro            # Sticky, hamburger mobile, scroll border
+    ├── Hero.astro              # Banner principal: coins animados como fondo, stats strip integrado
+    ├── HowItWorks.astro        # 3 pasos con conectores
+    ├── Services.astro          # 2 col: texto izq + cards der
+    ├── Banks.astro             # Logos de bancos compatibles
+    ├── VideosTutoriales.astro  # Tabs por banco con YouTube embed
+    ├── WhyUs.astro             # Grid de 6 features
+    ├── FAQ.astro               # Acordeón
+    ├── Ubicacion.astro         # Mapa / dirección local
+    ├── CTAFinal.astro          # Banner final con coins animados
+    ├── Footer.astro
+    ├── ButtonCTA.astro         # Botón reutilizable (variant: primary|ghost, size: md|lg)
+    └── Stats.astro             # ⚠️ OBSOLETO — no se usa en index.astro. Stats viven en Hero.astro
 ```
 
 ## Convenciones
@@ -140,6 +158,11 @@ npm run prisma:seed      # Seed: admin + config + contenido
 npx expo start --web     # Puerto 8081
 npx tsc --noEmit         # Verificar TypeScript
 npm install --legacy-peer-deps  # REQUERIDO por conflicto react 19.1 vs 19.2
+
+# Landing (efectivoya-landing/)
+npm run dev              # Dev server puerto 4321
+npm run build            # Genera dist/ — verificar antes de deploy
+npm run preview          # Sirve el build estático para testear localmente
 ```
 
 ## Seed
@@ -230,6 +253,15 @@ npm install --legacy-peer-deps  # REQUERIDO por conflicto react 19.1 vs 19.2
 - Chat admin: burbujas invertidas (admin=derecha, user=izquierda)
 - Config: 2 columnas desktop. Videos debajo. Sin cuenta recaudadora en UI. `cuenta_recaudadora_*` existe en schema pero no se expone
 - **Panel admin corre en web:** `Alert.alert` NO funciona. Usar `setMessage()` + banner inline (patron en `retiros/[id].tsx`)
+
+### Landing — gotchas
+
+- **`Stats.astro` NO se renderiza en `index.astro`** — Los datos de estadísticas viven en `Hero.astro` como un strip integrado en el banner. Editar `Stats.astro` no tendrá efecto visible hasta reintegrarlo
+- **Hero coins z-index:** `hero-coins-bg` (z:1) → `coins-fade` (z:2) → `hero-inner/stats-strip` (z:3). Respetar esta jerarquía al añadir elementos al hero
+- **`animation-fill-mode: backwards` REQUERIDO en coins** — Sin él las monedas aparecen congeladas/visibles al cargar antes de que arranque la animación. Aplica a `.coin` en `Hero.astro` y `.cta-coin` en `CTAFinal.astro`
+- **`hero-spacer`:** El segundo div del grid en `Hero.astro` es un spacer vacío que mantiene el layout 2 columnas en desktop (texto izq, coins visibles en der). En mobile se oculta con `display: none`
+- **`coins-fade` en Hero:** Gradiente lineal (izq→der) que oscurece la zona del texto y deja visible la derecha. En mobile es un overlay uniforme `rgba`. Ajustar si se cambia el layout
+- **CTAFinal coins:** Misma animación que Hero pero con vignette radial central para proteger el texto centrado. Posiciones distribuidas en los bordes (evitan el centro)
 
 ## Bugs conocidos
 

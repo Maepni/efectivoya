@@ -1,5 +1,33 @@
 ---
 import ButtonCTA from './ButtonCTA.astro';
+
+const coins = [
+  /* columna izq */
+  { left: '3%',  cls: 'xl',  delay: '0s',    dur: '7s',    sway: '14px',  gold: true  },
+  { left: '10%', cls: 'xxl', delay: '3.5s',  dur: '9s',    sway: '-18px', gold: false },
+  { left: '10%', cls: 'lg',  delay: '7s',    dur: '7.5s',  sway: '10px',  gold: true  },
+  { left: '18%', cls: 'lg',  delay: '1.5s',  dur: '6.5s',  sway: '-12px', gold: false },
+  { left: '18%', cls: 'xl',  delay: '5s',    dur: '8s',    sway: '16px',  gold: true  },
+  /* columna centro-izq */
+  { left: '28%', cls: 'xxl', delay: '0.5s',  dur: '10s',   sway: '20px',  gold: false },
+  { left: '28%', cls: 'lg',  delay: '6s',    dur: '7s',    sway: '-14px', gold: true  },
+  { left: '38%', cls: 'xl',  delay: '2.5s',  dur: '8.5s',  sway: '12px',  gold: false },
+  { left: '38%', cls: 'lg',  delay: '8.5s',  dur: '6.5s',  sway: '-10px', gold: true  },
+  /* columna centro */
+  { left: '50%', cls: 'xxl', delay: '1s',    dur: '9.5s',  sway: '-20px', gold: true  },
+  { left: '50%', cls: 'xl',  delay: '5.5s',  dur: '8s',    sway: '18px',  gold: false },
+  /* columna centro-der */
+  { left: '62%', cls: 'lg',  delay: '3s',    dur: '7s',    sway: '-12px', gold: true  },
+  { left: '62%', cls: 'xxl', delay: '7.5s',  dur: '10.5s', sway: '16px',  gold: false },
+  { left: '72%', cls: 'xl',  delay: '0.8s',  dur: '8.5s',  sway: '-18px', gold: true  },
+  { left: '72%', cls: 'lg',  delay: '6.5s',  dur: '7s',    sway: '14px',  gold: false },
+  /* columna der */
+  { left: '82%', cls: 'xxl', delay: '2s',    dur: '9s',    sway: '-16px', gold: true  },
+  { left: '82%', cls: 'lg',  delay: '8s',    dur: '7.5s',  sway: '10px',  gold: false },
+  { left: '90%', cls: 'xl',  delay: '4s',    dur: '8s',    sway: '18px',  gold: true  },
+  { left: '90%', cls: 'lg',  delay: '9.5s',  dur: '6.5s',  sway: '-12px', gold: false },
+  { left: '97%', cls: 'xxl', delay: '1.8s',  dur: '10s',   sway: '-20px', gold: true  },
+];
 ---
 
 <section id="que-es" class="hero">
@@ -13,6 +41,28 @@ import ButtonCTA from './ButtonCTA.astro';
   <!-- Corner accents -->
   <div class="corner-accent corner-tl" aria-hidden="true"></div>
   <div class="corner-accent corner-br" aria-hidden="true"></div>
+
+  <!-- ── Monedas como fondo completo ── -->
+  <div class="hero-coins-bg" aria-hidden="true">
+    {coins.map(c => (
+      <div
+        class={`coin coin-${c.cls}`}
+        style={`left:${c.left}; animation-delay:${c.delay}; animation-duration:${c.dur}; --coin-sway:${c.sway};`}
+      >
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" fill="#1C1200"/>
+          <circle cx="24" cy="24" r="22" fill="none" stroke={c.gold ? '#E09F3C' : '#C8921E'} stroke-width="1.8"/>
+          <circle cx="24" cy="24" r="18" fill="none" stroke={c.gold ? 'rgba(224,159,60,0.2)' : 'rgba(200,146,30,0.2)'} stroke-width="1"/>
+          <line x1="24" y1="8" x2="24" y2="40" stroke={c.gold ? '#E09F3C' : '#C8921E'} stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M33 16C33 12 29 10 24 10C19 10 15 12 15 16C15 21 19 23 24 24C29 25 33 28 33 32C33 36 29 38 24 38C19 38 15 36 15 32"
+                stroke={c.gold ? '#E09F3C' : '#C8921E'} stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    ))}
+  </div>
+
+  <!-- Fade: protege el texto en desktop (oscurece izquierda), atenúa todo en mobile -->
+  <div class="coins-fade" aria-hidden="true"></div>
 
   <!-- ── 2-col inner ── -->
   <div class="hero-inner">
@@ -28,9 +78,7 @@ import ButtonCTA from './ButtonCTA.astro';
 
       <!-- Main title -->
       <h1 class="hero-title fade-up delay-200">
-        <span class="title-white">EFECTIVO</span>
-        <br aria-hidden="true" />
-        <span class="title-red">YA</span>
+        <span class="title-white">EFECTIVO&nbsp;</span><span class="title-red">YA</span>
       </h1>
 
       <!-- Tagline -->
@@ -48,7 +96,7 @@ import ButtonCTA from './ButtonCTA.astro';
       <!-- CTA buttons -->
       <div class="hero-ctas fade-up delay-400">
         <ButtonCTA
-          href="https://tu-app.com"
+          href="https://app.efectivoya.net"
           text="Acceder a la App"
           target="_blank"
           variant="primary"
@@ -101,100 +149,32 @@ import ButtonCTA from './ButtonCTA.astro';
 
     </div>
 
-    <!-- RIGHT: fan of bills -->
-    <div class="hero-visual" aria-hidden="true">
-      <div class="abanico">
+    <!-- Spacer derecho: mantiene el grid 2 col en desktop, oculto en mobile -->
+    <div class="hero-spacer" aria-hidden="true"></div>
 
-        <!-- 6 billetes en abanico (izq → der, --b-rot de ±32°) -->
-        <div class="billete billete-1" style="--b-rot:-32deg; --b-delay:0.05s">
-          <div class="b-security"></div>
-          <div class="b-watermark">200</div>
-          <div class="b-body">
-            <div class="b-top">
-              <span class="b-currency">S/.</span>
-              <span class="b-amount">200</span>
-            </div>
-            <span class="b-label">DOSCIENTOS SOLES</span>
-          </div>
-          <div class="b-strip"></div>
-          <div class="b-border"></div>
-        </div>
+  </div>
 
-        <div class="billete billete-2" style="--b-rot:-19deg; --b-delay:0.10s">
-          <div class="b-security"></div>
-          <div class="b-watermark">50</div>
-          <div class="b-body">
-            <div class="b-top">
-              <span class="b-currency">S/.</span>
-              <span class="b-amount">50</span>
-            </div>
-            <span class="b-label">CINCUENTA SOLES</span>
-          </div>
-          <div class="b-strip"></div>
-          <div class="b-border"></div>
-        </div>
-
-        <div class="billete billete-3" style="--b-rot:-6deg; --b-delay:0.15s">
-          <div class="b-security"></div>
-          <div class="b-watermark">100</div>
-          <div class="b-body">
-            <div class="b-top">
-              <span class="b-currency">S/.</span>
-              <span class="b-amount">100</span>
-            </div>
-            <span class="b-label">CIEN SOLES</span>
-          </div>
-          <div class="b-strip"></div>
-          <div class="b-border"></div>
-        </div>
-
-        <div class="billete billete-4" style="--b-rot:7deg; --b-delay:0.20s">
-          <div class="b-security"></div>
-          <div class="b-watermark">20</div>
-          <div class="b-body">
-            <div class="b-top">
-              <span class="b-currency">S/.</span>
-              <span class="b-amount">20</span>
-            </div>
-            <span class="b-label">VEINTE SOLES</span>
-          </div>
-          <div class="b-strip"></div>
-          <div class="b-border"></div>
-        </div>
-
-        <div class="billete billete-5" style="--b-rot:20deg; --b-delay:0.25s">
-          <div class="b-security"></div>
-          <div class="b-watermark">100</div>
-          <div class="b-body">
-            <div class="b-top">
-              <span class="b-currency">S/.</span>
-              <span class="b-amount">100</span>
-            </div>
-            <span class="b-label">CIEN SOLES</span>
-          </div>
-          <div class="b-strip"></div>
-          <div class="b-border"></div>
-        </div>
-
-        <div class="billete billete-6" style="--b-rot:32deg; --b-delay:0.30s">
-          <div class="b-security"></div>
-          <div class="b-watermark">200</div>
-          <div class="b-body">
-            <div class="b-top">
-              <span class="b-currency">S/.</span>
-              <span class="b-amount">200</span>
-            </div>
-            <span class="b-label">DOSCIENTOS SOLES</span>
-          </div>
-          <div class="b-strip"></div>
-          <div class="b-border"></div>
-        </div>
-
-        <!-- Glow debajo del abanico -->
-        <div class="abanico-glow"></div>
-      </div>
+  <!-- ── Stats strip dentro del hero ── -->
+  <div class="hero-stats-strip fade-up delay-700" aria-label="Datos clave EfectivoYa">
+    <div class="hstat">
+      <span class="hstat-num">3,000<span class="hstat-sup">+</span></span>
+      <span class="hstat-lbl">Usuarios activos</span>
     </div>
-
+    <div class="hstat-sep" aria-hidden="true"></div>
+    <div class="hstat">
+      <span class="hstat-num">4</span>
+      <span class="hstat-lbl">Bancos compatibles</span>
+    </div>
+    <div class="hstat-sep" aria-hidden="true"></div>
+    <div class="hstat">
+      <span class="hstat-num">S/. 0</span>
+      <span class="hstat-lbl">Comisión en retiros</span>
+    </div>
+    <div class="hstat-sep" aria-hidden="true"></div>
+    <div class="hstat">
+      <span class="hstat-num hstat-red"><span class="hstat-lt">&lt;</span>60<span class="hstat-sup">s</span></span>
+      <span class="hstat-lbl">Aprobación de recarga</span>
+    </div>
   </div>
 
   <!-- Scroll indicator -->
@@ -205,8 +185,11 @@ import ButtonCTA from './ButtonCTA.astro';
 </section>
 
 <style>
+  .delay-350 { animation-delay: 0.475s; }
+  .delay-700 { animation-delay: 1.05s; }
+
   /* ────────────────────────────────────────────
-     HERO — layout
+     HERO
   ──────────────────────────────────────────── */
   .hero {
     position: relative;
@@ -220,25 +203,6 @@ import ButtonCTA from './ButtonCTA.astro';
     padding: clamp(100px, 14vh, 140px) clamp(20px, 4vw, 60px) clamp(60px, 8vh, 80px);
   }
 
-  /* 2-col grid wrapper */
-  .hero-inner {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 1280px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    align-items: center;
-  }
-
-  @media (max-width: 960px) {
-    .hero-inner {
-      grid-template-columns: 1fr;
-      gap: 52px;
-    }
-  }
-
   /* ── Background elements ── */
   .hero-grid {
     position: absolute;
@@ -249,6 +213,7 @@ import ButtonCTA from './ButtonCTA.astro';
     background-size: 80px 80px;
     background-position: center;
     pointer-events: none;
+    z-index: 0;
   }
 
   .hero-glow {
@@ -264,6 +229,7 @@ import ButtonCTA from './ButtonCTA.astro';
       transparent 68%);
     pointer-events: none;
     border-radius: 50%;
+    z-index: 0;
   }
 
   .corner-accent {
@@ -271,21 +237,101 @@ import ButtonCTA from './ButtonCTA.astro';
     width: 300px;
     height: 300px;
     pointer-events: none;
+    z-index: 0;
   }
-
   .corner-tl {
     top: 0; left: 0;
     background: radial-gradient(circle at top left, rgba(224,159,60,0.07) 0%, transparent 60%);
   }
-
   .corner-br {
     bottom: 0; right: 0;
     background: radial-gradient(circle at bottom right, rgba(237,50,58,0.06) 0%, transparent 60%);
   }
 
+  /* ── Coins background ── */
+  .hero-coins-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Fade: izquierda oscura (protege el texto), derecha transparente (monedas visibles)
+     Mobile: overlay más suave para que se vean mejor */
+  .coins-fade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background: linear-gradient(
+      to right,
+      #201F1F 0%,
+      #201F1F 28%,
+      rgba(32,31,31,0.65) 42%,
+      rgba(32,31,31,0.12) 56%,
+      transparent 68%
+    );
+  }
+
+  @media (max-width: 960px) {
+    .coins-fade {
+      background: rgba(32,31,31,0.55);
+    }
+  }
+
+  /* ── Coin elements ── */
+  .coin {
+    position: absolute;
+    top: -90px;
+    opacity: 0;                          /* oculto hasta que empiece la animación */
+    animation: coinFall linear infinite;
+    animation-fill-mode: backwards;      /* aplica el 0% keyframe durante el delay */
+    filter: drop-shadow(0 0 10px rgba(224,159,60,0.4));
+  }
+
+  .coin svg { display: block; width: 100%; height: auto; }
+
+  .coin-lg  { width: 110px; }
+  .coin-xl  { width: 150px; }
+  .coin-xxl { width: 200px; }
+
+  @media (max-width: 960px) {
+    .coin-xxl { width: 130px; }
+    .coin-xl  { width: 100px; }
+    .coin-lg  { width: 76px;  }
+  }
+
+  @keyframes coinFall {
+    0%   { top: -90px; opacity: 0;   transform: rotate(-6deg) translateX(0); }
+    8%   {              opacity: 0.68; }
+    50%  {                             transform: rotate(4deg) translateX(var(--coin-sway, 12px)); }
+    88%  {              opacity: 0.3; }
+    100% { top: calc(100% + 30px); opacity: 0; transform: rotate(10deg) translateX(0); }
+  }
+
   /* ────────────────────────────────────────────
-     LEFT column — content
+     2-col inner
   ──────────────────────────────────────────── */
+  .hero-inner {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1280px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (max-width: 960px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero-spacer { display: none; }
+  }
+
+  /* ── Content (left) ── */
   .hero-content {
     text-align: left;
     max-width: 560px;
@@ -328,10 +374,11 @@ import ButtonCTA from './ButtonCTA.astro';
   /* Title */
   .hero-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 12vw, 148px);
-    line-height: 0.88;
+    font-size: clamp(52px, 9vw, 128px);
+    line-height: 0.92;
     letter-spacing: -0.01em;
     margin-bottom: 24px;
+    white-space: nowrap;
   }
 
   .title-white { color: #fff; }
@@ -344,12 +391,12 @@ import ButtonCTA from './ButtonCTA.astro';
     font-size: clamp(15px, 1.8vw, 18px);
     color: #B2B3B3;
     max-width: 480px;
-    margin: 0 0 36px;
+    margin: 0 0 20px;
     line-height: 1.68;
   }
 
   @media (max-width: 960px) {
-    .hero-tagline { margin: 0 auto 36px; }
+    .hero-tagline { margin: 0 auto 20px; }
   }
 
   /* Speed badge */
@@ -365,7 +412,7 @@ import ButtonCTA from './ButtonCTA.astro';
     font-size: 13px;
     font-weight: 600;
     color: #ff6b70;
-    margin-bottom: 28px;
+    margin-bottom: 16px;
     animation: speedPulse 2.8s ease-in-out infinite;
   }
 
@@ -396,6 +443,18 @@ import ButtonCTA from './ButtonCTA.astro';
 
   @media (max-width: 960px) {
     .hero-ctas { justify-content: center; }
+  }
+
+  @media (max-width: 600px) {
+    .hero-ctas {
+      flex-direction: column;
+      align-items: center;
+    }
+    .hero-ctas .cta-ghost {
+      justify-content: center;
+      width: 100%;
+      max-width: 320px;
+    }
   }
 
   .cta-ghost {
@@ -450,6 +509,11 @@ import ButtonCTA from './ButtonCTA.astro';
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  @media (max-width: 960px) {
+    .store-buttons { justify-content: center; }
   }
 
   @keyframes badgeBeam {
@@ -538,189 +602,81 @@ import ButtonCTA from './ButtonCTA.astro';
   }
 
   /* ────────────────────────────────────────────
-     RIGHT column — ABANICO de billetes
+     STATS STRIP dentro del hero
   ──────────────────────────────────────────── */
-  .hero-visual {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 0 60px;
-  }
-
-  @media (max-width: 960px) {
-    .hero-visual {
-      padding: 0 0 20px;
-      order: 2; /* siempre debajo del contenido en mobile */
-    }
-  }
-
-  /* Contenedor del abanico — punto de pivote en el centro-inferior */
-  .abanico {
+  .hero-stats-strip {
     position: relative;
-    width: clamp(300px, 46vw, 540px);
-    height: clamp(180px, 28vw, 320px);
-    animation: fanFloat 6s ease-in-out infinite;
-    animation-delay: 1.2s;
+    z-index: 3;
+    width: 100%;
+    max-width: 1280px;
+    margin-top: 44px;
+    padding: 20px 32px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(224,159,60,0.12);
+    border-radius: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
   }
 
-  @keyframes fanFloat {
-    0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(-12px); }
-  }
-
-  /* ── Billete base ── */
-  .billete {
-    position: absolute;
-    width: clamp(170px, 28vw, 310px);
-    height: clamp(85px, 14vw, 155px);
-    border-radius: 8px;
-    bottom: 20px;
-    /* Centrar horizontalmente: left 50% - mitad del ancho */
-    left: calc(50% - clamp(85px, 14vw, 155px));
-    transform-origin: center bottom;
-    transform: rotate(var(--b-rot, 0deg));
-    animation: billFanIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--b-delay, 0s) both;
-    overflow: hidden;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.6),
-      0 2px 8px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-
-  @keyframes billFanIn {
-    from {
-      transform: rotate(0deg);
-      opacity: 0;
+  @media (max-width: 600px) {
+    .hero-stats-strip {
+      grid-template-columns: 1fr 1fr;
+      padding: 16px;
     }
-    to {
-      transform: rotate(var(--b-rot, 0deg));
-      opacity: 1;
-    }
+    .hstat-sep { display: none; }
+    .hstat:nth-child(1),
+    .hstat:nth-child(3) { border-right: 1px solid rgba(224,159,60,0.1); }
+    .hstat:nth-child(1),
+    .hstat:nth-child(2) { border-bottom: 1px solid rgba(224,159,60,0.1); }
   }
 
-  /* Colores inspirados en billetes peruanos */
-  .billete-1 { background: linear-gradient(145deg, #3E0C0C 0%, #6A1A1A 60%, #3E0C0C 100%); z-index: 1; }  /* S/. 200 — vino */
-  .billete-2 { background: linear-gradient(145deg, #08263C 0%, #0C4468 60%, #08263C 100%); z-index: 2; }  /* S/. 50  — azul */
-  .billete-3 { background: linear-gradient(145deg, #0A2F18 0%, #145C2A 60%, #0A2F18 100%); z-index: 3; }  /* S/. 100 — verde */
-  .billete-4 { background: linear-gradient(145deg, #3A1500 0%, #6B2A00 60%, #3A1500 100%); z-index: 4; }  /* S/. 20  — naranja */
-  .billete-5 { background: linear-gradient(145deg, #0A2F18 0%, #145C2A 60%, #0A2F18 100%); z-index: 5; }  /* S/. 100 — verde */
-  .billete-6 { background: linear-gradient(145deg, #3E0C0C 0%, #6A1A1A 60%, #3E0C0C 100%); z-index: 6; }  /* S/. 200 — vino */
-
-  /* Patrón de seguridad (líneas diagonales) */
-  .b-security {
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      -50deg,
-      transparent,
-      transparent 5px,
-      rgba(255,255,255,0.018) 5px,
-      rgba(255,255,255,0.018) 6px
-    );
-    pointer-events: none;
-  }
-
-  /* Número fantasma de fondo (watermark) */
-  .b-watermark {
-    position: absolute;
-    right: 6px;
-    bottom: -8px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(60px, 9vw, 110px);
-    line-height: 1;
-    color: rgba(255,255,255,0.04);
-    user-select: none;
-    pointer-events: none;
-    letter-spacing: -0.02em;
-  }
-
-  /* Contenido central del billete */
-  .b-body {
-    position: absolute;
-    top: 50%;
-    left: clamp(12px, 1.8vw, 22px);
-    transform: translateY(-50%);
+  .hstat {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    padding: 8px 16px;
   }
 
-  .b-top {
+  @media (max-width: 600px) {
+    .hstat { padding: 14px 8px; }
+  }
+
+  .hstat-sep {
+    width: 1px;
+    height: 40px;
+    background: rgba(224,159,60,0.15);
+    margin: 0 4px;
+  }
+
+  .hstat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(26px, 3.5vw, 38px);
+    line-height: 1;
+    color: #E09F3C;
+    letter-spacing: 0.01em;
     display: flex;
     align-items: baseline;
-    gap: 3px;
+    gap: 1px;
   }
 
-  .b-currency {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(13px, 2vw, 22px);
-    color: rgba(224,159,60,0.85);
+  .hstat-sup {
+    font-size: 0.55em;
     line-height: 1;
+    vertical-align: super;
   }
 
-  .b-amount {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(28px, 5vw, 58px);
-    color: #E09F3C;
-    line-height: 1;
-    letter-spacing: -0.01em;
-    text-shadow:
-      0 0 14px rgba(224,159,60,0.55),
-      0 0 32px rgba(224,159,60,0.25);
-  }
+  .hstat-lt  { font-size: 0.72em; }
+  .hstat-red { color: #ED323A; }
 
-  .b-label {
+  .hstat-lbl {
     font-family: 'Sora', sans-serif;
-    font-size: clamp(5px, 0.7vw, 9px);
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(224,159,60,0.4);
-  }
-
-  /* Banda de seguridad vertical (como los billetes reales) */
-  .b-strip {
-    position: absolute;
-    right: clamp(22px, 4vw, 48px);
-    top: 12%;
-    bottom: 12%;
-    width: 3px;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(224,159,60,0.55) 20%,
-      rgba(255,220,100,0.8) 50%,
-      rgba(224,159,60,0.55) 80%,
-      transparent 100%
-    );
-    border-radius: 2px;
-    pointer-events: none;
-  }
-
-  /* Borde interior decorativo */
-  .b-border {
-    position: absolute;
-    inset: 5px;
-    border: 1px solid rgba(224,159,60,0.16);
-    border-radius: 4px;
-    pointer-events: none;
-  }
-
-  /* Glow debajo del abanico */
-  .abanico-glow {
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%;
-    height: 60px;
-    background: radial-gradient(
-      ellipse at center bottom,
-      rgba(224,159,60,0.22) 0%,
-      transparent 70%
-    );
-    pointer-events: none;
-    z-index: 0;
+    font-size: clamp(11px, 1.1vw, 13px);
+    font-weight: 500;
+    color: rgba(178,179,179,0.7);
+    white-space: nowrap;
   }
 
   /* ────────────────────────────────────────────
@@ -731,7 +687,7 @@ import ButtonCTA from './ButtonCTA.astro';
     bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1;
+    z-index: 3;
   }
 
   .scroll-line {
@@ -747,25 +703,9 @@ import ButtonCTA from './ButtonCTA.astro';
     100% { opacity: 0; transform: scaleY(0.3) translateY(100%); }
   }
 
-  /* ────────────────────────────────────────────
-     Responsive
-  ──────────────────────────────────────────── */
   @media (max-width: 480px) {
     .trust-sep        { display: none; }
     .hero-trust       { flex-direction: column; gap: 8px; }
     .scroll-indicator { display: none; }
-
-    .billete {
-      width: 150px;
-      height: 75px;
-      left: calc(50% - 75px);
-    }
-
-    .abanico {
-      width: 280px;
-      height: 160px;
-    }
-
-    .b-watermark { font-size: 56px; }
   }
 </style>
