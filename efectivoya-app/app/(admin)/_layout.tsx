@@ -30,12 +30,12 @@ export default function AdminRootLayout() {
   useEffect(() => {
     if (!isInitialized) return;
 
-    const isLoginPage = segments[segments.length - 1] === 'login';
+    const isLoginPage = segments[segments.length - 1] === 'signin';
 
     if (isAuthenticated && isLoginPage) {
       router.replace('/(admin)');
     } else if (!isAuthenticated && !isLoginPage) {
-      router.replace('/(admin)/login');
+      router.replace('/(admin)/signin' as any);
     }
   }, [isAuthenticated, isInitialized, segments, router]);
 
@@ -43,7 +43,7 @@ export default function AdminRootLayout() {
     return <LoadingScreen />;
   }
 
-  const isLoginPage = segments[segments.length - 1] === 'login';
+  const isLoginPage = segments[segments.length - 1] === 'signin';
 
   if (isLoginPage || !isAuthenticated) {
     return (
