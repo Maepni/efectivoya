@@ -1,15 +1,15 @@
 ---
-// ← Editar con la información real del local
 const LOCAL = {
   nombre: 'EfectivoYa',
-  direccion: 'Av. [Nombre de la Avenida] [Número]',
-  referencia: 'Frente a [referencia conocida]',
-  distrito: '[Distrito]',
-  ciudad: 'Lima, Perú',
-  horario: 'Lun – Sáb  /  9:00 – 18:00',
-  mapsUrl: 'https://maps.google.com/?q=EfectivoYa+Lima', // ← reemplazar con link real
-  foto: '/local.jpg', // ← colocar foto real en efectivoya-landing/public/local.jpg
-  fotoAlt: 'Local de EfectivoYa',
+  direccion: 'Av. Mariscal Castilla N° 1736',
+  referencia: 'A 1/2 cuadra de los bancos, entre Jr. Manzanos y Jr. Aguirre Morales',
+  distrito: 'El Tambo',
+  ciudad: 'Huancayo, Junín',
+  horarioSemana: 'Lunes a viernes: 9:00 a 18:00',
+  horarioSabado: 'Sábados: 9:00 a 15:00',
+  mapsUrl: 'https://maps.app.goo.gl/k1MLNfaNekEjBKw99',
+  foto: '/local.jpg',
+  fotoAlt: 'Local de EfectivoYa en Av. Mariscal Castilla, El Tambo, Huancayo',
 };
 ---
 
@@ -50,10 +50,8 @@ const LOCAL = {
             </span>
             <div>
               <span class="detail-main">{LOCAL.direccion}</span>
-              {LOCAL.referencia && (
-                <span class="detail-sub">{LOCAL.referencia}</span>
-              )}
-              <span class="detail-sub">{LOCAL.distrito} · {LOCAL.ciudad}</span>
+              <span class="detail-sub">{LOCAL.referencia}</span>
+              <span class="detail-sub detail-zona">{LOCAL.distrito}&nbsp;·&nbsp;{LOCAL.ciudad}</span>
             </div>
           </li>
 
@@ -66,7 +64,8 @@ const LOCAL = {
             </span>
             <div>
               <span class="detail-main">Horario de atención</span>
-              <span class="detail-sub">{LOCAL.horario}</span>
+              <span class="detail-sub">{LOCAL.horarioSemana}</span>
+              <span class="detail-sub">{LOCAL.horarioSabado}</span>
             </div>
           </li>
         </ul>
@@ -76,7 +75,7 @@ const LOCAL = {
           target="_blank"
           rel="noopener noreferrer"
           class="maps-btn"
-          aria-label="Ver ubicación en Google Maps"
+          aria-label={`Ver ubicación de EfectivoYa en ${LOCAL.direccion}, ${LOCAL.distrito}, en Google Maps`}
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 1.5C5.52 1.5 3.5 3.52 3.5 6c0 3.5 4.5 8.5 4.5 8.5s4.5-5 4.5-8.5c0-2.48-2.02-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -161,7 +160,7 @@ const LOCAL = {
 
   .ubicacion-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(36px, 6vw, 64px);
+    font-size: clamp(34px, 7vw, 64px);
     color: #fff;
     line-height: 1;
     margin-bottom: 36px;
@@ -176,7 +175,7 @@ const LOCAL = {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 28px;
     margin-bottom: 36px;
   }
 
@@ -190,6 +189,7 @@ const LOCAL = {
     flex-shrink: 0;
     width: 36px;
     height: 36px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -201,27 +201,34 @@ const LOCAL = {
   .detail-main {
     display: block;
     font-family: 'Sora', sans-serif;
-    font-size: 16px;
+    font-size: clamp(15px, 2.5vw, 16px);
     font-weight: 600;
     color: #fff;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
   .detail-sub {
     display: block;
     font-family: 'Sora', sans-serif;
-    font-size: 13px;
+    font-size: clamp(13px, 2.2vw, 14px);
     font-weight: 400;
     color: #B2B3B3;
-    line-height: 1.5;
+    line-height: 1.6;
+  }
+
+  .detail-zona {
+    margin-top: 4px;
+    color: rgba(178,179,179,0.7);
   }
 
   /* ── Maps button ── */
   .maps-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 14px 24px;
+    min-height: 44px;
     background: transparent;
     border: 1.5px solid #ED323A;
     border-radius: 8px;
@@ -231,7 +238,15 @@ const LOCAL = {
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s ease;
-    align-self: flex-start;
+    /* Mobile: ancho completo */
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    .maps-btn {
+      width: auto;
+      align-self: flex-start;
+    }
   }
 
   .maps-btn:hover {
