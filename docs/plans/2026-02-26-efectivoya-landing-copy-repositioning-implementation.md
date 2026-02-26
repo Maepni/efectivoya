@@ -10,6 +10,49 @@
 
 ---
 
+## Context Pack para ejecutar en nueva sesión (sin depender de este chat)
+
+### A. Resultado esperado de negocio
+
+- Mensaje dominante de toda la landing: `en efectivo al instante`.
+- Propuesta central: efectivizar saldo de tarjeta de crédito.
+- Bloque operativo real: dirección, referencia, horarios y Google Maps de Huancayo.
+
+### B. Archivos obligatorios del cambio
+
+- `efectivoya-landing/src/pages/index.astro`
+- `efectivoya-landing/src/components/Hero.astro`
+- `efectivoya-landing/src/components/Services.astro`
+- `efectivoya-landing/src/components/HowItWorks.astro`
+- `efectivoya-landing/src/components/FAQ.astro`
+- `efectivoya-landing/src/components/Ubicacion.astro`
+
+### C. Reglas editoriales no negociables
+
+- Usar `tarjeta de crédito`, `efectivo al instante`, `validación`, `atención personalizada`.
+- Corregir `boucher` -> `voucher`.
+- Evitar framing de "billetera digital generalista" cuando opaque el servicio principal.
+- Mantener ortografía consistente con `Jr.`, `N°`, tildes.
+
+### D. Datos reales de ubicación (fuente de verdad)
+
+- Dirección: `Av Mariscal Castilla N° 1736`
+- Referencia: `A 1/2 cuadra de los bancos, entre Jr. Manzanos y Jr. Aguirre Morales`
+- Zona: `El Tambo · Huancayo · Junín`
+- Horarios:
+  - `Lunes a viernes: 9:00 a 18:00`
+  - `Sábados: 9:00 a 15:00`
+- Maps: `https://maps.app.goo.gl/k1MLNfaNekEjBKw99`
+
+### E. Target UX responsive mínimo (Ubicacion)
+
+- `<768px`: botón Maps full-width, sin overflow horizontal, lectura rápida.
+- `>=768px`: grilla 2 columnas balanceada, sin romper jerarquía.
+- Touch target mínimo: 44px en CTA y elementos interactivos.
+- Contraste legible en textos secundarios sobre fondo oscuro.
+
+---
+
 ### Task 1: Baseline y guardrails de copy
 
 **Files:**
@@ -31,13 +74,6 @@ Aplicar como regla en edición:
 - Frase ancla: `en efectivo al instante`
 - Términos obligatorios: `tarjeta de crédito`, `voucher`, `validación`, `atención personalizada`
 
-**Step 3: Commit**
-
-```bash
-git add docs/plans/2026-02-26-efectivoya-landing-copy-repositioning-implementation.md
-git commit -m "docs: add implementation plan for landing copy repositioning"
-```
-
 ### Task 2: Actualizar metadata SEO al nuevo posicionamiento
 
 **Files:**
@@ -53,6 +89,9 @@ Expected: match presente.
 Actualizar `title` y `description` para reflejar servicio principal:
 - Título centrado en efectivizar saldo de tarjeta de crédito en efectivo.
 - Descripción con propuesta concreta y ubicación Huancayo.
+- Referencia sugerida:
+  - `title`: `EfectivoYa — Convierte tu tarjeta de crédito en efectivo al instante | Huancayo`
+  - `description`: `Efectiviza el saldo de tu tarjeta de crédito en efectivo al instante con atención personalizada en Huancayo. Dirección y horarios oficiales en esta página.`
 
 **Step 3: Verificar reemplazo**
 
@@ -84,6 +123,7 @@ Cambio de textos:
 - Badge de velocidad: `En efectivo al instante`
 - CTA principal: `Efectivizar ahora`
 - CTA secundario: `Ver cómo funciona`
+- Nota UX: mantener longitud de tagline en 2-3 líneas en móvil (evitar párrafos extensos).
 
 **Step 3: Verificar copy nuevo**
 
@@ -116,6 +156,11 @@ Cards objetivo:
 - Transparencia total
 
 Actualizar intro para evitar framing de billetera genérica.
+- Copys sugeridos:
+  - `Efectivización inmediata`: `Procesamos tu operación con validación rápida para que recibas tu dinero sin esperas largas.`
+  - `Atención personalizada`: `Te guiamos paso a paso durante todo el proceso, por chat o en atención presencial.`
+  - `Seguridad en cada operación`: `Validación de datos y control de transacciones para proteger tu información.`
+  - `Transparencia total`: `Antes de confirmar, conoces claramente las condiciones de tu operación.`
 
 **Step 3: Validar reemplazo**
 
@@ -147,6 +192,7 @@ Pasos:
 3. Recibe tu efectivo al instante
 
 Actualizar subtítulo para coherencia del flujo.
+- Subtítulo sugerido: `Tres pasos claros para recibir efectivo al instante.`
 
 **Step 3: Verificar pasos nuevos**
 
@@ -180,6 +226,12 @@ Preguntas objetivo:
 - ¿Cuál es el horario de atención?
 
 Respuestas cortas, claras y sin ambigüedad comercial.
+- Respuestas sugeridas:
+  - Servicio: explicar que efectiviza saldo de tarjeta de crédito en efectivo.
+  - Tiempo: operación rápida sujeta a validación.
+  - Requisitos: documento de identidad + validación solicitada por el canal.
+  - Seguridad: controles y confirmación de datos antes de ejecutar.
+  - Horario: L-V 9:00-18:00 y sábados 9:00-15:00.
 
 **Step 3: Verificar FAQ nueva**
 
@@ -212,6 +264,7 @@ Valores:
 - `ciudad`: `Huancayo, Junín`
 - `horario`: separar en 2 líneas (L-V / Sábado)
 - `mapsUrl`: `https://maps.app.goo.gl/k1MLNfaNekEjBKw99`
+- Texto de ciudad recomendado en UI: `El Tambo · Huancayo · Junín`
 
 **Step 3: Ajuste responsive y accesibilidad**
 
@@ -220,6 +273,12 @@ Valores:
 - Separación vertical mayor entre líneas de dirección/referencia/ciudad.
 - `aria-label` del botón con dirección real.
 - `fotoAlt` descriptivo del local en El Tambo.
+- Reglas CSS sugeridas:
+  - título: `font-size: clamp(34px, 7vw, 64px);`
+  - detalle principal: `font-size: clamp(15px, 2.5vw, 16px);`
+  - detalle secundario: `font-size: clamp(13px, 2.2vw, 14px);`
+  - maps móvil: `width: 100%; min-height: 44px; justify-content: center;`
+  - maps desktop (`min-width: 768px`): `width: auto;`
 
 **Step 4: Verificar reemplazo**
 
@@ -252,6 +311,7 @@ Expected: posibles matches.
 - Reemplazar `boucher` por `voucher`.
 - Evitar claims genéricos de billetera cuando compitan con el mensaje principal.
 - Mantener acentos y abreviaturas estándar (`Jr.`, `N°`).
+- Confirmar que no quede copy contradictorio en `index.astro` (title/description).
 
 **Step 3: Verificar limpieza**
 
@@ -286,12 +346,26 @@ Checklist:
 - Ubicacion muestra dirección, referencia, horarios y Maps correctos.
 - Móvil (375px): botón Maps usable, sin overflow horizontal.
 - Tablet (768px) y desktop (1024px+): jerarquía y espaciado correctos.
+- Validaciones extra:
+  - No quedan referencias a `boucher`.
+  - No quedan claims de "billetera digital" que contradigan el posicionamiento principal.
+  - El botón de Maps abre `maps.app.goo.gl/k1MLNfaNekEjBKw99`.
 
-**Step 3: Estado final y commit de cierre**
+**Step 3: Captura de evidencias de verificación**
+
+Run:
+- `cd efectivoya-landing && npm run build`
+- `rg -n "boucher|Boucher" src/components -S`
+- `rg -n "Mariscal Castilla|Aguirre Morales|9:00 a 18:00|9:00 a 15:00|maps.app.goo.gl" src/components/Ubicacion.astro -S`
+Expected:
+- Build OK.
+- Sin matches de `boucher`.
+- Datos reales presentes en Ubicacion.
+
+**Step 4: Estado final y commit de cierre**
 
 ```bash
 git status
 git add efectivoya-landing/src/pages/index.astro efectivoya-landing/src/components/Hero.astro efectivoya-landing/src/components/Services.astro efectivoya-landing/src/components/HowItWorks.astro efectivoya-landing/src/components/FAQ.astro efectivoya-landing/src/components/Ubicacion.astro
 git commit -m "feat: reposition landing message to instant card cash-out service"
 ```
-
