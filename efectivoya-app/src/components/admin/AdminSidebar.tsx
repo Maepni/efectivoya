@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: Layout.fontSize.xl,
     fontWeight: 'bold',
-    color: Colors.white,
+    color: '#ffffff',
   },
   logoAccent: {
     color: Colors.primary,

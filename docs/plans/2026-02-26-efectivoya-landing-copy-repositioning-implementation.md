@@ -1,7 +1,5 @@
 # Efectivoya Landing Copy Repositioning Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-
 **Goal:** Reposicionar la landing de EfectivoYa para comunicar con claridad "en efectivo al instante", actualizar ubicación/horarios reales y mejorar la legibilidad responsive de la sección Ubicación.
 
 **Architecture:** Se mantiene la arquitectura actual de Astro por componentes, haciendo cambios editoriales y de estilos en componentes existentes sin rediseño estructural. El flujo de mensaje se refuerza de arriba hacia abajo: Hero (propuesta de valor), HowItWorks (proceso), Services (beneficios), FAQ (objeciones) y Ubicación (confianza operativa). La validación será por build de Astro y checklist manual responsive.
